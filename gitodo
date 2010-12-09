@@ -1,0 +1,118 @@
+#!/bin/bash
+
+itemsdir=items
+
+shopt -s nullglob
+shopt -s dotglob
+
+list_items()
+{
+	for i in "$itemsdir"/*
+	do
+		# Read priority and/or date.
+		prio=$(sed -rn '1,5s/^prio: ?//p' "$i")
+		when=$(sed -rn '1,5s/^when: ?//p' "$i")
+		whennorm=$(date -d "$when" '+%F %T')
+
+		spaces=${when//[^ ]/}
+		spaces=${#spaces}
+		colons=${when//[^:]/}
+		colons=${#colons}
+
+		case $spaces in
+			0)
+				if (( colons > 0 ))
+				then
+					# Only time.
+					timetype=0
+				else
+					# Only date.
+					timetype=1
+				fi
+				;;
+			1)
+				# Date and time.
+				timetype=2
+				;;
+		esac
+
+		if [[ "$when" == "" ]]
+		then
+			# No date or time.
+			timetype=3
+		fi
+
+		(echo -e "$prio\n$whennorm\n$timetype\n$i") | tr '\n' ' '
+		echo
+	done | sort -k1n -k2n -k3n |
+	while read -r prio day time timetype file
+	do
+		# Pretty printing.
+
+		if (( prio < -5 ))
+		then
+			tput bold
+			tput setaf 1
+		elif (( prio < 0 ))
+		then
+			tput setaf 1
+		elif (( prio > 5 ))
+		then
+			tput setaf 4
+		elif (( prio > 0 ))
+		then
+			tput setaf 2
+		fi
+		printf '[%3s] ' "$prio"
+
+		case $timetype in
+			0) echo -n "[           $time]" ;;
+			1) echo -n "[$day         ]" ;;
+			2) echo -n "[$day $time]" ;;
+			3) echo -n "[                   ]" ;;
+		esac
+
+		filename=$(basename "$file")
+		filename=${filename##*0}
+		printf ' [%4d]: ' "$filename"
+
+		echo "$(sed -rn '1,5s/^subject: ?//p' "$file")"
+		tput sgr0
+	done
+}
+
+new_item()
+{
+	existing=("$itemsdir"/*)
+	if (( "${#existing[@]}" == 0 ))
+	then
+		next=1
+	else
+		last=${existing[$((${#existing[@]} - 1))]}
+		last=${last##*0}
+		next=$((last + 1))
+	fi
+	next=$(printf '%04d' $next)
+
+	$EDITOR "$itemsdir/$next"
+}
+
+show_item()
+{
+	item=${1##*0}
+	item=$(printf '%04d' $item)
+
+	cat "$itemsdir/$item"
+}
+
+case "$1" in
+	--show|-show|show|--s|-s|s)
+		show_item "$2"
+		;;
+	--new|-new|new|--n|-n|n)
+		new_item
+		;;
+	*)
+		list_items
+		;;
+esac
