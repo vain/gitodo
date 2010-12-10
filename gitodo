@@ -146,7 +146,7 @@ pullall()
 
 complete_id()
 {
-	item=${1##*0}
+	item=$(echo "$1" | sed 's/^0\+//')
 	item=$(printf '%04d' $item)
 	echo "$itemsdir/i$item"
 }
