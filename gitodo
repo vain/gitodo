@@ -107,20 +107,22 @@ new_item()
 	$EDITOR "$itemsdir/$next"
 }
 
-show_item()
+complete_id()
 {
 	item=${1##*0}
 	item=$(printf '%04d' $item)
-
-	$EDITOR "$itemsdir/$item"
+	echo "$itemsdir/$item"
 }
 
 case "$1" in
 	--show|-show|show|--s|-s|s)
-		show_item "$2"
+		$EDITOR "$(complete_id "$2")"
 		;;
 	--new|-new|new|--n|-n|n)
 		new_item
+		;;
+	--delete|-delete|delete|--d|-d|d)
+		rm -v "$(complete_id "$2")"
 		;;
 	*)
 		list_items
