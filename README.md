@@ -31,6 +31,9 @@ Note the order: Items with a higher importance come first. If two items
 have the same importance, they're sorted by their deadline. Deadlines
 can be a date, a time (meaning "today") or both.
 
+If the deadline for a task has already passed, it's marked with a `[!]`
+at the beginning of the line.
+
 Items are simple text files. They look like this:
 
 	what: Subject of the task.
