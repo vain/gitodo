@@ -18,7 +18,7 @@ cd "$(dirname "$(readlink -e "$0")")"
 
 __tput()
 {
-	if which tput >/dev/null 2>&1
+	if which tput >/dev/null 2>&1 && [[ -t 1 ]]
 	then
 		tput "$@"
 	fi
