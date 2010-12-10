@@ -14,6 +14,8 @@ itemsdir=items
 shopt -s nullglob
 shopt -u dotglob
 
+cd "$(dirname "$(readlink -e "$0")")"
+
 __tput()
 {
 	if which tput >/dev/null 2>&1
@@ -130,15 +132,37 @@ complete_id()
 	echo "$itemsdir/$item"
 }
 
+checkrepo()
+{
+	(
+		cd "$itemsdir"
+		[[ -d .git ]] || git init
+	)
+}
+
+commit()
+{
+	(
+		cd "$itemsdir"
+		git add .
+		git commit -a -m "Auto-commit $HOSTNAME."
+	)
+}
+
+checkrepo
+
 case "$1" in
 	--show|-show|show|--s|-s|s)
 		$EDITOR "$(complete_id "$2")"
+		commit
 		;;
 	--new|-new|new|--n|-n|n)
 		new_item
+		commit
 		;;
 	--delete|-delete|delete|--d|-d|d)
 		rm -v "$(complete_id "$2")"
+		commit
 		;;
 	*)
 		list_items
