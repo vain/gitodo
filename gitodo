@@ -117,7 +117,7 @@ new_item()
 		next=1
 	else
 		last=${existing[$((${#existing[@]} - 1))]}
-		last=${last##*0}
+		last=$(echo "$last" | sed 's/^[^0-9]\+// ; s/^0\+//')
 		next=$((last + 1))
 	fi
 	next=$(printf '%04d' $next)
