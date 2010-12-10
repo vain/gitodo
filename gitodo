@@ -180,7 +180,11 @@ case "$1" in
 		commit
 		;;
 	--delete|-delete|delete|--d|-d|d)
-		rm -v "$(complete_id "$2")"
+		shift
+		for i
+		do
+			rm -v "$(complete_id "$i")"
+		done
 		commit
 		;;
 	--log|-log|log|--l|-l|l)
