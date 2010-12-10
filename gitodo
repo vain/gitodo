@@ -100,8 +100,7 @@ list_items()
 			3) echo -n "[                   ]" ;;
 		esac
 
-		filename=$(basename "$file")
-		filename=${filename##*0}
+		filename=$(echo "$file" | sed 's/^[^0-9]\+// ; s/^0\+//')
 		printf ' [%4d]: ' "$filename"
 
 		sed -rn '1,5s/^(subject|what): ?//p' "$file" | sed -n '1p;q'
