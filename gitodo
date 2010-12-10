@@ -12,7 +12,7 @@ EDITOR=${EDITOR:-vim}
 itemsdir=items
 
 shopt -s nullglob
-shopt -s dotglob
+shopt -u dotglob
 
 __tput()
 {
