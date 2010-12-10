@@ -125,6 +125,26 @@ new_item()
 	$EDITOR "$itemsdir/i$next"
 }
 
+pullall()
+{
+	(
+		cd "$itemsdir"
+		pwdabs=$(readlink -e .)
+		while read -r host path
+		do
+			if [[ "$host" != "$HOSTNAME" ]]
+			then
+				# Pull from another machine on the net.
+				git pull "ssh://$host$path" master
+			elif [[ "$path" != "$pwdabs" ]]
+			then
+				# Pull locally.
+				git pull "$path" master
+			fi
+		done < remotes
+	)
+}
+
 complete_id()
 {
 	item=${1##*0}
@@ -167,6 +187,9 @@ case "$1" in
 	--log|-log|log|--l|-l|l)
 		cd "$itemsdir"
 		git log --oneline --decorate --graph
+		;;
+	--pull|-pull|pull|--p|-p|p)
+		pullall
 		;;
 	*)
 		list_items
