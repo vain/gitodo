@@ -160,6 +160,7 @@ complete_id()
 checkrepo()
 {
 	(
+		mkdir -p "$itemsdir"
 		cd "$itemsdir"
 		[[ -d .git ]] || git init
 	)
