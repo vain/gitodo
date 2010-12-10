@@ -204,6 +204,19 @@ case "$1" in
 	--pull|-pull|pull|--p|-p|p)
 		pullall
 		;;
+	--help|-help|help|--h|-h|h)
+		cat <<EOM
+Usage: $(basename "$0") [options]...
+
+  -s, --show id [id...]      Edit all given IDs using \$EDITOR.
+  -n, --new                  Add a new task. You'll be put in your
+                             \$EDITOR to do so.
+  -d, --delete id [id...]    Delete all given IDs.
+  -l, --log                  Show log of the items repository.
+  -p, --pull                 Pull from all configured remotes.
+  -h, --help                 Show this help page.
+EOM
+		;;
 	*)
 		list_items
 		;;
