@@ -172,7 +172,11 @@ checkrepo
 
 case "$1" in
 	--show|-show|show|--s|-s|s)
-		$EDITOR "$(complete_id "$2")"
+		shift
+		for i
+		do
+			$EDITOR "$(complete_id "$i")"
+		done
 		commit
 		;;
 	--new|-new|new|--n|-n|n)
