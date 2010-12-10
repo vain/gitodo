@@ -26,7 +26,7 @@ __tput()
 
 list_items()
 {
-	for i in "$itemsdir"/*
+	for i in "$itemsdir"/i*
 	do
 		# Read priority and/or date.
 		prio=$(sed -rn '1,5s/^prio: ?//p' "$i" | sed -n '1p;q')
@@ -111,7 +111,7 @@ list_items()
 
 new_item()
 {
-	existing=("$itemsdir"/*)
+	existing=("$itemsdir"/i*)
 	if (( "${#existing[@]}" == 0 ))
 	then
 		next=1
@@ -122,14 +122,14 @@ new_item()
 	fi
 	next=$(printf '%04d' $next)
 
-	$EDITOR "$itemsdir/$next"
+	$EDITOR "$itemsdir/i$next"
 }
 
 complete_id()
 {
 	item=${1##*0}
 	item=$(printf '%04d' $item)
-	echo "$itemsdir/$item"
+	echo "$itemsdir/i$item"
 }
 
 checkrepo()
