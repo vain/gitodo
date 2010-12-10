@@ -26,6 +26,11 @@ __tput()
 
 list_items()
 {
+	__tput bold
+	echo 'Old Prio        Deadline          ID    Subject'
+	echo '--- ----- --------------------- ------  -------'
+	__tput sgr0
+
 	for i in "$itemsdir"/i*
 	do
 		# Read priority and/or date.
