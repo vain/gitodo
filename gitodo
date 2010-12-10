@@ -60,8 +60,7 @@ list_items()
 			timetype=3
 		fi
 
-		(echo -e "$prio\n$whennorm\n$timetype\n$i") | tr '\n' ' '
-		echo
+		echo "$prio $whennorm $timetype $i"
 	done | sort -k1n -k2n -k3n |
 	while read -r prio day time timetype file
 	do
