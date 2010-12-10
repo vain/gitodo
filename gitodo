@@ -5,6 +5,14 @@ itemsdir=items
 shopt -s nullglob
 shopt -s dotglob
 
+__tput()
+{
+	if which tput >/dev/null 2>&1
+	then
+		tput "$@"
+	fi
+}
+
 list_items()
 {
 	for i in "$itemsdir"/*
@@ -51,17 +59,17 @@ list_items()
 
 		if (( prio < -5 ))
 		then
-			tput bold
-			tput setaf 1
+			__tput bold
+			__tput setaf 1
 		elif (( prio < 0 ))
 		then
-			tput setaf 1
+			__tput setaf 1
 		elif (( prio > 5 ))
 		then
-			tput setaf 4
+			__tput setaf 4
 		elif (( prio > 0 ))
 		then
-			tput setaf 2
+			__tput setaf 2
 		fi
 		printf '[%3s] ' "$prio"
 
@@ -77,7 +85,7 @@ list_items()
 		printf ' [%4d]: ' "$filename"
 
 		echo "$(sed -rn '1,5s/^subject: ?//p' "$file")"
-		tput sgr0
+		__tput sgr0
 	done
 }
 
