@@ -86,7 +86,7 @@ list_items()
 		filename=${filename##*0}
 		printf ' [%4d]: ' "$filename"
 
-		echo "$(sed -rn '1,5s/^(subject|what): ?//p' "$file")"
+		sed -rn '1,5s/^(subject|what): ?//p' "$file"
 		__tput sgr0
 	done
 }
