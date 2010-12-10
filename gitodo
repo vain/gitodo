@@ -60,6 +60,7 @@ list_items()
 		then
 			# No date or time.
 			timetype=3
+			whennorm="2038-01-01 00:00:00"
 		fi
 
 		echo "$prio $whennorm $timetype $i"
