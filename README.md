@@ -77,6 +77,25 @@ Doing a `gitodo --pull` will pull the current task items from all your
 remotes.
 
 
+Setup
+-----
+
+First, clone the code repository:
+
+	$ cd ~/git
+	$ git clone git://github.com/vain/gitodo.git
+
+If you already have an existing repository for your task items, clone
+that one as well:
+
+	$ cd ~/git/gitodo
+	$ git clone ssh://.../gitodo/items
+
+Note: Currently, the path "items" is hardcoded and *must* be located in
+the code repository. I know, that's nasty for distributors, but it's a
+lot easier for *me*. ;-)
+
+
 Portability
 -----------
 
