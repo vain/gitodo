@@ -59,6 +59,15 @@ list_items()
 	do
 		# Pretty printing.
 
+		stampnow=$(date '+%s')
+		stampitem=$(date -d "$day $time" '+%s')
+		if (( timetype != 3 )) && (( stampnow - stampitem > 0 ))
+		then
+			echo -n '[!] '
+		else
+			echo -n '    '
+		fi
+
 		if (( prio < -5 ))
 		then
 			__tput bold
