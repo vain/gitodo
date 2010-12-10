@@ -112,7 +112,7 @@ show_item()
 	item=${1##*0}
 	item=$(printf '%04d' $item)
 
-	cat "$itemsdir/$item"
+	$EDITOR "$itemsdir/$item"
 }
 
 case "$1" in
