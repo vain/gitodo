@@ -164,6 +164,10 @@ case "$1" in
 		rm -v "$(complete_id "$2")"
 		commit
 		;;
+	--log|-log|log|--l|-l|l)
+		cd "$itemsdir"
+		git log --oneline --decorate --graph
+		;;
 	*)
 		list_items
 		;;
