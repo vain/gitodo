@@ -20,6 +20,7 @@ list_items()
 	do
 		# Read priority and/or date.
 		prio=$(sed -rn '1,5s/^prio: ?//p' "$i")
+		prio=${prio:-0}
 		when=$(sed -rn '1,5s/^when: ?//p' "$i")
 		whennorm=$(date -d "$when" '+%F %T')
 
