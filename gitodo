@@ -221,6 +221,22 @@ case "$1" in
 		shift
 		git log --oneline --decorate --graph "$@"
 		;;
+	--cron|-cron|cron|--c|-c|c)
+		out=$(list_items)
+		if [[ "$(echo "$out" | tail -n +3 | grep '^[^ ]')" != "" ]]
+		then
+			echo "OUTDATED TASKS:"
+			echo "==============="
+			echo
+			echo "$out" | grep '^[^ \*]' | sed 's/^/    /'
+			echo
+			echo
+			echo "DEADLINE CLOSE:"
+			echo "==============="
+			echo
+			echo "$out" | grep '^[^ !]' | sed 's/^/    /'
+		fi
+		;;
 	--help|-help|help|--h|-h|h)
 		cat <<EOM
 Usage: $(basename "$0") [options]...
@@ -231,6 +247,8 @@ Usage: $(basename "$0") [options]...
   -d, --delete id [id...]    Delete all given IDs.
   -l, --log [options]        Show log of the items repository. Add
                              options to "git log" if desired.
+  -c, --cron                 Show a list of outdated tasks, suitable for
+                             a cron job.
   -h, --help                 Show this help page.
 EOM
 		;;
