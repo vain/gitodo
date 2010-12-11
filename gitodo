@@ -20,11 +20,15 @@ shopt -u dotglob
 
 __tput()
 {
-	# Only use tput if it's available and if stdout is a terminal.
+	# Only use tput if it's available and if stdout is a terminal. Usage
+	# of color may be enforced, though.
 
-	if which tput >/dev/null 2>&1 && [[ -t 1 ]]
+	if which tput >/dev/null 2>&1
 	then
-		tput "$@"
+		if [[ -t 1 ]] || [[ -n $GITODO_FORCE_COLOR ]]
+		then
+			tput "$@"
+		fi
 	fi
 }
 

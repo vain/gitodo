@@ -99,6 +99,13 @@ revision will run on msysgit, but I'll do my very best, Ms. Sophie.
 Of course, it runs on GNU/Linux as well.
 
 
+Environment
+-----------
+
+* `$GITODO_FORCE_COLOR`: If this variable is set, color is used in any
+  case, even if stdout is not a terminal.
+
+
 Command line options
 --------------------
 
