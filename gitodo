@@ -91,12 +91,23 @@ list_items()
 		# Find out if the deadline has passed.
 		stampnow=$(date '+%s')
 		stampitem=$(date -d "$day $time" '+%s')
-		if (( timetype != 3 )) && (( stampnow - stampitem > 0 ))
+		taskdiff=$((stampnow - stampitem))
+		if (( timetype != 3 ))
 		then
-			__tput bold
-			__tput setaf 1
-			echo -n '[!] '
-			__tput sgr0
+			if (( taskdiff > 0 ))
+			then
+				__tput bold
+				__tput setaf 1
+				echo -n '[!] '
+				__tput sgr0
+			elif (( taskdiff > -3600 ))
+			then
+				__tput setaf 1
+				echo -n '[*] '
+				__tput sgr0
+			else
+				echo -n '    '
+			fi
 		else
 			echo -n '    '
 		fi
