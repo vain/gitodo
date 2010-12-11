@@ -30,7 +30,8 @@ Typical output from the script might look like this:
 
 Note the order: Items with a higher importance come first. If two items
 have the same importance, they're sorted by their deadline. Deadlines
-can be a date, a time (meaning "today") or both.
+can be a date, a time (meaning "today") or both. If there's no deadline,
+the task is considered to be "not important" and is moved to the bottom.
 
 If the deadline for a task has already passed, it's marked with a `[!]`
 at the beginning of the line.
@@ -45,6 +46,8 @@ Items are simple text files. They look like this:
 
 Deadline and priority are optional. The default priority is 0 and no
 deadline means 2038-01-01 00:00:00. ;-)
+
+`subject:` is an alias for `what:` and `dead:` is an alias for `when:`.
 
 
 Task item files, the repo and synching
@@ -95,6 +98,9 @@ The script is *meant* to be able to run in the
 [msysgit](http://code.google.com/p/msysgit/) environment on Windows.
 That's because I need that at work (sigh). I can't guarantee that every
 revision will run on msysgit, but I'll do my very best, Ms. Sophie.
+
+Furthermore, that's why I can't simply use other scripts like
+[git-todo.py](https://github.com/lydgate/git-todo-py) or similar.
 
 Of course, it runs on GNU/Linux as well.
 
