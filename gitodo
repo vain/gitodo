@@ -81,10 +81,14 @@ list_items()
 			whennorm="2038-01-01 00:00:00"
 		fi
 
+		# Read warning period. Defaults to one hour before the deadline.
+		warn=$(sed -rn '1,5s/^warn: ?//p' "$i" | sed -n '1p;q')
+		warn=${warn:-1}
+
 		# Print these infos so they can be sorted. Then read them again.
-		echo "$prio $whennorm $timetype $i"
+		echo "$prio $whennorm $warn $timetype $i"
 	done | sort -n |
-	while read -r prio day time timetype file
+	while read -r prio day time warn timetype file
 	do
 		# Pretty printing.
 
@@ -100,7 +104,7 @@ list_items()
 				__tput setaf 1
 				echo -n '! '
 				__tput sgr0
-			elif (( taskdiff > -3600 ))
+			elif (( taskdiff > -warn * 3600 ))
 			then
 				__tput setaf 1
 				echo -n '* '

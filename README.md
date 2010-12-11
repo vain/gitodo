@@ -33,20 +33,25 @@ have the same importance, they're sorted by their deadline. Deadlines
 can be a date, a time (meaning "today") or both. If there's no deadline,
 the task is considered to be "not important" and is moved to the bottom.
 
-If the deadline for a task has already passed, it's marked with a `!`
-at the beginning of the line. If the deadline is close (less than 1 hour
-left), the task is marked with a `*`.
+If the deadline for a task has already passed, it's marked with a `!` at
+the beginning of the line. If the deadline is close (usually less than 1
+hour left, can be set), the task is marked with a `*`.
 
 Items are simple text files. They look like this:
 
 	what: Subject of the task.
 	when: 2010-12-10 08:30
 	prio: 2
+	warn: 4
 
 	Some other lines describing the task in detail.
 
 Deadline and priority are optional. The default priority is 0 and no
 deadline means 2038-01-01 00:00:00. ;-)
+
+`warn: 4` means that this task gets marked as "close to deadline" four
+hours before the deadline will be reached. If this fields is left out,
+it defaults to one hour.
 
 `subject:` is an alias for `what:` and `dead:` is an alias for `when:`.
 
