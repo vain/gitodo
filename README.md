@@ -15,26 +15,27 @@ You can do the following:
 When listing tasks, they're first sorted by importance then by deadline.
 Typical output from the script might look like this:
 
-	Old Prio        Deadline          ID   Subject
-	--- ----- --------------------- ------ -------
-	    [-15] [                   ] [   1] Mail to jane: Dinner.
-	    [ -3] [                   ] [   2] Christmas presents.
-	[!] [  0] [           22:00:00] [   9] Remove garbage from your bed.
-	    [  0] [           23:30:00] [   8] Go to sleep. Yes, it's important.
-	    [  0] [2010-12-10 23:59:00] [  10] Still awake?
-	    [  0] [2010-12-13         ] [   6] Prepare talk about Git.
-	    [  0] [2010-12-24         ] [   7] Remove SVN from all computers.
-	    [  0] [                   ] [   4] Wash dishes.
-	    [  0] [                   ] [   5] Buy new milk.
-	    [  5] [                   ] [   3] Wash the car.
+	O Prio        Deadline          ID   Subject
+	- ----- --------------------- ------ -------
+	  [-15] [                   ] [   1] Mail to jane: Dinner.
+	  [ -3] [                   ] [   2] Christmas presents.
+	! [  0] [           22:00:00] [   9] Remove garbage from your bed.
+	  [  0] [           23:30:00] [   8] Go to sleep. Yes, it's important.
+	  [  0] [2010-12-10 23:59:00] [  10] Still awake?
+	  [  0] [2010-12-13         ] [   6] Prepare talk about Git.
+	  [  0] [2010-12-24         ] [   7] Remove SVN from all computers.
+	  [  0] [                   ] [   4] Wash dishes.
+	  [  0] [                   ] [   5] Buy new milk.
+	  [  5] [                   ] [   3] Wash the car.
 
 Note the order: Items with a higher importance come first. If two items
 have the same importance, they're sorted by their deadline. Deadlines
 can be a date, a time (meaning "today") or both. If there's no deadline,
 the task is considered to be "not important" and is moved to the bottom.
 
-If the deadline for a task has already passed, it's marked with a `[!]`
-at the beginning of the line.
+If the deadline for a task has already passed, it's marked with a `!`
+at the beginning of the line. If the deadline is close (less than 1 hour
+left), the task is marked with a `*`.
 
 Items are simple text files. They look like this:
 
