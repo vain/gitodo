@@ -11,24 +11,12 @@ elseif exists("b:current_syntax")
 	finish
 endif
 
-syn match gtprio "^prio:"
-syn match gtwhen "^when:"
-syn match gtdead "^dead:"
-syn match gtwhat "^what:"
-syn match gtwarn "^warn:"
-syn match gtsubject "^subject:"
+syn match gtkey "\v^(prio|when|dead|what|subject|warn):"
 syn match gtsubjectline contains=gtumlaut "\v(^(what|subject): )@<=.*"
-
 syn match gtumlaut "\vö|Ö|ä|Ä|ü|Ü|ß"
 
-hi def link gtprio Identifier
-hi def link gtwhen gtprio
-hi def link gtdead gtprio
-hi def link gtwhat gtprio
-hi def link gtwarn gtprio
-hi def link gtsubject gtprio
+hi def link gtkey Identifier
 hi def link gtsubjectline String
-
 hi def link gtumlaut ErrorMsg
 
 let b:current_syntax = "gitodo"
