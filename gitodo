@@ -32,15 +32,18 @@ __tput()
 	fi
 }
 
-list_items()
+header()
 {
-	# List all items.
-
 	# Header.
 	__tput bold
 	echo 'O Prio        Deadline          ID   Subject'
 	echo '- ----- --------------------- ------ -------'
 	__tput sgr0
+}
+
+list_items()
+{
+	# List all items.
 
 	# Process all item files and extract relevant fields.
 	for i in i*
@@ -152,6 +155,44 @@ list_items()
 	done
 }
 
+cron_output()
+{
+	# Show outdated tasks and those whose deadline is close.
+
+	# Find relevant tasks.
+	out=$(list_items)
+	outdated=$(echo "$out" | grep '^!')
+	warning=$(echo "$out" | grep '^\*')
+
+	# Pretty printing.
+	if [[ "$outdated" != "" ]]
+	then
+		echo "OUTDATED TASKS:"
+		echo "==============="
+		echo
+		(
+			header
+			echo "$outdated"
+		) | sed 's/^/    /'
+
+		if [[ "$warning" != "" ]]
+		then
+			echo
+			echo
+		fi
+	fi
+	if [[ "$warning" != "" ]]
+	then
+		echo "DEADLINE CLOSE:"
+		echo "==============="
+		echo
+		(
+			header
+			echo "$warning"
+		) | sed 's/^/    /'
+	fi
+}
+
 new_item()
 {
 	# Get all items and see which one is the last one. Then add 1.
@@ -226,20 +267,7 @@ case "$1" in
 		git log --oneline --decorate --graph "$@"
 		;;
 	--cron|-cron|cron|--c|-c|c)
-		out=$(list_items)
-		if [[ "$(echo "$out" | tail -n +3 | grep '^[^ ]')" != "" ]]
-		then
-			echo "OUTDATED TASKS:"
-			echo "==============="
-			echo
-			echo "$out" | grep '^[^ \*]' | sed 's/^/    /'
-			echo
-			echo
-			echo "DEADLINE CLOSE:"
-			echo "==============="
-			echo
-			echo "$out" | grep '^[^ !]' | sed 's/^/    /'
-		fi
+		cron_output
 		;;
 	--help|-help|help|--h|-h|h)
 		cat <<EOM
@@ -257,6 +285,7 @@ Usage: $(basename "$0") [options]...
 EOM
 		;;
 	*)
+		header
 		list_items
 		;;
 esac
