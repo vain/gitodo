@@ -8,15 +8,20 @@
 # me a pizza in return.
 # ------------------------------------------------------------------
 
+
+# Defaults and "configuration".
 EDITOR=${EDITOR:-vim}
 itemsbase=${XDG_DATA_HOME:-"$(dirname "$(readlink -e "$0")")"}
 itemsdir="$itemsbase/gitodo.items"
 
+# These are essential.
 shopt -s nullglob
 shopt -u dotglob
 
 __tput()
 {
+	# Only use tput if it's available and if stdout is a terminal.
+
 	if which tput >/dev/null 2>&1 && [[ -t 1 ]]
 	then
 		tput "$@"
@@ -25,11 +30,15 @@ __tput()
 
 list_items()
 {
+	# List all items.
+
+	# Header.
 	__tput bold
 	echo 'Old Prio        Deadline          ID    Subject'
 	echo '--- ----- --------------------- ------  -------'
 	__tput sgr0
 
+	# Process all item files and extract relevant fields.
 	for i in i*
 	do
 		# Read priority and/or date.
@@ -38,6 +47,7 @@ list_items()
 		when=$(sed -rn '1,5s/^when: ?//p' "$i" | sed -n '1p;q')
 		whennorm=$(date -d "$when" '+%F %T')
 
+		# Find out whether it's date + time, only date or only time.
 		spaces=${when//[^ ]/}
 		spaces=${#spaces}
 		colons=${when//[^:]/}
@@ -67,12 +77,14 @@ list_items()
 			whennorm="2038-01-01 00:00:00"
 		fi
 
+		# Print these infos so they can be sorted. Then read them again.
 		echo "$prio $whennorm $timetype $i"
 	done | sort -n |
 	while read -r prio day time timetype file
 	do
 		# Pretty printing.
 
+		# Find out if the deadline has passed.
 		stampnow=$(date '+%s')
 		stampitem=$(date -d "$day $time" '+%s')
 		if (( timetype != 3 )) && (( stampnow - stampitem > 0 ))
@@ -82,6 +94,7 @@ list_items()
 			echo -n '    '
 		fi
 
+		# Highlight according to priority.
 		if (( prio < -5 ))
 		then
 			__tput bold
@@ -98,6 +111,7 @@ list_items()
 		fi
 		printf '[%3s] ' "$prio"
 
+		# Show only those time fields that are set in the item's file.
 		case $timetype in
 			0) echo -n "[           $time]" ;;
 			1) echo -n "[$day         ]" ;;
@@ -105,16 +119,21 @@ list_items()
 			3) echo -n "[                   ]" ;;
 		esac
 
+		# Print the id of the item.
 		filename=$(echo "$file" | sed 's/^[^0-9]\+// ; s/^0\+//')
 		printf ' [%4d]: ' "$filename"
 
+		# Print the subject of the item.
 		sed -rn '1,5s/^(subject|what): ?//p' "$file" | sed -n '1p;q'
+
 		__tput sgr0
 	done
 }
 
 new_item()
 {
+	# Get all items and see which one is the last one. Then add 1.
+
 	existing=(i*)
 	if (( "${#existing[@]}" == 0 ))
 	then
@@ -131,6 +150,10 @@ new_item()
 
 complete_id()
 {
+	# Complete an ID (like "12") by removing any leading zeroes (needed
+	# so that printf doesn't think it's an octal number). Then pad that
+	# number with the right amount of zeroes. Result: "0012".
+
 	item=$(echo "$1" | sed 's/^0\+//')
 	item=$(printf '%04d' $item)
 	echo "i$item"
@@ -138,6 +161,8 @@ complete_id()
 
 checkrepo()
 {
+	# Initialize the repo (if needed) and cd to it.
+
 	mkdir -p "$itemsdir"
 	cd "$itemsdir"
 	[[ -d .git ]] || git init
@@ -145,6 +170,8 @@ checkrepo()
 
 commit()
 {
+	# Commit all changes in the repo.
+
 	git add .
 	git commit -a -m "Auto-commit $HOSTNAME."
 }
