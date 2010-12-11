@@ -79,6 +79,14 @@ that one as well:
 	$ cd "$XDG_DATA_HOME"
 	$ git clone ssh://.../gitodo.items
 
+If you decide to use the Vim syntax files, you should link them into
+your `~/.vim` directory:
+
+	$ cd ~/.vim/ftdetect
+	$ ln -s ~/git/gitodo/vim/ftdetect/gitodo.vim
+	$ cd ../syntax/
+	$ ln -s ~/git/gitodo/vim/syntax/gitodo.vim
+
 
 Portability
 -----------
