@@ -81,7 +81,7 @@ list_items()
 		then
 			# No date or time.
 			timetype=3
-			whennorm="2038-01-01 00:00:00"
+			whennorm='2038-01-01 00:00:00'
 		fi
 
 		# Read warning period. Defaults to one hour before the deadline.
@@ -90,7 +90,8 @@ list_items()
 
 		# Print these infos so they can be sorted. Then read them again.
 		echo "$prio $whennorm $warn $timetype $i"
-	done | sort -n |
+	done |
+	sort -n |
 	while read -r prio day time warn timetype file
 	do
 		# Pretty printing.
@@ -167,8 +168,8 @@ cron_output()
 	# Pretty printing.
 	if [[ "$outdated" != "" ]]
 	then
-		echo "OUTDATED TASKS:"
-		echo "==============="
+		echo 'OUTDATED TASKS:'
+		echo '==============='
 		echo
 		(
 			header
@@ -183,8 +184,8 @@ cron_output()
 	fi
 	if [[ "$warning" != "" ]]
 	then
-		echo "DEADLINE CLOSE:"
-		echo "==============="
+		echo 'DEADLINE CLOSE:'
+		echo '==============='
 		echo
 		(
 			header
