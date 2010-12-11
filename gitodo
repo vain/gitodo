@@ -195,20 +195,15 @@ cron_output()
 
 new_item()
 {
-	# Get all items and see which one is the last one. Then add 1.
+	# Get the first free ID.
 
-	existing=(i*)
-	if (( "${#existing[@]}" == 0 ))
-	then
-		next=1
-	else
-		last=${existing[$((${#existing[@]} - 1))]}
-		last=$(echo "$last" | sed 's/^[^0-9]\+// ; s/^0\+//')
-		next=$((last + 1))
-	fi
-	next=$(printf '%04d' $next)
+	next=1
+	while [[ -f "i$(printf '%04d' "$next")" ]]
+	do
+		((next++))
+	done
 
-	$EDITOR "i$next"
+	$EDITOR "i$(printf '%04d' "$next")"
 }
 
 complete_id()
