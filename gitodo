@@ -9,12 +9,11 @@
 # ------------------------------------------------------------------
 
 EDITOR=${EDITOR:-vim}
-itemsdir=items
+itemsbase=${XDG_DATA_HOME:-"$(dirname "$(readlink -e "$0")")"}
+itemsdir="$itemsbase/gitodo.items"
 
 shopt -s nullglob
 shopt -u dotglob
-
-cd "$(dirname "$(readlink -e "$0")")"
 
 __tput()
 {
@@ -31,7 +30,7 @@ list_items()
 	echo '--- ----- --------------------- ------  -------'
 	__tput sgr0
 
-	for i in "$itemsdir"/i*
+	for i in i*
 	do
 		# Read priority and/or date.
 		prio=$(sed -rn '1,5s/^prio: ?//p' "$i" | sed -n '1p;q')
@@ -116,7 +115,7 @@ list_items()
 
 new_item()
 {
-	existing=("$itemsdir"/i*)
+	existing=(i*)
 	if (( "${#existing[@]}" == 0 ))
 	then
 		next=1
@@ -127,32 +126,27 @@ new_item()
 	fi
 	next=$(printf '%04d' $next)
 
-	$EDITOR "$itemsdir/i$next"
+	$EDITOR "i$next"
 }
 
 complete_id()
 {
 	item=$(echo "$1" | sed 's/^0\+//')
 	item=$(printf '%04d' $item)
-	echo "$itemsdir/i$item"
+	echo "i$item"
 }
 
 checkrepo()
 {
-	(
-		mkdir -p "$itemsdir"
-		cd "$itemsdir"
-		[[ -d .git ]] || git init
-	)
+	mkdir -p "$itemsdir"
+	cd "$itemsdir"
+	[[ -d .git ]] || git init
 }
 
 commit()
 {
-	(
-		cd "$itemsdir"
-		git add .
-		git commit -a -m "Auto-commit $HOSTNAME."
-	)
+	git add .
+	git commit -a -m "Auto-commit $HOSTNAME."
 }
 
 checkrepo
@@ -179,7 +173,6 @@ case "$1" in
 		commit
 		;;
 	--log|-log|log|--l|-l|l)
-		cd "$itemsdir"
 		git log --oneline --decorate --graph
 		;;
 	--help|-help|help|--h|-h|h)
