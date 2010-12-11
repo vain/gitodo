@@ -11,7 +11,7 @@
 
 # Defaults and "configuration".
 EDITOR=${EDITOR:-vim}
-itemsbase=${XDG_DATA_HOME:-"$(dirname "$(readlink -e "$0")")"}
+itemsbase=${XDG_DATA_HOME:-"$(dirname "$0")"}
 itemsdir="$itemsbase/gitodo.items"
 
 # These are essential.
