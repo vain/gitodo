@@ -104,6 +104,13 @@ Furthermore, that's why I can't simply use other scripts like
 
 Of course, it runs on GNU/Linux as well.
 
+A little advise: If you *ever* think about putting the task items repo
+on a USB stick and if you want to use that repo from both Windows and
+GNU, make sure to *disable* msysgit's "autocrlf" feature. For more
+information, see
+[this blogpost](http://www.tigraine.at/2010/02/03/disable-autcrlf-in-msysgit/).
+If you leave it enabled, it's going to be nasty.
+
 
 Environment
 -----------
