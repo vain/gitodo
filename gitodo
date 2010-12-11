@@ -130,26 +130,6 @@ new_item()
 	$EDITOR "$itemsdir/i$next"
 }
 
-pullall()
-{
-	(
-		cd "$itemsdir"
-		pwdabs=$(readlink -e .)
-		while read -r host path
-		do
-			if [[ "$host" != "$HOSTNAME" ]]
-			then
-				# Pull from another machine on the net.
-				git pull "ssh://$host$path" master
-			elif [[ "$path" != "$pwdabs" ]]
-			then
-				# Pull locally.
-				git pull "$path" master
-			fi
-		done < remotes
-	)
-}
-
 complete_id()
 {
 	item=$(echo "$1" | sed 's/^0\+//')
@@ -202,13 +182,6 @@ case "$1" in
 		cd "$itemsdir"
 		git log --oneline --decorate --graph
 		;;
-	--pull|-pull|pull|--p|-p|p)
-		pullall
-		;;
-	--remotes|-remotes|remotes|--r|-r|r)
-		$EDITOR "$itemsdir/remotes"
-		commit
-		;;
 	--help|-help|help|--h|-h|h)
 		cat <<EOM
 Usage: $(basename "$0") [options]...
@@ -218,8 +191,6 @@ Usage: $(basename "$0") [options]...
                              \$EDITOR to do so.
   -d, --delete id [id...]    Delete all given IDs.
   -l, --log                  Show log of the items repository.
-  -p, --pull                 Pull from all configured remotes.
-  -r, --remotes              Edit the list of remotes.
   -h, --help                 Show this help page.
 EOM
 		;;
