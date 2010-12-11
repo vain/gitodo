@@ -89,7 +89,10 @@ list_items()
 		stampitem=$(date -d "$day $time" '+%s')
 		if (( timetype != 3 )) && (( stampnow - stampitem > 0 ))
 		then
+			__tput bold
+			__tput setaf 1
 			echo -n '[!] '
+			__tput sgr0
 		else
 			echo -n '    '
 		fi
