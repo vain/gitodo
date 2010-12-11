@@ -200,7 +200,8 @@ case "$1" in
 		commit
 		;;
 	--log|-log|log|--l|-l|l)
-		git log --oneline --decorate --graph
+		shift
+		git log --oneline --decorate --graph "$@"
 		;;
 	--help|-help|help|--h|-h|h)
 		cat <<EOM
@@ -210,7 +211,8 @@ Usage: $(basename "$0") [options]...
   -n, --new                  Add a new task. You'll be put in your
                              \$EDITOR to do so.
   -d, --delete id [id...]    Delete all given IDs.
-  -l, --log                  Show log of the items repository.
+  -l, --log [options]        Show log of the items repository. Add
+                             options to "git log" if desired.
   -h, --help                 Show this help page.
 EOM
 		;;
