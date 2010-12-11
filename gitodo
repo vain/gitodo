@@ -38,8 +38,8 @@ list_items()
 
 	# Header.
 	__tput bold
-	echo 'Old Prio        Deadline          ID   Subject'
-	echo '--- ----- --------------------- ------ -------'
+	echo 'O Prio        Deadline          ID   Subject'
+	echo '- ----- --------------------- ------ -------'
 	__tput sgr0
 
 	# Process all item files and extract relevant fields.
@@ -98,18 +98,18 @@ list_items()
 			then
 				__tput bold
 				__tput setaf 1
-				echo -n '[!] '
+				echo -n '! '
 				__tput sgr0
 			elif (( taskdiff > -3600 ))
 			then
 				__tput setaf 1
-				echo -n '[*] '
+				echo -n '* '
 				__tput sgr0
 			else
-				echo -n '    '
+				echo -n '  '
 			fi
 		else
-			echo -n '    '
+			echo -n '  '
 		fi
 
 		# Highlight according to priority.
