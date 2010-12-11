@@ -17,10 +17,14 @@ syn match gtdead "^dead:"
 syn match gtwhat "^what:"
 syn match gtsubject "^subject:"
 
+syn match gtumlaut "\vö|Ö|ä|Ä|ü|Ü|ß"
+
 hi def link gtprio Identifier
 hi def link gtwhen gtprio
 hi def link gtdead gtprio
 hi def link gtwhat gtprio
 hi def link gtsubject gtprio
+
+hi def link gtumlaut ErrorMsg
 
 let b:current_syntax = "gitodo"
