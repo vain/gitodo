@@ -9,23 +9,24 @@ You can do the following:
 * Add, edit and list your tasks. Essentially, that's a todo list.
 * Prioritize some tasks. Negative priorities mean a higher urgency.
 * Set a deadline for tasks.
-* Synchronize your tasks with other machines.
+* Be able to synchronize your tasks with other machines because they're
+  kept in a Git repository.
 
 When listing tasks, they're first sorted by importance then by deadline.
 Typical output from the script might look like this:
 
-	Old Prio        Deadline          ID    Subject
-	--- ----- --------------------- ------  -------
-	    [-15] [                   ] [   1]: Mail to jane: Dinner.
-	    [ -3] [                   ] [   2]: Christmas presents.
-	[!] [  0] [           22:00:00] [   9]: Remove garbage from your bed.
-	    [  0] [           23:30:00] [   8]: Go to sleep. Yes, it's important.
-	    [  0] [2010-12-10 23:59:00] [  10]: Still awake?
-	    [  0] [2010-12-13         ] [   6]: Prepare talk about Git.
-	    [  0] [2010-12-24         ] [   7]: Remove SVN from all computers.
-	    [  0] [                   ] [   4]: Wash dishes.
-	    [  0] [                   ] [   5]: Buy new milk.
-	    [  5] [                   ] [   3]: Wash the car.
+	Old Prio        Deadline          ID   Subject
+	--- ----- --------------------- ------ -------
+	    [-15] [                   ] [   1] Mail to jane: Dinner.
+	    [ -3] [                   ] [   2] Christmas presents.
+	[!] [  0] [           22:00:00] [   9] Remove garbage from your bed.
+	    [  0] [           23:30:00] [   8] Go to sleep. Yes, it's important.
+	    [  0] [2010-12-10 23:59:00] [  10] Still awake?
+	    [  0] [2010-12-13         ] [   6] Prepare talk about Git.
+	    [  0] [2010-12-24         ] [   7] Remove SVN from all computers.
+	    [  0] [                   ] [   4] Wash dishes.
+	    [  0] [                   ] [   5] Buy new milk.
+	    [  5] [                   ] [   3] Wash the car.
 
 Note the order: Items with a higher importance come first. If two items
 have the same importance, they're sorted by their deadline. Deadlines
@@ -49,35 +50,19 @@ deadline means 2038-01-01 00:00:00. ;-)
 Task item files, the repo and synching
 --------------------------------------
 
-All your tasks are kept in the subdirectory "items". On the first start,
+All your task items are kept in single directory. On the first start,
 a Git repository will be created in this directory. Every change of your
-task list will be automatically committed to that repository.
+task list will be automatically committed to that repository. By
+default, this directory is `$XDG_DATA_HOME/gitodo.items`. If
+`$XDG_DATA_HOME` is not set, the directory in which the `gitodo` script
+resides will be used.
 
 Common task items will be named like "i0123": That would be the file for
 the 123rd item. Note that new items will get the next free ID. If 123
 currently is the highest ID, a new item will get ID 124.
 
-There's a special file in the items directory called "remotes". It lists
-all your peers:
-
-	pinguin /home/void/git/gitodo/items
-	pinguin /tmp/tmp/gitodo/items
-	mobiltux /home/void/git/gitodo/items
-	worklaptop /home/jane/gitodo/items
-
-The first field is a host name, the second field a path on that host. If
-it's a foreign host, SSH will be used to fetch from their Git repo. If
-it's the same host that you're currently logged in to, then a local
-fetch will take place.
-
-* Q: Why not use the native "remotes" mechanism of Git?
-* A: Native Git remotes would have to be maintained on every single
-  clone. But I'm lazy and I don't want to do that. I want to define a
-  single list will *all* repositories and the script has to find out
-  if it can pull from them.
-
-Doing a `gitodo --pull` will pull the current task items from all your
-remotes.
+Add the items repo to your synching mechanism if you want them to be
+synched.
 
 
 Setup
@@ -91,12 +76,8 @@ First, clone the code repository:
 If you already have an existing repository for your task items, clone
 that one as well:
 
-	$ cd ~/git/gitodo
-	$ git clone ssh://.../gitodo/items
-
-Note: Currently, the path "items" is hardcoded and *must* be located in
-the code repository. I know, that's nasty for distributors, but it's a
-lot easier for *me*. ;-)
+	$ cd "$XDG_DATA_HOME"
+	$ git clone ssh://.../gitodo.items
 
 
 Portability
