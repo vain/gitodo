@@ -17,6 +17,7 @@ syn match gtdead "^dead:"
 syn match gtwhat "^what:"
 syn match gtwarn "^warn:"
 syn match gtsubject "^subject:"
+syn match gtsubjectline contains=gtumlaut "\v(^(what|subject): )@<=.*"
 
 syn match gtumlaut "\vö|Ö|ä|Ä|ü|Ü|ß"
 
@@ -26,6 +27,7 @@ hi def link gtdead gtprio
 hi def link gtwhat gtprio
 hi def link gtwarn gtprio
 hi def link gtsubject gtprio
+hi def link gtsubjectline String
 
 hi def link gtumlaut ErrorMsg
 
