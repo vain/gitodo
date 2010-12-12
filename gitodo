@@ -156,6 +156,17 @@ list_items()
 	done
 }
 
+count_tasks()
+{
+	# Count outdated tasks, those whose deadline is close and all tasks
+	# in total.
+
+	out=$(list_items)
+	outdated=$(echo "$out" | grep '^!' | wc -l)
+	warning=$(echo "$out" | grep '^\*' | wc -l)
+	echo $outdated $warning $(echo "$out" | wc -l)
+}
+
 cron_output()
 {
 	# Show outdated tasks and those whose deadline is close.
@@ -265,6 +276,9 @@ case "$1" in
 	--cron|-cron|cron|--c|-c|c)
 		cron_output
 		;;
+	--count|-count|count)
+		count_tasks
+		;;
 	--help|-help|help|--h|-h|h)
 		cat <<EOM
 Usage: $(basename "$0") [options]...
@@ -277,6 +291,8 @@ Usage: $(basename "$0") [options]...
                              options to "git log" if desired.
   -c, --cron                 Show a list of outdated tasks, suitable for
                              a cron job.
+  --count                    Count tasks (all open tasks, tasks close to
+                             deadline and outdated tasks).
   -h, --help                 Show this help page.
 EOM
 		;;
