@@ -48,10 +48,13 @@ list_items()
 	# Process all item files and extract relevant fields.
 	for i in i*
 	do
+		# Ensure compatibility with "broken" files.
+		item=$(tr -d '\r' < "$i")
+
 		# Read priority and/or date.
-		prio=$(sed -rn '1,5s/^prio: ?//p' "$i" | sed -n '1p;q')
+		prio=$(echo "$item" | sed -rn '1,5s/^prio: ?//p' | sed q)
 		prio=${prio:-0}
-		when=$(sed -rn '1,5s/^(when|dead): ?//p' "$i" | sed -n '1p;q')
+		when=$(echo "$item" | sed -rn '1,5s/^(when|dead): ?//p' | sed q)
 		whennorm=$(date -d "$when" '+%F %T')
 
 		# Find out whether it's date + time, only date or only time.
@@ -85,14 +88,25 @@ list_items()
 		fi
 
 		# Read warning period. Defaults to one hour before the deadline.
-		warn=$(sed -rn '1,5s/^warn: ?//p' "$i" | sed -n '1p;q')
+		warn=$(echo "$item" | sed -rn '1,5s/^warn: ?//p' | sed q)
 		warn=${warn:-1}
 
+		# Get the ID by removing the "i" and leading zeros from the
+		# filename. Usage of expr is a nice trick: It doesn't recognize
+		# octal numbers and doesn't output leading zeros. Hence, adding
+		# 0 effectively strips leading zeros.
+		id=${i//i/}
+		id=$(expr "$id" + 0)
+
+		# Get the item's subject.
+		subject=$(echo "$item" | sed -rn '1,5s/^(subject|what): ?//p' |
+			sed q)
+
 		# Print these infos so they can be sorted. Then read them again.
-		echo "$prio $whennorm $warn $timetype $i"
+		echo "$prio $whennorm $warn $timetype $id $subject"
 	done |
 	sort -n |
-	while read -r prio day time warn timetype file
+	while read -r prio day time warn timetype id subject
 	do
 		# Pretty printing.
 
@@ -145,12 +159,9 @@ list_items()
 			3) echo -n "[                   ]" ;;
 		esac
 
-		# Print the id of the item.
-		filename=$(echo "$file" | sed 's/^[^0-9]\+// ; s/^0\+//')
-		printf ' [%4d] ' "$filename"
-
-		# Print the subject of the item.
-		sed -rn '1,5s/^(subject|what): ?//p' "$file" | sed -n '1p;q'
+		# ID and subject.
+		printf ' [%4d] ' "$id"
+		echo "$subject"
 
 		__tput sgr0
 	done
