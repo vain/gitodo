@@ -231,13 +231,10 @@ new_item()
 
 complete_id()
 {
-	# Complete an ID (like "12") by removing any leading zeroes (needed
-	# so that printf doesn't think it's an octal number). Then pad that
-	# number with the right amount of zeroes. Result: "0012".
+	# Complete an ID (like "03") by properly padding it and by adding
+	# the "i" (result: "i0003").
 
-	item=$(echo "$1" | sed 's/^0\+//')
-	item=$(printf '%04d' $item)
-	echo "i$item"
+	printf 'i%04d' $(expr $1 + 0)
 }
 
 checkrepo()
