@@ -51,10 +51,44 @@ list_items()
 		# Ensure compatibility with "broken" files.
 		item=$(tr -d '\r' < "$i")
 
-		# Read priority and/or date.
-		prio=$(echo "$item" | sed -rn '1,5s/^prio: ?//p' | sed q)
-		prio=${prio:-0}
-		when=$(echo "$item" | sed -rn '1,5s/^(when|dead): ?//p' | sed q)
+		# Process the file line by line and read header fields. Do word
+		# splitting but don't do globbing.
+		set -o noglob
+
+		OIFS=$IFS
+		IFS=$'\n'
+		lines=($item)
+		IFS=$OIFS
+
+		prio=0
+		when=""
+		warn=1
+		subject=""
+
+		for line in "${lines[@]}"
+		do
+			set -- $line
+			case $1 in
+				prio:)
+					prio=$2
+					;;
+				when:|dead:)
+					shift
+					when=$@
+					;;
+				warn:)
+					warn=$2
+					;;
+				what:|subject:)
+					shift
+					subject=$@
+					;;
+			esac
+		done
+
+		set +o noglob
+
+		# Normalize deadline.
 		whennorm=$(date -d "$when" '+%F %T')
 
 		# Find out whether it's date + time, only date or only time.
@@ -87,20 +121,12 @@ list_items()
 			whennorm='2038-01-01 00:00:00'
 		fi
 
-		# Read warning period. Defaults to one hour before the deadline.
-		warn=$(echo "$item" | sed -rn '1,5s/^warn: ?//p' | sed q)
-		warn=${warn:-1}
-
 		# Get the ID by removing the "i" and leading zeros from the
 		# filename. Usage of expr is a nice trick: It doesn't recognize
 		# octal numbers and doesn't output leading zeros. Hence, adding
 		# 0 effectively strips leading zeros.
 		id=${i//i/}
 		id=$(expr "$id" + 0)
-
-		# Get the item's subject.
-		subject=$(echo "$item" | sed -rn '1,5s/^(subject|what): ?//p' |
-			sed q)
 
 		# Print these infos so they can be sorted. Then read them again.
 		echo "$prio $whennorm $warn $timetype $id $subject"
