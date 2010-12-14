@@ -230,7 +230,7 @@ cron_output()
 			echo
 		fi
 	fi
-	if [[ "$warning" != "" ]]
+	if [[ "$warning" != "" ]] && [[ $1 == 1 ]]
 	then
 		echo 'DEADLINE CLOSE:'
 		echo '==============='
@@ -308,7 +308,10 @@ case "$1" in
 		git log --oneline --decorate --graph "$@"
 		;;
 	--cron|-cron|cron|--c|-c|c)
-		cron_output
+		cron_output 1
+		;;
+	--cron-outdated|-cron-outdated|cron-outdated|--o|-o|o)
+		cron_output 0
 		;;
 	--count|-count|count)
 		count_tasks
@@ -323,7 +326,10 @@ Usage: $(basename "$0") [options]...
   -d, --delete id [id...]    Delete all given IDs.
   -l, --log [options]        Show log of the items repository. Add
                              options to "git log" if desired.
-  -c, --cron                 Show a list of outdated tasks, suitable for
+  -c, --cron                 Show a list of outdated tasks and tasks
+                             close to the deadline, suitable for a cron
+                             job.
+  -o, --cron-outdated        Show a list of outdated tasks, suitable for
                              a cron job.
   --count                    Count tasks (all open tasks, tasks close to
                              deadline and outdated tasks).
