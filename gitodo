@@ -108,8 +108,8 @@ list_items()
 					timetype=1
 				fi
 				;;
-			1)
-				# Date and time.
+			*)
+				# Date + time or something like "next tuesday 8am".
 				timetype=2
 				;;
 		esac
