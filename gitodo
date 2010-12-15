@@ -242,17 +242,22 @@ cron_output()
 	fi
 }
 
-new_item()
+new_items()
 {
-	# Get the first free ID.
+	# Create $1 new items.
 
-	next=1
-	while [[ -f "i$(printf '%04d' "$next")" ]]
+	for (( i = 0; i < $1; i++ ))
 	do
-		((next++))
-	done
+		# Get the first free ID.
 
-	$EDITOR "i$(printf '%04d' "$next")"
+		next=1
+		while [[ -f "i$(printf '%04d' "$next")" ]]
+		do
+			((next++))
+		done
+
+		$EDITOR "i$(printf '%04d' "$next")"
+	done
 }
 
 complete_id()
@@ -292,7 +297,7 @@ case "$1" in
 		commit
 		;;
 	--new|-new|new|--n|-n|n)
-		new_item
+		new_items "${2:-1}"
 		commit
 		;;
 	--delete|-delete|delete|--d|-d|d)
@@ -321,8 +326,10 @@ case "$1" in
 Usage: $(basename "$0") [options]...
 
   -s, --show id [id...]      Edit all given IDs using \$EDITOR.
-  -n, --new                  Add a new task. You'll be put in your
-                             \$EDITOR to do so.
+  -n, --new [n]              Add a new task. You'll be put in your
+                             \$EDITOR to do so. If you specify 'n',
+                             then 'n' new tasks will be created.
+                             ('n' defaults to 1).
   -d, --delete id [id...]    Delete all given IDs.
   -l, --log [options]        Show log of the items repository. Add
                              options to "git log" if desired.
