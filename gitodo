@@ -248,15 +248,18 @@ new_items()
 
 	for (( i = 0; i < $1; i++ ))
 	do
-		# Get the first free ID.
+		# Get a random free ID. This is done in order to reduce the
+		# possibility of conflicts. Imagine you add a new item on
+		# computer A and (in parallel) a new item on computer B. When
+		# merging the two branches, you'd get a conflict.
 
-		next=1
-		while [[ -f "i$(printf '%04d' "$next")" ]]
+		next=$((RANDOM % 9999))
+		while [[ -f "$(complete_id $next)" ]]
 		do
-			((next++))
+			next=$((RANDOM % 9999))
 		done
 
-		$EDITOR "i$(printf '%04d' "$next")"
+		$EDITOR "$(complete_id $next)"
 	done
 }
 
