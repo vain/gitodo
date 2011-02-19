@@ -18,18 +18,20 @@ itemsdir="$itemsbase/gitodo.items"
 shopt -s nullglob
 shopt -u dotglob
 
+# Only use tput if it's available and if stdout is a terminal. Usage of
+# color may be enforced, though. Do this check only once -- afterwards,
+# __tput may be used as a wrapper for tput.
+if which tput >/dev/null 2>&1
+then
+	if [[ -t 1 ]] || [[ -n $GITODO_FORCE_COLOR ]]
+	then
+		use_tput=1
+	fi
+fi
+
 __tput()
 {
-	# Only use tput if it's available and if stdout is a terminal. Usage
-	# of color may be enforced, though.
-
-	if which tput >/dev/null 2>&1
-	then
-		if [[ -t 1 ]] || [[ -n $GITODO_FORCE_COLOR ]]
-		then
-			tput "$@"
-		fi
-	fi
+	[[ -n $use_tput ]] && tput "$@"
 }
 
 header()
