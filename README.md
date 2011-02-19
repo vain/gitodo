@@ -67,9 +67,8 @@ default, this directory is `$XDG_DATA_HOME/gitodo.items`. If
 resides will be used.
 
 Common task items will be named like "i0123": That would be the file for
-the 123rd item. Note that new items will get the first free ID. If,
-currently, there's items with IDs 1, 2, 5 and 8, then a new item will
-get ID 3.
+the 123rd item. Note that new items will get a random free ID ranging
+from 0 to 9999. This is done to avoid merge conflicts.
 
 Add the items repo to your synching mechanism if you want them to be
 synched.
