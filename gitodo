@@ -200,7 +200,7 @@ count_tasks()
 	# Count outdated tasks, those whose deadline is close and all tasks
 	# in total.
 
-	out=$(list_items)
+	out=$(use_tput= list_items)
 	outdated=$(echo "$out" | grep '^!' | wc -l)
 	warning=$(echo "$out" | grep '^\*' | wc -l)
 	echo $outdated $warning $(echo "$out" | wc -l)
@@ -211,7 +211,7 @@ cron_output()
 	# Show outdated tasks and those whose deadline is close.
 
 	# Find relevant tasks.
-	out=$(list_items)
+	out=$(use_tput= list_items)
 	outdated=$(echo "$out" | grep '^!')
 	warning=$(echo "$out" | grep '^\*')
 
