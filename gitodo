@@ -53,8 +53,9 @@ list_items()
 	# Process all item files and extract relevant fields.
 	for i in i*
 	do
-		# Ensure compatibility with "broken" files.
-		item=$(tr -d '\r' < "$i")
+		# Read the file and ensure compatibility with "broken" files.
+		item=$(< "$i")
+		item=${item//$'\r'/}
 
 		# Process the file line by line and read header fields. Do word
 		# splitting but don't do globbing.
