@@ -47,6 +47,9 @@ list_items()
 {
 	# List all items.
 
+	# Get the current timestamp.
+	stampnow=$(date '+%s')
+
 	# Process all item files and extract relevant fields.
 	for i in i*
 	do
@@ -139,7 +142,6 @@ list_items()
 		# Pretty printing.
 
 		# Find out if the deadline has passed.
-		stampnow=$(date '+%s')
 		stampitem=$(date -d "$day $time" '+%s')
 		taskdiff=$((stampnow - stampitem))
 		if (( timetype != 3 ))
