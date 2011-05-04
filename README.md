@@ -55,6 +55,9 @@ it defaults to one hour.
 
 `subject:` is an alias for `what:` and `dead:` is an alias for `when:`.
 
+If there's a line containing only `nocron`, then this item is not shown
+when gitodo is called with `--cron` or `--cron-outdated`.
+
 
 Task item files, the repo and synching
 --------------------------------------

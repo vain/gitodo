@@ -47,6 +47,9 @@ list_items()
 {
 	# List all items.
 
+	# Is this output meant for cronjobs?
+	[[ $1 == cron ]] && cron=1 || cron=0
+
 	# Get the current timestamp.
 	stampnow=$(date '+%s')
 
@@ -70,6 +73,7 @@ list_items()
 		when=""
 		warn=1
 		subject=""
+		nocron=0
 
 		for line in "${lines[@]}"
 		do
@@ -90,6 +94,9 @@ list_items()
 					subject=$@
 					;;
 			esac
+
+			# Exclude this item from cron warnings?
+			[[ "$line" == "nocron" ]] && nocron=1
 		done
 
 		set +o noglob
@@ -135,17 +142,17 @@ list_items()
 		id=$(expr "$id" + 0)
 
 		# Print these infos so they can be sorted. Then read them again.
-		echo "$prio $whennorm $warn $timetype $id $subject"
+		echo "$prio $whennorm $warn $nocron $timetype $id $subject"
 	done |
 	sort -n |
-	while read -r prio day time warn timetype id subject
+	while read -r prio day time warn nocron timetype id subject
 	do
 		# Pretty printing.
 
 		# Find out if the deadline has passed.
 		stampitem=$(date -d "$day $time" '+%s')
 		taskdiff=$((stampnow - stampitem))
-		if (( timetype != 3 ))
+		if ! (( cron & nocron )) && (( timetype != 3 ))
 		then
 			if (( taskdiff > 0 ))
 			then
@@ -214,7 +221,7 @@ cron_output()
 	# Show outdated tasks and those whose deadline is close.
 
 	# Find relevant tasks.
-	out=$(use_tput= list_items)
+	out=$(use_tput= list_items cron)
 	outdated=$(echo "$out" | grep '^!')
 	warning=$(echo "$out" | grep '^\*')
 

@@ -1,7 +1,7 @@
 " Vim syntax file
 " Language:     Gitodo
 " Maintainer:   Vain <pcode@uninformativ.de>
-" Last Change:  2010 Dec 11
+" Last Change:  2011 May 04
 
 " For version 5.x: Clear all syntax items
 " For version 6.x: Quit when a syntax file was already loaded
@@ -12,6 +12,7 @@ elseif exists("b:current_syntax")
 endif
 
 syn match gtkey "\v^(prio|when|dead|what|subject|warn):"
+syn match gtkey "^nocron$"
 syn match gtsubjectline contains=gtumlaut "\v(^(what|subject): )@<=.*"
 syn match gtumlaut "\vö|Ö|ä|Ä|ü|Ü|ß"
 
