@@ -311,6 +311,14 @@ case "$1" in
 		done
 		commit
 		;;
+	--print|-print|print|--p|-p|p)
+		shift
+		for i
+		do
+			cat "$(complete_id "$i")"
+			echo
+		done
+		;;
 	--new|-new|new|--n|-n|n)
 		new_items "${2:-1}"
 		commit
@@ -341,6 +349,7 @@ case "$1" in
 Usage: $(basename "$0") [options]...
 
   -s, --show id [id...]      Edit all given IDs using \$EDITOR.
+  -p, --print id [id...]     Dump all given IDs to stdout.
   -n, --new [n]              Add a new task. You'll be put in your
                              \$EDITOR to do so. If you specify 'n',
                              then 'n' new tasks will be created.
