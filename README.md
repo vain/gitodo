@@ -103,21 +103,17 @@ your `~/.vim` directory:
 Portability
 -----------
 
-The script is *meant* to be able to run in the
+Until commit cfe3c9d, this script was *meant* to be able to run in the
 [msysgit](http://code.google.com/p/msysgit/) environment on Windows.
-That's because I need that at work (sigh). I can't guarantee that every
-revision will run on msysgit, but I'll do my very best, Ms. Sophie.
+That's because I needed that at work (sigh). However, I am no longer
+forced to use Windows. As I now mainly use Arch Linux, I cannot
+guarantee for portability. YMMV.
 
-Furthermore, that's why I can't simply use other scripts like
-[git-todo.py](https://github.com/lydgate/git-todo-py) or similar.
-
-Of course, it runs on GNU/Linux as well.
-
-A little advise: If you *ever* think about putting the task items repo
-on a USB stick and if you want to use that repo from both Windows and
-GNU, make sure to *disable* msysgit's "autocrlf" feature. For more
-information, see
-[this blogpost](http://www.tigraine.at/2010/02/03/disable-autcrlf-in-msysgit/).
+Anyway, a little advise: If you *ever* think about putting the task
+items repo on a USB stick and if you want to use that repo from both
+Windows and GNU, make sure to *disable* msysgit's "autocrlf" feature.
+For more information, see [this
+blogpost](http://www.tigraine.at/2010/02/03/disable-autcrlf-in-msysgit/).
 If you leave it enabled, it's going to be nasty.
 
 
