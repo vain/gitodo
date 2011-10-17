@@ -100,6 +100,21 @@ your `~/.vim` directory:
 	$ ln -s ~/git/gitodo/vim/syntax/gitodo.vim
 
 
+highcal
+-------
+
+The `highcal` script is an optional Python script. It's purpose is to
+create a calendar similar to cal(1). The script also reads from STDIN a
+list of dates which will be highlighted. On Unix-like systems, it can be
+easily combined with gitodo:
+
+	$ gitodo --raw | cut -d' ' -f2 | highcal
+
+You'll see the current month plus the two following months. The current
+day is marked as well as all deadlines for TODO items (as long as there
+is one).
+
+
 Portability
 -----------
 
