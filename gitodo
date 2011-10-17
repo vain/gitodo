@@ -43,16 +43,8 @@ header()
 	__tput sgr0
 }
 
-list_items()
+read_items_raw()
 {
-	# List all items.
-
-	# Is this output meant for cronjobs?
-	[[ $1 == cron ]] && cron=1 || cron=0
-
-	# Get the current timestamp.
-	stampnow=$(date '+%s')
-
 	# Process all item files and extract relevant fields.
 	for i in i*
 	do
@@ -144,10 +136,15 @@ list_items()
 		# Print these infos so they can be sorted. Then read them again.
 		echo "$prio $whennorm $warn $nocron $timetype $id $subject"
 	done |
-	sort -n |
+	sort -n
+}
+
+pretty_print_items()
+{
 	while read -r prio day time warn nocron timetype id subject
 	do
-		# Pretty printing.
+		# Pretty printing. This function is meant to be fed the output
+		# of read_items_raw().
 
 		# Find out if the deadline has passed.
 		stampitem=$(date -d "$day $time" '+%s')
@@ -203,6 +200,19 @@ list_items()
 
 		__tput sgr0
 	done
+}
+
+list_items()
+{
+	# List all items.
+
+	# Is this output meant for cronjobs?
+	[[ $1 == cron ]] && cron=1 || cron=0
+
+	# Get the current timestamp.
+	stampnow=$(date '+%s')
+
+	read_items_raw | pretty_print_items
 }
 
 count_tasks()
@@ -365,8 +375,13 @@ Usage: $(basename "$0") [options]...
                              a cron job.
   --count                    Count tasks (all open tasks, tasks close to
                              deadline and outdated tasks).
+  --raw                      Don't do pretty printing. This option is
+                             meant for scripting.
   -h, --help                 Show this help page.
 EOM
+		;;
+	--raw)
+		read_items_raw
 		;;
 	*)
 		header
