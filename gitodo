@@ -361,7 +361,7 @@ case "$1" in
 	--count|-count|count)
 		count_tasks
 		;;
-	--raw)
+	--raw|-raw|raw)
 		read_items_raw
 		;;
 	*)
