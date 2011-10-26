@@ -312,6 +312,13 @@ commit()
 
 checkrepo
 
+if [[ -z "$1" ]]
+then
+	header
+	list_items
+	exit
+fi
+
 case "$1" in
 	--edit|-edit|edit|--e|-e|e)
 		shift
@@ -354,7 +361,10 @@ case "$1" in
 	--count|-count|count)
 		count_tasks
 		;;
-	--help|-help|help|--h|-h|h)
+	--raw)
+		read_items_raw
+		;;
+	*)
 		cat <<EOM
 Usage: $(basename "$0") [options]...
 
@@ -377,13 +387,8 @@ Usage: $(basename "$0") [options]...
   --raw                      Don't do pretty printing. This option is
                              meant for scripting.
   -h, --help                 Show this help page.
+
+  If no options are given, a list of all TODO items is shown.
 EOM
-		;;
-	--raw)
-		read_items_raw
-		;;
-	*)
-		header
-		list_items
 		;;
 esac
