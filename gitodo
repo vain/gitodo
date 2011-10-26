@@ -313,7 +313,7 @@ commit()
 checkrepo
 
 case "$1" in
-	--edit|-edit|edit|--e|-e|e|--show|-show|show|--s|-s|s)
+	--edit|-edit|edit|--e|-e|e)
 		shift
 		for i
 		do
@@ -358,8 +358,7 @@ case "$1" in
 		cat <<EOM
 Usage: $(basename "$0") [options]...
 
-  -e, --edit id [id...],
-  -s, --show id [id...]      Edit all given IDs using \$EDITOR.
+  -e, --edit id [id...],     Edit all given IDs using \$EDITOR.
   -p, --print id [id...]     Dump all given IDs to stdout.
   -n, --new [n]              Add a new task. You'll be put in your
                              \$EDITOR to do so. If you specify 'n',
