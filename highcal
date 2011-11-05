@@ -1,13 +1,5 @@
 #!/usr/bin/env python3
 
-# ------------------------------------------------------------------
-# "THE PIZZA-WARE LICENSE" (Revision 42):
-# Peter Hofmann <pcode@uninformativ.de> wrote this file. As long as you
-# retain this notice you can do whatever you want with this stuff. If we
-# meet some day, and you think this stuff is worth it, you can buy me a
-# pizza in return.
-# ------------------------------------------------------------------
-
 # Create calendars like cal(1) but optionally highlight some days. Feed
 # this script a list of days on STDIN, one day per line. Like so:
 #
