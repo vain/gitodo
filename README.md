@@ -77,6 +77,27 @@ Add the items repo to your synching mechanism if you want them to be
 synched.
 
 
+Searching
+---------
+
+Instead of giving explicit IDs, you can also use egrep-regexes to search
+your items. The following command edits all items matching "jane" or
+"diane", your TODO item with ID 432 and all items matching "gnu":
+
+	$ gitodo -e ':/(j|di)ane' 432 ':/gnu'
+
+Searching using `:/` as a prefix works with the `--edit`, `--print` and
+`--delete` commands.
+
+To filter your list of TODO items, you can use the `--search` command:
+
+	$ gitodo --search time
+	O Prio        Deadline          ID   Subject
+	- ----- --------------------- ------ -------
+	  [  0] [2012-07-13 11:01:00] [1156] time_t party
+
+Note: When using `--search`, you must not prefix your regex with `:/`.
+
 Setup
 -----
 

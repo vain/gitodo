@@ -198,12 +198,23 @@ list_items()
 	# List all items.
 
 	# Is this output meant for cronjobs?
-	[[ $1 == cron ]] && cron=1 || cron=0
+	cron=0
+	if [[ -n "$1" ]]
+	then
+		[[ $1 == cron ]] && cron=1
+		shift
+	fi
 
 	# Get the current timestamp.
 	stampnow=$(date '+%s')
 
-	read_items_raw | pretty_print_items
+	# Apply a filter?
+	if [[ -n "$1" ]]
+	then
+		read_items_raw | egrep "$1" | pretty_print_items
+	else
+		read_items_raw | pretty_print_items
+	fi
 }
 
 count_tasks()
@@ -284,6 +295,22 @@ complete_id()
 	printf 'i%04d' $(expr $1 + 0)
 }
 
+resolve_id()
+{
+	if [[ "${1:0:2}" == ':/' ]]
+	then
+		read_items_raw |
+		egrep "${1:2}" |
+		while read -r a b c d e f id h
+		do
+			complete_id "$id"
+			echo
+		done
+	else
+		complete_id "$1"
+	fi
+}
+
 checkrepo()
 {
 	# Initialize the repo (if needed) and cd to it.
@@ -311,11 +338,18 @@ then
 fi
 
 case "$1" in
+	--search|-search|search|--s|-s|s)
+		header
+		list_items nocron "$2"
+		;;
 	--edit|-edit|edit|--e|-e|e)
 		shift
 		for i
 		do
-			$EDITOR "$(complete_id "$i")"
+			for id in $(resolve_id "$i")
+			do
+				$EDITOR $id
+			done
 		done
 		commit
 		;;
@@ -323,8 +357,11 @@ case "$1" in
 		shift
 		for i
 		do
-			cat "$(complete_id "$i")"
-			echo
+			for id in $(resolve_id "$i")
+			do
+				cat $id
+				echo
+			done
 		done
 		;;
 	--new|-new|new|--n|-n|n)
@@ -335,7 +372,10 @@ case "$1" in
 		shift
 		for i
 		do
-			rm -v "$(complete_id "$i")"
+			for id in $(resolve_id "$i")
+			do
+				rm -v $id
+			done
 		done
 		commit
 		;;
@@ -359,6 +399,7 @@ case "$1" in
 		cat <<EOM
 Usage: $(basename "$0") [options]...
 
+  -s, --search regex         List all matching items.
   -e, --edit id [id...],     Edit all given IDs using \$EDITOR.
   -p, --print id [id...]     Dump all given IDs to stdout.
   -n, --new [n]              Add a new task. You'll be put in your
@@ -380,6 +421,12 @@ Usage: $(basename "$0") [options]...
   -h, --help                 Show this help page.
 
   If no options are given, a list of all TODO items is shown.
+
+  Note: If an "id" starts with ":/", then a search takes place. For
+  example, "gitodo -e ':/(j|di)ane'" edits all items that match "jane"
+  or "diane".
+
+  regexes must be egrep-regexes.
 EOM
 		;;
 esac
