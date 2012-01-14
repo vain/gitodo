@@ -359,6 +359,10 @@ case "$1" in
 		do
 			for id in $(resolve_id "$i")
 			do
+				__tput bold
+				echo "$id"
+				echo "${id//?/-}"
+				__tput sgr0
 				cat $id
 				echo
 			done
