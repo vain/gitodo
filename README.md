@@ -86,17 +86,26 @@ your items. The following command edits all items matching "jane" or
 
 	$ gitodo -e ':/(j|di)ane' 432 ':/gnu'
 
-Searching using `:/` as a prefix works with the `--edit`, `--print` and
-`--delete` commands.
+Searching using `:/` as a prefix works with the `--edit`, `--print`,
+`--delete` and `--search` commands.
 
-To filter your list of TODO items, you can use the `--search` command:
+To filter your list of TODO items, you can use the `--search` command.
+Again, you can either start your search term with `:/` to perform an
+egrep-search:
 
-	$ gitodo --search time
+	$ gitodo --search :/time
 	O Prio        Deadline          ID   Subject
 	- ----- --------------------- ------ -------
 	  [  0] [2012-07-13 11:01:00] [1156] time_t party
 
-Note: When using `--search`, you must not prefix your regex with `:/`.
+Or, you can supply one or more ids and even mix both variants:
+
+	$ gitodo --search 7458 2436 :/time
+	O Prio        Deadline          ID   Subject
+	- ----- --------------------- ------ -------
+	  [  0] [2012-07-01         ] [7458] lico-update
+	  [  0] [2012-07-13 11:01:00] [1156] time_t party
+	  [  1] [                   ] [2436] aoi patches
 
 Setup
 -----

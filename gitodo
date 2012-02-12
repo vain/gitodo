@@ -36,8 +36,11 @@ header()
 
 read_items_raw()
 {
+	# Read either specific files or glob "i*".
+	[[ -n "$1" ]] && files=("$@") || files=(i*)
+
 	# Process all item files and extract relevant fields.
-	for i in i*
+	for i in "${files[@]}"
 	do
 		# Read the file and ensure compatibility with "broken" files.
 		item=$(< "$i")
@@ -208,10 +211,18 @@ list_items()
 	# Get the current timestamp.
 	stampnow=$(date '+%s')
 
-	# Apply a filter?
+	# Apply a filter? Can be some search regexes or some ids or both.
 	if [[ -n "$1" ]]
 	then
-		read_items_raw | egrep "$1" | pretty_print_items
+		ires=()
+		for i
+		do
+			ires+=($(resolve_id "$i"))
+		done
+		if (( "${#ires[@]}" > 0 ))
+		then
+			read_items_raw "${ires[@]}" | pretty_print_items
+		fi
 	else
 		read_items_raw | pretty_print_items
 	fi
@@ -339,8 +350,9 @@ fi
 
 case "$1" in
 	--search|-search|search|--s|-s|s)
+		shift
 		header
-		list_items nocron "$2"
+		list_items nocron "$@"
 		;;
 	--edit|-edit|edit|--e|-e|e)
 		shift
@@ -403,7 +415,7 @@ case "$1" in
 		cat <<EOM
 Usage: $(basename "$0") [options]...
 
-  -s, --search regex         List all matching items.
+  -s, --search id [id...]    List all matching items.
   -e, --edit id [id...],     Edit all given IDs using \$EDITOR.
   -p, --print id [id...]     Dump all given IDs to stdout.
   -n, --new [n]              Add a new task. You'll be put in your
