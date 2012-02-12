@@ -311,11 +311,13 @@ resolve_id()
 	if [[ "${1:0:2}" == ':/' ]]
 	then
 		read_items_raw |
-		egrep "${1:2}" |
-		while read -r a b c d e f id h
+		while read -r a b c d e f id subject
 		do
-			complete_id "$id"
-			echo
+			if echo "$subject" | egrep -q "${1:2}"
+			then
+				complete_id "$id"
+				echo
+			fi
 		done
 	else
 		complete_id "$1"
