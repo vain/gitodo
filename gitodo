@@ -419,7 +419,7 @@ case "${opt#-}" in
 Usage: $(basename "$0") [options]...
 
   -s, --search id [id...]    List all matching items.
-  -e, --edit id [id...],     Edit all given IDs using \$EDITOR.
+  -e, --edit id [id...]      Edit all given IDs using \$EDITOR.
   -p, --print id [id...]     Dump all given IDs to stdout.
   -n, --new [n]              Add a new task. You'll be put in your
                              \$EDITOR to do so. If you specify 'n',
