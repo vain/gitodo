@@ -107,6 +107,25 @@ Or, you can supply one or more ids and even mix both variants:
 	  [  0] [2012-07-13 11:01:00] [1156] time_t party
 	  [  1] [                   ] [2436] aoi patches
 
+To search in bodies of items, you can use `--body`. Note: Don't prefix
+your search term with `:/` when using `--body`. The `:/` is only needed
+to distinguish IDs from search terms. As `--body` does not understand
+IDs, there's no need for `:/`.
+
+	$ gitodo --body party
+	i1156
+	-----
+	what: time_t party
+	when: 2012-07-13 11:01
+	prio: 50
+
+	At 11:01:20 UTC on July 13, 2012, the Unix time number will reach
+	0x50000000 (1,342,177,280 seconds). With the exception of locations in
+	time zones UTC−12:00, UTC+13:00, and UTC+14:00, this also happens on a
+	Friday the 13th.
+
+	http://en.wikipedia.org/wiki/Unix_time
+
 Setup
 -----
 

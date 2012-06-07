@@ -324,6 +324,41 @@ resolve_id()
 	fi
 }
 
+printid()
+{
+	__tput bold
+	echo "$1"
+	echo "${1//?/-}"
+	__tput sgr0
+	cat $1
+	echo
+}
+
+printall()
+{
+	# Each argument ...
+	for i
+	do
+		# ... may expand to multiple IDs if it's a search expression.
+		for id in $(resolve_id "$i")
+		do
+			printid "$id"
+		done
+	done
+}
+
+searchbody()
+{
+	# Read all IDs, then grep through all bodies. $1 is expected to be a
+	# regular expression.
+	read_items_raw |
+	while read -r a b c d e f id rest
+	do
+		cid=$(complete_id "$id")
+		egrep -q "$1" "$cid" && printid "$cid"
+	done
+}
+
 checkrepo()
 {
 	# Initialize the repo (if needed) and cd to it.
@@ -357,6 +392,10 @@ case "${opt#-}" in
 		header
 		list_items nocron "$@"
 		;;
+	body|b)
+		shift
+		searchbody "$@"
+		;;
 	edit|e)
 		shift
 		for i
@@ -370,18 +409,7 @@ case "${opt#-}" in
 		;;
 	print|p)
 		shift
-		for i
-		do
-			for id in $(resolve_id "$i")
-			do
-				__tput bold
-				echo "$id"
-				echo "${id//?/-}"
-				__tput sgr0
-				cat $id
-				echo
-			done
-		done
+		printall "$@"
 		;;
 	new|n)
 		new_items "${2:-1}"
@@ -426,6 +454,8 @@ Usage: $(basename "$0") [options]...
                              then 'n' new tasks will be created.
                              ('n' defaults to 1).
   -d, --delete id [id...]    Delete all given IDs.
+  -b, --body term            Search in bodies of items and print
+                             matching items (including their bodies).
   -l, --log [options]        Show log of the items repository. Add
                              options to "git log" if desired.
   -c, --cron                 Show a list of outdated tasks and tasks
