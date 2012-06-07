@@ -387,7 +387,7 @@ fi
 
 opt=${1#-}
 case "${opt#-}" in
-	search|s)
+	list|i)
 		shift
 		header
 		list_items nocron "$@"
@@ -446,7 +446,7 @@ case "${opt#-}" in
 		cat <<EOM
 Usage: $(basename "$0") [options]...
 
-  -s, --search id [id...]    List all matching items.
+  -i, --list id [id...]      List all matching items.
   -e, --edit id [id...]      Edit all given IDs using \$EDITOR.
   -p, --print id [id...]     Dump all given IDs to stdout.
   -n, --new [n]              Add a new task. You'll be put in your
@@ -472,8 +472,8 @@ Usage: $(basename "$0") [options]...
   If no options are given, a list of all TODO items is shown.
 
   Note: If an "id" starts with ":/", then a search takes place. For
-  example, "gitodo -e ':/(j|di)ane'" edits all items that match "jane"
-  or "diane".
+  example, "gitodo -e ':/(j|di)ane'" edits all items whose subject
+  matches "jane" or "diane".
 
   regexes must be egrep-regexes.
 EOM

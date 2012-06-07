@@ -81,33 +81,35 @@ Searching
 ---------
 
 Instead of giving explicit IDs, you can also use egrep-regexes to search
-your items. The following command edits all items matching "jane" or
-"diane", your TODO item with ID 432 and all items matching "gnu":
+the subjects of your items. The following command edits all items
+matching "jane" or "diane", your TODO item with ID 432 and all items
+matching "gnu":
 
 	$ gitodo -e ':/(j|di)ane' 432 ':/gnu'
 
 Searching using `:/` as a prefix works with the `--edit`, `--print`,
-`--delete` and `--search` commands.
+`--delete` and `--list` commands. Let me repeat: This only searches in
+*subject lines*.
 
-To filter your list of TODO items, you can use the `--search` command.
+To filter your list of TODO items, you can use the `--list` command.
 Again, you can either start your search term with `:/` to perform an
 egrep-search:
 
-	$ gitodo --search :/time
+	$ gitodo --list :/time
 	O Prio        Deadline          ID   Subject
 	- ----- --------------------- ------ -------
 	  [  0] [2012-07-13 11:01:00] [1156] time_t party
 
 Or, you can supply one or more ids and even mix both variants:
 
-	$ gitodo --search 7458 2436 :/time
+	$ gitodo --list 7458 2436 :/time
 	O Prio        Deadline          ID   Subject
 	- ----- --------------------- ------ -------
 	  [  0] [2012-07-01         ] [7458] lico-update
 	  [  0] [2012-07-13 11:01:00] [1156] time_t party
 	  [  1] [                   ] [2436] aoi patches
 
-To search in bodies of items, you can use `--body`. Note: Don't prefix
+To search in *bodies* of items, you can use `--body`. Note: Don't prefix
 your search term with `:/` when using `--body`. The `:/` is only needed
 to distinguish IDs from search terms. As `--body` does not understand
 IDs, there's no need for `:/`.
@@ -125,6 +127,8 @@ IDs, there's no need for `:/`.
 	Friday the 13th.
 
 	http://en.wikipedia.org/wiki/Unix_time
+
+Again, you can use egrep-regexes with `--body`.
 
 Setup
 -----
