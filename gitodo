@@ -350,13 +350,14 @@ then
 	exit
 fi
 
-case "$1" in
-	--search|-search|search|--s|-s|s)
+opt=${1#-}
+case "${opt#-}" in
+	search|s)
 		shift
 		header
 		list_items nocron "$@"
 		;;
-	--edit|-edit|edit|--e|-e|e)
+	edit|e)
 		shift
 		for i
 		do
@@ -367,7 +368,7 @@ case "$1" in
 		done
 		commit
 		;;
-	--print|-print|print|--p|-p|p)
+	print|p)
 		shift
 		for i
 		do
@@ -382,11 +383,11 @@ case "$1" in
 			done
 		done
 		;;
-	--new|-new|new|--n|-n|n)
+	new|n)
 		new_items "${2:-1}"
 		commit
 		;;
-	--delete|-delete|delete|--d|-d|d)
+	delete|d)
 		shift
 		for i
 		do
@@ -397,20 +398,20 @@ case "$1" in
 		done
 		commit
 		;;
-	--log|-log|log|--l|-l|l)
+	log|l)
 		shift
 		git log --oneline --decorate --graph "$@"
 		;;
-	--cron|-cron|cron|--c|-c|c)
+	cron|c)
 		cron_output 1
 		;;
-	--cron-outdated|-cron-outdated|cron-outdated|--o|-o|o)
+	cron-outdated|o)
 		cron_output 0
 		;;
-	--count|-count|count)
+	count)
 		count_tasks
 		;;
-	--raw|-raw|raw)
+	raw)
 		read_items_raw
 		;;
 	*)
