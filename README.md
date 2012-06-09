@@ -177,6 +177,11 @@ That's because I needed that at work (sigh). However, I am no longer
 forced to use Windows. As I now mainly use Arch Linux, I cannot
 guarantee for portability. YMMV.
 
+I don't know when I'll be forced to Windows again. When this happens, I
+want to continue using gitodo. So I try to keep most of the original
+code which is proven to run on msysgit. Unfortunately, this also means
+that I have to keep a lot of ugly and slow code.
+
 Anyway, a little advise: If you *ever* think about putting the task
 items repo on a USB stick and if you want to use that repo from both
 Windows and GNU, make sure to *disable* msysgit's "autocrlf" feature.
