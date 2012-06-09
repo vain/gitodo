@@ -13,11 +13,9 @@ endif
 
 syn match gtkey "\v^(prio|when|dead|what|subject|warn):"
 syn match gtkey "^nocron$"
-syn match gtsubjectline contains=gtumlaut "\v(^(what|subject): )@<=.*"
-syn match gtumlaut "\vö|Ö|ä|Ä|ü|Ü|ß"
+syn match gtsubjectline "\v(^(what|subject): )@<=.*"
 
 hi def link gtkey Identifier
 hi def link gtsubjectline String
-hi def link gtumlaut ErrorMsg
 
 let b:current_syntax = "gitodo"
