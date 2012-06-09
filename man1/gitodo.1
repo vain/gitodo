@@ -1,0 +1,339 @@
+.TH GITODO 1  "June 2012" "Git-TODO" "A personal task manager"
+.SH NAME
+gitodo \- a personal task manager.
+.SH SYNOPSIS
+\fBgitodo\fP
+.br
+\fBgitodo\fP \fB\-\-list\fP \fIid\fP [\fIid ...\fP]
+.br
+\fBgitodo\fP \fB\-\-edit\fP \fIid\fP [\fIid ...\fP]
+.br
+\fBgitodo\fP \fB\-\-print\fP \fIid\fP [\fIid ...\fP]
+.br
+\fBgitodo\fP \fB\-\-delete\fP \fIid\fP [\fIid ...\fP]
+.br
+\fBgitodo\fP \fB\-\-new\fP [\fIn\fP]
+.br
+\fBgitodo\fP \fB\-\-body\fP \fIterm\fP
+.br
+\fBgitodo\fP \fB\-\-log\fP [\fIOPTIONS ...\fP]
+.br
+\fBgitodo\fP \fB\-\-cron\fP
+.br
+\fBgitodo\fP \fB\-\-cron\-outdated\fP
+.br
+\fBgitodo\fP \fB\-\-count\fP
+.br
+\fBgitodo\fP \fB\-\-raw\fP
+.SH DESCRIPTION
+gitodo is a simple personal task manager for your command line.
+.P
+You can do the following:
+.P
+.IP \(bu 4
+Add, edit and list your tasks. Essentially, that's a TODO list.
+.IP \(bu 4
+Prioritize some tasks. Negative priorities mean a higher urgency.
+.IP \(bu 4
+Set a deadline for tasks.
+.IP \(bu 4
+Be able to synchronize your tasks with other machines because they're
+kept in a Git repository.
+.P
+When listing tasks, they're first sorted by importance then by deadline.
+Typical output from the script might look like this:
+.P
+\f(CW
+.nf
+O Prio        Deadline          ID   Subject
+- ----- --------------------- ------ -------
+  [-15] [                   ] [   1] Mail to jane: Dinner.
+  [ -3] [                   ] [   2] Christmas presents.
+! [  0] [           22:00:00] [   9] Remove garbage from your bed.
+  [  0] [           23:30:00] [   8] Go to sleep. Yes, it's important.
+  [  0] [2010-12-10 23:59:00] [  10] Still awake?
+  [  0] [2010-12-13         ] [   6] Prepare talk about Git.
+  [  0] [2010-12-24         ] [   7] Remove SVN from all computers.
+  [  0] [                   ] [   4] Wash dishes.
+  [  0] [                   ] [   5] Buy new milk.
+  [  5] [                   ] [   3] Wash the car.
+.fi
+\fP
+.P
+Note the order: Items with a higher importance come first. If two items
+have the same importance, they're sorted by their deadline. Deadlines
+can be a date, a time (meaning \(lqtoday\(rq) or both. If there's no
+deadline, the task is considered to be \(lqnot important\(rq and is
+moved to the bottom.
+.P
+If the deadline for a task has already passed, it's marked with a
+\fB!\fP at the beginning of the line. If the deadline is close (usually
+less than 1 hour left, can be set), the task is marked with a \fB*\fP.
+.SH OPTIONS
+\fBgitodo\fP is meant to be used on the command line. To make things
+easier for you, you can leave out leading dashes. That is, instead of
+using \fB\-\-list\fP you could just write \fBlist\fP or even \fBi\fP
+because \fB\-i\fP is the short alias for \fB\-\-list\fP.
+.P
+As you'll see, all important commands have a short alias.
+.TP
+\fB\-i\fP, \fB\-\-list\fP \fIid [id ...]\fP
+List all matching items.
+.TP
+\fB\-e\fP, \fB\-\-edit\fP \fIid [id ...]\fP
+Edit all matching items using $\fBEDITOR\fP, one after another.
+.TP
+\fB\-p\fP, \fB\-\-print\fP \fIid [id ...]\fP
+Print all matching items including their body to \fBstdout\fP.
+.TP
+\fB\-n\fP, \fB\-\-new\fP [\fIn\fP]
+Add \fIn\fP new tasks. You'll be put in your $\fBEDITOR\fP to do so. If
+you don't specify \fIn\fP, exactly one new task will be created.
+.TP
+\fB\-d\fP, \fB\-\-delete\fP \fIid [id ...]\fP
+Delete all matching items.
+.TP
+\fB\-b\fP, \fB\-\-body\fP \fIterm\fP
+Search in bodies of items and print matching items (including their
+bodies). \fIterm\fP must be an \fBegrep\fP(1)-regex.
+.TP
+\fB\-l\fP, \fB\-\-log\fP [\fIoptions\fP]
+Show log of the items repository. This calls \fBgit log\fP, any
+\fIoptions\fP will be passed on to \fBgit\fP.
+.TP
+\fB\-c\fP, \fB\-\-cron\fP
+Show a list of outdated tasks and tasks close to the deadline, suitable
+for a cron job.
+.TP
+\fB\-o\fP, \fB\-\-cron\-outdated\fP
+Show a list of outdated tasks, suitable for a cron job.
+.TP
+\fB\-\-count\fP
+Count tasks (all open tasks, tasks close to deadline and outdated
+tasks).
+.TP
+\fB\-\-raw\fP
+Don't do pretty printing. This option is meant for scripting.
+.SH SYNTAX
+Items are simple text files. They look like this:
+.P
+\f(CW
+.nf
+	what: Subject of the task.
+	when: 2010-12-10 08:30
+	prio: 2
+	warn: 4
+
+	Some other lines describing the task in detail.
+.fi
+\fP
+.P
+Deadline and priority are optional. In fact, only a subject line is
+mandatory. The default priority is 0 and no deadline means 2038-01-01
+00:00:00. ;-) A negative number means higher priority (just like Linux'
+\fBnice\fP(1) values). The priority is meant to range from -99 to 99.
+.P
+\fBwarn: 4\fP means that this task gets marked as \(lqclose to
+deadline\(rq four hours before the deadline will be reached. If this
+fields is left out, it defaults to one hour.
+.P
+\fBsubject:\fP is an alias for \fBwhat:\fP and \fBdead:\fP is an alias
+for \fBwhen:\fP.
+.P
+If there's a line containing only \fBnocron\fP, then this item is not
+shown when \fBgitodo\fP is called with \fB\-\-cron\fP or
+\fB\-\-cron-outdated\fP.
+.P
+To help you procrastinate, \fBgitodo\fP knows a special item type: Items
+with a priority less than 99 (i.e., 100, 101, 102, ...) which do have a
+deadline set are hidden from listings. Such items are not included in
+\fB\-\-cron\fP output and \fB\-\-count\fP, either. They're only shown if
+they are close to their deadline or even outdated.
+.P
+This is meant for TODO items that are so unimportant that you don't want
+to be bothered by them \(em until it really is about time.
+.P
+\f(CW
+.nf
+	what: Wash the car.
+	dead: 2012-06-15 12:00
+	prio: 100
+
+	I really should do this. Some day.
+.fi
+\fP
+.P
+If you do want to see such items, you can set the environment variable
+$\fBGITODO_SHOW_UNIMPORTANT\fP.
+.SH "TASK ITEM FILES, THE REPOSITORY AND SYNCHING"
+All your task items are kept in a single directory. On the first start,
+a Git repository will be created in this directory. Every change of your
+task list will be automatically committed to that repository. By
+default, this directory is \fI$XDG_DATA_HOME/gitodo.items\fP. If
+$\fBXDG_DATA_HOME\fP is not set, the directory in which the \fBgitodo\fP
+script resides will be used.
+.P
+Common task items will be named like \fIi0123\fP: That would be the file
+for the 123rd item. Note that new items will get a random free ID
+ranging from 0 to 9999. This is done to avoid merge conflicts.
+.P
+Add the items repo to your synching mechanism if you want them to be
+synched.
+.SH SEARCHING
+Instead of giving explicit IDs, you can also use egrep-regexes to search
+the subjects of your items. The following command edits all items
+matching \(lqjane\(rq or \(lqdiane\(rq, your TODO item with ID 432 and
+all items matching \(lqgnu\(rq:
+.P
+\f(CW
+.nf
+	$ gitodo -e ':/(j|di)ane' 432 ':/gnu'
+.fi
+\fP
+.P
+Searching using \fB:/\fP as a prefix works with the \fB\-\-edit\fP,
+\fB\-\-print\fP, \fB\-\-delete\fP and \fB\-\-list\fP commands. Let me
+repeat: This only searches in \fBsubject lines\fB.
+.P
+To filter your list of TODO items, you can use the \fB\-\-list\fP
+command. Again, you can either start your search term with \fB:/\fP to
+perform an egrep-search:
+.P
+\f(CW
+.nf
+	$ gitodo --list :/time
+	O Prio        Deadline          ID   Subject
+	- ----- --------------------- ------ -------
+	  [  0] [2012-07-13 11:01:00] [1156] time_t party
+.fi
+\fP
+.P
+Or, you can supply one or more ids and even mix both variants:
+.P
+\f(CW
+.nf
+	$ gitodo --list 7458 2436 :/time
+	O Prio        Deadline          ID   Subject
+	- ----- --------------------- ------ -------
+	  [  0] [2012-07-01         ] [7458] lico-update
+	  [  0] [2012-07-13 11:01:00] [1156] time_t party
+	  [  1] [                   ] [2436] aoi patches
+.fi
+\fP
+.P
+To search in \fBbodies\fP of items, you can use \fB\-\-body\fP. Note:
+Don't prefix your search term with \fB:/\fP when using \fB\-\-body\fP.
+The \fB:/\fP is only needed to distinguish IDs from search terms. As
+\fB\-\-body\fP does not understand IDs, there's no need for \fB:/\fP.
+.P
+\f(CW
+.nf
+	$ gitodo --body party
+	i1156
+	-----
+	what: time_t party
+	when: 2012-07-13 11:01
+	prio: 50
+
+	At 11:01:20 UTC on July 13, 2012, the Unix time number will
+	reach 0x50000000 (1,342,177,280 seconds). With the exception of
+	locations in time zones UTC−12:00, UTC+13:00, and UTC+14:00,
+	this also happens on a Friday the 13th.
+
+	http://en.wikipedia.org/wiki/Unix_time
+.fi
+\fP
+.P
+Again, you can use egrep-regexes with \fB\-\-body\fP.
+.SH SETUP
+First, clone the code repository:
+.P
+\f(CW
+.nf
+	$ cd ~/git
+	$ git clone git://github.com/vain/gitodo.git
+.fi
+\fP
+.P
+If you already have an existing repository for your task items, clone
+that one as well:
+.P
+\f(CW
+.nf
+	$ cd "$XDG_DATA_HOME"
+	$ git clone ssh://.../gitodo.items
+.fi
+\fP
+.P
+If you decide to use the Vim syntax files, you should link them into
+your \fI~/.vim\fP directory:
+.P
+\f(CW
+.nf
+	$ cd ~/.vim/ftdetect
+	$ ln -s ~/git/gitodo/vim/ftdetect/gitodo.vim
+	$ cd ../syntax/
+	$ ln -s ~/git/gitodo/vim/syntax/gitodo.vim
+.fi
+\fP
+.SH "USING GITODO WITH HIGHCAL"
+The \fBhighcal\fP(1) script is an additional and optional Python script.
+It's purpose is to create a calendar similar to \fBcal\fP(1). The script
+also reads from \fBstdin\fP a list of dates which will be highlighted.
+On Unix-like systems, it can be easily combined with gitodo:
+.P
+\f(CW
+.nf
+	$ gitodo --raw | cut -d' ' -f2 | highcal
+.fi
+\fP
+.P
+You'll see the current month plus the two following months. The current
+day is marked as well as all deadlines for TODO items (as long as there
+is one).
+.SH PORTABILITY
+Until commit \fBcfe3c9d\fP, this script was \fBmeant\fP to be able to
+run in the \fBmsysgit\fP (http://code.google.com/p/msysgit/) environment
+on Windows. That's because I needed that at work (sigh). However, I am
+no longer forced to use Windows. As I now mainly use Arch Linux, I
+cannot guarantee for portability. YMMV.
+.P
+I don't know when I'll be forced to use Windows again. When this
+happens, I want to continue using gitodo. So I try to keep most of the
+original code which is proven to run on msysgit. Unfortunately, this
+also means that I have to keep a lot of ugly and slow code.
+.P
+Anyway, a little advise: If you ever think about putting the task items
+repo on a USB stick and if you want to use that repo from both Windows
+and GNU, make sure to \fBdisable\fP msysgit's \(lqautocrlf\(rq feature.
+For more information, see:
+.P
+http://www.tigraine.at/2010/02/03/disable-autcrlf-in-msysgit/
+.P
+If you leave it enabled, it's going to be nasty.
+.SH ENVIRONMENT
+.TP
+.B GITODO_FORCE_COLOR
+If this variable is set, color is used in any case, even if stdout is
+not a terminal.
+.TP
+.B GITODO_SHOW_UNIMPORTANT
+If this variable is set, filtering of \(lqunimportant items\(rq (see
+above) will be disabled.
+.SH FILES
+.TP
+.I $XDG_DATA_HOME/gitodo.items/
+Default directory for the items repository.
+.SH BUGS
+Currently, no bugs are known. If you find one, we invite you to report
+it at the GitHub Issue tracker (http://github.com/vain/gitodo/issues).
+.SH LICENSE
+\fBgitodo\fP is released as \(lqPIZZA-WARE\(rq. See the accompanying
+\fILICENSE\fP file.
+.SH HISTORY
+\fBgitodo\fP was originally written by Peter Hofmann. The project was
+started in December 2010.
+.SH "SEE ALSO"
+.BR highcal (1),
+.BR git (1),
+.BR tput (1).
