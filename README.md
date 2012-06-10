@@ -77,6 +77,28 @@ Add the items repo to your synching mechanism if you want them to be
 synched.
 
 
+Very unimportant items
+----------------------
+
+To help you procrastinate, gitodo knows a special item type: Items with
+a priority less than 99 (i.e., 100, 101, 102, ...) which do have a
+deadline set are hidden from listings. Such items are not included in
+`--cron` output and `--count`, either. They're only shown if they are
+close to their deadline or even outdated.
+
+This is meant for TODO items that are so unimportant that you don't want
+to be bothered by them -- until it really is about time.
+
+	what: Wash the car.
+	dead: 2012-06-15 12:00
+	prio: 100
+
+	I really should do this. Some day.
+
+If you do want to see such items, you can set the environment variable
+`$GITODO_SHOW_UNIMPORTANT`.
+
+
 Searching
 ---------
 
@@ -195,6 +217,8 @@ Environment
 
 * `$GITODO_FORCE_COLOR`: If this variable is set, color is used in any
   case, even if stdout is not a terminal.
+* `$GITODO_SHOW_UNIMPORTANT`: If this variable is set, filtering of
+  "unimportant items" (see above) is suppressed.
 
 
 Command line options

@@ -156,8 +156,13 @@ pretty_print_items()
 				__tput setaf 1
 				echo -n '* '
 				__tput sgr0
-			else
+			elif (( prio <= 99 )) || [[ -n $GITODO_SHOW_UNIMPORTANT ]]
+			then
 				echo -n '  '
+			else
+				# Skip items with a priority lower than 99 if they have
+				# a deadline.
+				continue
 			fi
 		else
 			echo -n '  '
