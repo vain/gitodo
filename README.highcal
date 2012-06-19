@@ -1,0 +1,49 @@
+HIGHCAL(1)           Highlight dates in a calendar          HIGHCAL(1)
+
+
+
+NAME
+       highcal - highlight dates in a calendar.
+
+SYNOPSIS
+       highcal
+
+DESCRIPTION
+       Create  calendars  like  cal(1)  but  optionally highlight some
+       days.  Feed this script a list of days on stdin,  one  day  per
+       line:
+
+
+            $ ./highcal <<EOF
+            2011-10-16
+            2011-07-08
+            EOF
+
+
+       The  current month will be shown plus the two following months.
+       The script will highlight the dates from stdin.
+
+       highcal requires tput(1) in order to set colors.
+
+OPTIONS
+       highcal does not know any options.
+
+BUGS
+       Currently, no bugs are known. If you find one, we invite you to
+       report      it      at     the     GitHub     Issue     tracker
+       (http://github.com/vain/gitodo/issues).
+
+LICENSE
+       highcal is  released  as  “PIZZA-WARE”.  See  the  accompanying
+       LICENSE file.
+
+HISTORY
+       gitodo was originally written by Peter Hofmann. The project was
+       started in December 2010. highcal was added in October 2011.
+
+SEE ALSO
+       gitodo(1), git(1), tput(1).
+
+
+
+highcal                        June 2012                    HIGHCAL(1)

@@ -1,0 +1,334 @@
+GITODO(1)               A personal task manager              GITODO(1)
+
+
+
+NAME
+       gitodo - a personal task manager.
+
+SYNOPSIS
+       gitodo
+       gitodo --list id [id ...]
+       gitodo --edit id [id ...]
+       gitodo --print id [id ...]
+       gitodo --delete id [id ...]
+       gitodo --new [n]
+       gitodo --body term
+       gitodo --log [OPTIONS ...]
+       gitodo --cron
+       gitodo --cron-outdated
+       gitodo --count
+       gitodo --raw
+
+DESCRIPTION
+       gitodo is a simple personal task manager for your command line.
+
+       You can do the following:
+
+       ·   Add,  edit  and list your tasks. Essentially, that's a TODO
+           list.
+
+       ·   Prioritize some tasks. Negative priorities  mean  a  higher
+           urgency.
+
+       ·   Set a deadline for tasks.
+
+       ·   Be  able  to  synchronize  your  tasks  with other machines
+           because they're kept in a Git repository.
+
+       When listing tasks, they're first sorted by importance then  by
+       deadline.  Typical output from the script might look like this:
+
+
+       O Prio        Deadline          ID   Subject
+       - ----- --------------------- ------ -------
+         [-15] [                   ] [   1] Mail to jane: Dinner.
+         [ -3] [                   ] [   2] Christmas presents.
+       ! [  0] [           22:00:00] [   9] Remove garbage from your bed.
+         [  0] [           23:30:00] [   8] Go to sleep. Yes, it's important.
+         [  0] [2010-12-10 23:59:00] [  10] Still awake?
+         [  0] [2010-12-13         ] [   6] Prepare talk about Git.
+         [  0] [2010-12-24         ] [   7] Remove SVN from all computers.
+         [  0] [                   ] [   4] Wash dishes.
+         [  0] [                   ] [   5] Buy new milk.
+         [  5] [                   ] [   3] Wash the car.
+
+
+       Note  the  order: Items with a higher importance come first. If
+       two items have the same importance,  they're  sorted  by  their
+       deadline.  Deadlines can be a date, a time (meaning “today”) or
+       both. If there's no deadline, the task is considered to be “not
+       important” and is moved to the bottom.
+
+       If the deadline for a task has already passed, it's marked with
+       a ! at the beginning of the line.  If  the  deadline  is  close
+       (usually less than 1 hour left, can be set), the task is marked
+       with a *.
+
+OPTIONS
+       gitodo is meant to be used on the command line. To make  things
+       easier  for  you,  you  can  leave out leading dashes. That is,
+       instead of using --list you could just write  list  or  even  i
+       because -i is the short alias for --list.
+
+       As you'll see, all important commands have a short alias.
+
+       -i, --list id [id ...]
+              List all matching items.
+
+       -e, --edit id [id ...]
+              Edit   all  matching  items  using  $EDITOR,  one  after
+              another.
+
+       -p, --print id [id ...]
+              Print all matching items including their body to stdout.
+
+       -n, --new [n]
+              Add n new tasks. You'll be put in your $EDITOR to do so.
+              If  you  don't  specify  n, exactly one new task will be
+              created.
+
+       -d, --delete id [id ...]
+              Delete all matching items.
+
+       -b, --body term
+              Search in bodies  of  items  and  print  matching  items
+              (including    their    bodies).    term   must   be   an
+              egrep(1)-regex.
+
+       -l, --log [options]
+              Show log of the items repository. This  calls  git  log,
+              any options will be passed on to git.
+
+       -c, --cron
+              Show  a  list  of  outdated tasks and tasks close to the
+              deadline, suitable for a cron job.
+
+       -o, --cron-outdated
+              Show a list of outdated tasks, suitable for a cron job.
+
+       --count
+              Count tasks (all open tasks, tasks close to deadline and
+              outdated tasks).
+
+       --raw  Don't  do  pretty  printing.  This  option  is meant for
+              scripting.
+
+SYNTAX
+       Items are simple text files. They look like this:
+
+
+            what: Subject of the task.
+            when: 2010-12-10 08:30
+            prio: 2
+            warn: 4
+
+            Some other lines describing the task in detail.
+
+
+       Deadline and priority are optional. In  fact,  only  a  subject
+       line  is  mandatory.  The default priority is 0 and no deadline
+       means 2038-01-01 00:00:00. ;-) A negative number  means  higher
+       priority  (just  like  Linux'  nice(1) values). The priority is
+       meant to range from -99 to 99.
+
+       warn: 4 means that this task gets marked as “close to deadline”
+       four  hours before the deadline will be reached. If this fields
+       is left out, it defaults to one hour.
+
+       subject: is an alias for what: and dead: is an alias for when:.
+
+       If there's a line containing only nocron, then this item is not
+       shown when gitodo is called with --cron or --cron-outdated.
+
+       To  help  you  procrastinate, gitodo knows a special item type:
+       Items with a priority less than 99 (i.e., 100, 101,  102,  ...)
+       which  do  have  a  deadline set are hidden from listings. Such
+       items are not included in --cron output  and  --count,  either.
+       They're  only shown if they are close to their deadline or even
+       outdated.
+
+       This is meant for TODO items that are so unimportant  that  you
+       don't  want  to  be bothered by them — until it really is about
+       time.
+
+
+            what: Wash the car.
+            dead: 2012-06-15 12:00
+            prio: 100
+
+            I really should do this. Some day.
+
+
+       If you do want to see such items, you can set  the  environment
+       variable $GITODO_SHOW_UNIMPORTANT.
+
+TASK ITEM FILES, THE REPOSITORY AND SYNCHING
+       All  your  task  items  are  kept in a single directory. On the
+       first start, a Git repository will be created  in  this  direc‐
+       tory. Every change of your task list will be automatically com‐
+       mitted to  that  repository.  By  default,  this  directory  is
+       $XDG_DATA_HOME/gitodo.items.  If $XDG_DATA_HOME is not set, the
+       directory in which the gitodo script resides will be used.
+
+       Common task items will be named like i0123: That would  be  the
+       file  for the 123rd item. Note that new items will get a random
+       free ID ranging from 0 to 9999. This is  done  to  avoid  merge
+       conflicts.
+
+       Add  the items repo to your synching mechanism if you want them
+       to be synched.
+
+SEARCHING
+       Instead of giving explicit IDs, you can also use  egrep-regexes
+       to  search  the  subjects  of your items. The following command
+       edits all items matching “jane” or “diane”, your TODO item with
+       ID 432 and all items matching “gnu”:
+
+
+            $ gitodo -e ':/(j|di)ane' 432 ':/gnu'
+
+
+       Searching  using :/ as a prefix works with the --edit, --print,
+       --delete and --list commands. Let me repeat: This only searches
+       in subject lines.
+
+       To  filter your list of TODO items, you can use the --list com‐
+       mand. Again, you can either start your search term with  :/  to
+       perform an egrep-search:
+
+
+            $ gitodo --list :/time
+            O Prio        Deadline          ID   Subject
+            - ----- --------------------- ------ -------
+              [  0] [2012-07-13 11:01:00] [1156] time_t party
+
+
+       Or, you can supply one or more ids and even mix both variants:
+
+
+            $ gitodo --list 7458 2436 :/time
+            O Prio        Deadline          ID   Subject
+            - ----- --------------------- ------ -------
+              [  0] [2012-07-01         ] [7458] lico-update
+              [  0] [2012-07-13 11:01:00] [1156] time_t party
+              [  1] [                   ] [2436] aoi patches
+
+
+       To  search  in bodies of items, you can use --body. Note: Don't
+       prefix your search term with :/ when using --body.  The  :/  is
+       only  needed  to  distinguish  IDs from search terms. As --body
+       does not understand IDs, there's no need for :/.
+
+
+            $ gitodo --body party
+            i1156
+            -----
+            what: time_t party
+            when: 2012-07-13 11:01
+            prio: 50
+
+            At 11:01:20 UTC on July 13, 2012, the Unix time number will
+            reach 0x50000000 (1,342,177,280 seconds). With the exception of
+            locations in time zones UTC−12:00, UTC+13:00, and UTC+14:00,
+            this also happens on a Friday the 13th.
+
+            http://en.wikipedia.org/wiki/Unix_time
+
+
+       Again, you can use egrep-regexes with --body.
+
+SETUP
+       First, clone the code repository:
+
+
+            $ cd ~/git
+            $ git clone git://github.com/vain/gitodo.git
+
+
+       If you already have an existing repository for your task items,
+       clone that one as well:
+
+
+            $ cd "$XDG_DATA_HOME"
+            $ git clone ssh://.../gitodo.items
+
+
+       If you decide to use the Vim syntax files, you should link them
+       into your ~/.vim directory:
+
+
+            $ cd ~/.vim/ftdetect
+            $ ln -s ~/git/gitodo/vim/ftdetect/gitodo.vim
+            $ cd ../syntax/
+            $ ln -s ~/git/gitodo/vim/syntax/gitodo.vim
+
+
+USING GITODO WITH HIGHCAL
+       The highcal(1) script is  an  additional  and  optional  Python
+       script.   It's  purpose  is  to  create  a  calendar similar to
+       cal(1). The script also reads from stdin a list of dates  which
+       will  be  highlighted.   On Unix-like systems, it can be easily
+       combined with gitodo:
+
+
+            $ gitodo --raw | cut -d' ' -f2 | highcal
+
+
+       You'll see the current month plus the two following months. The
+       current  day  is marked as well as all deadlines for TODO items
+       (as long as there is one).
+
+PORTABILITY
+       Until commit cfe3c9d, this script was meant to be able  to  run
+       in  the msysgit (http://code.google.com/p/msysgit/) environment
+       on Windows. That's because I needed that at work  (sigh).  How‐
+       ever, I am no longer forced to use Windows. As I now mainly use
+       Arch Linux, I cannot guarantee for portability. YMMV.
+
+       I don't know when I'll be forced to  use  Windows  again.  When
+       this happens, I want to continue using gitodo. So I try to keep
+       most of the original code which is proven to  run  on  msysgit.
+       Unfortunately,  this  also  means  that I have to keep a lot of
+       ugly and slow code.
+
+       Anyway, a little advise: If you ever think  about  putting  the
+       task items repo on a USB stick and if you want to use that repo
+       from both Windows and  GNU,  make  sure  to  disable  msysgit's
+       “autocrlf” feature.  For more information, see:
+
+       http://www.tigraine.at/2010/02/03/disable-autcrlf-in-msysgit/
+
+       If you leave it enabled, it's going to be nasty.
+
+ENVIRONMENT
+       GITODO_FORCE_COLOR
+              If this variable is set, color is used in any case, even
+              if stdout is not a terminal.
+
+       GITODO_SHOW_UNIMPORTANT
+              If this  variable  is  set,  filtering  of  “unimportant
+              items” (see above) will be disabled.
+
+FILES
+       $XDG_DATA_HOME/gitodo.items/
+              Default directory for the items repository.
+
+BUGS
+       Currently, no bugs are known. If you find one, we invite you to
+       report     it     at     the     GitHub      Issue      tracker
+       (http://github.com/vain/gitodo/issues).
+
+LICENSE
+       gitodo  is  released  as  “PIZZA-WARE”.  See  the  accompanying
+       LICENSE file.
+
+HISTORY
+       gitodo was originally written by Peter Hofmann. The project was
+       started in December 2010.
+
+SEE ALSO
+       highcal(1), git(1), tput(1).
+
+
+
+Git-TODO                       June 2012                     GITODO(1)
