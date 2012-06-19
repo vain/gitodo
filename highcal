@@ -1,17 +1,5 @@
 #!/usr/bin/env python3
 
-# Create calendars like cal(1) but optionally highlight some days. Feed
-# this script a list of days on STDIN, one day per line. Like so:
-#
-#  $ ./highcal <<EOF
-#  2011-10-16
-#  2011-07-08
-#  EOF
-#
-# The current month will be shown plus the two following months. The
-# script will highlight the dates from STDIN.
-
-
 import datetime
 import calendar
 import os
