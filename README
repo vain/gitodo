@@ -293,7 +293,7 @@ PORTABILITY
        Unfortunately,  this  also  means  that I have to keep a lot of
        ugly and slow code.
 
-       Anyway, a little advise: If you ever think  about  putting  the
+       Anyway, a little advice: If you ever think  about  putting  the
        task items repo on a USB stick and if you want to use that repo
        from both Windows and  GNU,  make  sure  to  disable  msysgit's
        “autocrlf” feature.  For more information, see:
