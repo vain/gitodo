@@ -166,13 +166,16 @@ to be bothered by them \(em until it really is about time.
 If you do want to see such items, you can set the environment variable
 $\fBGITODO_SHOW_UNIMPORTANT\fP.
 .SH "TASK ITEM FILES, THE REPOSITORY AND SYNCHING"
-All your task items are kept in a single directory. On the first start,
-a Git repository will be created in this directory. Every change of your
+All your task items are kept in a single directory. Every change of your
 task list will be automatically committed to that repository. By
 default, \fI$XDG_DATA_HOME/gitodo.items\fP will be used or
 \fI$HOME/.local/share/gitodo.items\fP if $\fBXDG_DATA_HOME\fP is not
 set. Use the environment variable $\fBGITODO_DATA\fP to change this. If
 it's set, then this directory is used.
+.P
+\fBImportant note:\fP Your items directory must exist and it must
+already be initialized as a Git repository. \fBgitodo\fP will not do
+this for you.
 .P
 Common task items will be named like \fIi0123\fP: That would be the file
 for the 123rd item. Note that new items will get a random free ID
@@ -257,7 +260,8 @@ First, clone the code repository:
 \fP
 .P
 If you already have an existing repository for your task items, clone
-that one as well:
+that one as well (otherwise create the directory and do a \fBgit
+init\fP):
 .P
 \f(CW
 .nf

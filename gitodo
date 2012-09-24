@@ -366,11 +366,15 @@ searchbody()
 
 checkrepo()
 {
-	# Initialize the repo (if needed) and cd to it.
+	# Check if the directory exists and if it's a git repo. cd to it.
 
-	mkdir -p "$datadir"
+	if [[ ! -d "$datadir"/.git ]]
+	then
+		echo "\`$datadir' is not a Git repository." >&2
+		return 1
+	fi
+
 	cd "$datadir"
-	[[ -d .git ]] || git init
 }
 
 commit()
@@ -381,7 +385,7 @@ commit()
 	git commit -a -m "Auto-commit $HOSTNAME."
 }
 
-checkrepo
+checkrepo || exit 1
 
 if [[ -z "$1" ]]
 then

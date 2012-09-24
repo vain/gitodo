@@ -163,14 +163,16 @@ SYNTAX
        variable $GITODO_SHOW_UNIMPORTANT.
 
 TASK ITEM FILES, THE REPOSITORY AND SYNCHING
-       All  your  task  items  are  kept in a single directory. On the
-       first start, a Git repository will be created  in  this  direc‐
-       tory. Every change of your task list will be automatically com‐
-       mitted      to      that      repository.      By      default,
-       $XDG_DATA_HOME/gitodo.items      will      be      used      or
-       $HOME/.local/share/gitodo.items if $XDG_DATA_HOME is  not  set.
-       Use  the  environment  variable $GITODO_DATA to change this. If
-       it's set, then this directory is used.
+       All  your  task  items  are  kept  in a single directory. Every
+       change of your task list will  be  automatically  committed  to
+       that  repository.  By default, $XDG_DATA_HOME/gitodo.items will
+       be used or $HOME/.local/share/gitodo.items if $XDG_DATA_HOME is
+       not  set.  Use  the environment variable $GITODO_DATA to change
+       this. If it's set, then this directory is used.
+
+       Important note: Your items directory must  exist  and  it  must
+       already  be initialized as a Git repository. gitodo will not do
+       this for you.
 
        Common task items will be named like i0123: That would  be  the
        file  for the 123rd item. Note that new items will get a random
@@ -248,7 +250,8 @@ SETUP
 
 
        If you already have an existing repository for your task items,
-       clone that one as well:
+       clone that one as well (otherwise create the directory and do a
+       git init):
 
 
             $ cd "$XDG_DATA_HOME"
@@ -266,10 +269,10 @@ SETUP
 
 
 USING GITODO WITH HIGHCAL
-       The highcal(1) script is  an  additional  and  optional  Python
-       script.   It's  purpose  is  to  create  a  calendar similar to
-       cal(1). The script also reads from stdin a list of dates  which
-       will  be  highlighted.   On Unix-like systems, it can be easily
+       The  highcal(1)  script  is  an  additional and optional Python
+       script.  It's purpose  is  to  create  a  calendar  similar  to
+       cal(1).  The script also reads from stdin a list of dates which
+       will be highlighted.  On Unix-like systems, it  can  be  easily
        combined with gitodo:
 
 
@@ -277,25 +280,25 @@ USING GITODO WITH HIGHCAL
 
 
        You'll see the current month plus the two following months. The
-       current  day  is marked as well as all deadlines for TODO items
+       current day is marked as well as all deadlines for  TODO  items
        (as long as there is one).
 
 PORTABILITY
-       Until commit cfe3c9d, this script was meant to be able  to  run
-       in  the msysgit (http://code.google.com/p/msysgit/) environment
-       on Windows. That's because I needed that at work  (sigh).  How‐
+       Until  commit  cfe3c9d, this script was meant to be able to run
+       in the msysgit (http://code.google.com/p/msysgit/)  environment
+       on  Windows.  That's because I needed that at work (sigh). How‐
        ever, I am no longer forced to use Windows. As I now mainly use
        Arch Linux, I cannot guarantee for portability. YMMV.
 
-       I don't know when I'll be forced to  use  Windows  again.  When
+       I  don't  know  when  I'll be forced to use Windows again. When
        this happens, I want to continue using gitodo. So I try to keep
-       most of the original code which is proven to  run  on  msysgit.
-       Unfortunately,  this  also  means  that I have to keep a lot of
+       most  of  the  original code which is proven to run on msysgit.
+       Unfortunately, this also means that I have to  keep  a  lot  of
        ugly and slow code.
 
-       Anyway, a little advice: If you ever think  about  putting  the
+       Anyway,  a  little  advice: If you ever think about putting the
        task items repo on a USB stick and if you want to use that repo
-       from both Windows and  GNU,  make  sure  to  disable  msysgit's
+       from  both  Windows  and  GNU,  make  sure to disable msysgit's
        “autocrlf” feature.  For more information, see:
 
        http://www.tigraine.at/2010/02/03/disable-autcrlf-in-msysgit/
@@ -304,8 +307,8 @@ PORTABILITY
 
 ENVIRONMENT
        GITODO_DATA
-              If  this  variable  is set, it must point to a directory
-              where your git repository will be stored.  You  can  use
+              If this variable is set, it must point  to  a  directory
+              where  your  git  repository will be stored. You can use
               this to override the default location (see FILES below).
 
        GITODO_FORCE_COLOR
@@ -313,19 +316,19 @@ ENVIRONMENT
               if stdout is not a terminal.
 
        GITODO_SHOW_UNIMPORTANT
-              If this  variable  is  set,  filtering  of  “unimportant
+              If  this  variable  is  set,  filtering  of “unimportant
               items” (see above) will be disabled.
 
 FILES
        $XDG_DATA_HOME/gitodo.items/
        $HOME/.local/share/gitodo.items/
-              Default  per-user  data directory if $GITODO_DATA is not
+              Default per-user data directory if $GITODO_DATA  is  not
               set. The $HOME variant is only used if $XDG_DATA_HOME is
               not set.
 
 BUGS
        Currently, no bugs are known. If you find one, we invite you to
-       report     it     at     the     GitHub      Issue      tracker
+       report      it      at     the     GitHub     Issue     tracker
        (http://github.com/vain/gitodo/issues).
 
 LICENSE
