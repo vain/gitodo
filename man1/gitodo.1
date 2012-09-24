@@ -169,9 +169,10 @@ $\fBGITODO_SHOW_UNIMPORTANT\fP.
 All your task items are kept in a single directory. On the first start,
 a Git repository will be created in this directory. Every change of your
 task list will be automatically committed to that repository. By
-default, this directory is \fI$XDG_DATA_HOME/gitodo.items\fP. If
-$\fBXDG_DATA_HOME\fP is not set, the directory in which the \fBgitodo\fP
-script resides will be used.
+default, \fI$XDG_DATA_HOME/gitodo.items\fP will be used or
+\fI$HOME/.local/share/gitodo.items\fP if $\fBXDG_DATA_HOME\fP is not
+set. Use the environment variable $\fBGITODO_DATA\fP to change this. If
+it's set, then this directory is used.
 .P
 Common task items will be named like \fIi0123\fP: That would be the file
 for the 123rd item. Note that new items will get a random free ID
@@ -313,6 +314,11 @@ http://www.tigraine.at/2010/02/03/disable-autcrlf-in-msysgit/
 If you leave it enabled, it's going to be nasty.
 .SH ENVIRONMENT
 .TP
+.B GITODO_DATA
+If this variable is set, it must point to a directory where your git
+repository will be stored. You can use this to override the default
+location (see \fBFILES\fP below).
+.TP
 .B GITODO_FORCE_COLOR
 If this variable is set, color is used in any case, even if stdout is
 not a terminal.
@@ -322,8 +328,13 @@ If this variable is set, filtering of \(lqunimportant items\(rq (see
 above) will be disabled.
 .SH FILES
 .TP
-.I $XDG_DATA_HOME/gitodo.items/
-Default directory for the items repository.
+.PD 0
+\fI$XDG_DATA_HOME/gitodo.items/\fP
+.TP
+.PD
+\fI$HOME/.local/share/gitodo.items/\fP
+Default per-user data directory if $\fBGITODO_DATA\fP is not set. The
+$\fBHOME\fP variant is only used if $\fBXDG_DATA_HOME\fP is not set.
 .SH BUGS
 Currently, no bugs are known. If you find one, we invite you to report
 it at the GitHub Issue tracker (http://github.com/vain/gitodo/issues).

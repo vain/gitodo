@@ -166,9 +166,11 @@ TASK ITEM FILES, THE REPOSITORY AND SYNCHING
        All  your  task  items  are  kept in a single directory. On the
        first start, a Git repository will be created  in  this  direc‐
        tory. Every change of your task list will be automatically com‐
-       mitted to  that  repository.  By  default,  this  directory  is
-       $XDG_DATA_HOME/gitodo.items.  If $XDG_DATA_HOME is not set, the
-       directory in which the gitodo script resides will be used.
+       mitted      to      that      repository.      By      default,
+       $XDG_DATA_HOME/gitodo.items      will      be      used      or
+       $HOME/.local/share/gitodo.items if $XDG_DATA_HOME is  not  set.
+       Use  the  environment  variable $GITODO_DATA to change this. If
+       it's set, then this directory is used.
 
        Common task items will be named like i0123: That would  be  the
        file  for the 123rd item. Note that new items will get a random
@@ -301,6 +303,11 @@ PORTABILITY
        If you leave it enabled, it's going to be nasty.
 
 ENVIRONMENT
+       GITODO_DATA
+              If  this  variable  is set, it must point to a directory
+              where your git repository will be stored.  You  can  use
+              this to override the default location (see FILES below).
+
        GITODO_FORCE_COLOR
               If this variable is set, color is used in any case, even
               if stdout is not a terminal.
@@ -311,7 +318,10 @@ ENVIRONMENT
 
 FILES
        $XDG_DATA_HOME/gitodo.items/
-              Default directory for the items repository.
+       $HOME/.local/share/gitodo.items/
+              Default  per-user  data directory if $GITODO_DATA is not
+              set. The $HOME variant is only used if $XDG_DATA_HOME is
+              not set.
 
 BUGS
        Currently, no bugs are known. If you find one, we invite you to

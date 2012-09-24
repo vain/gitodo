@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # Defaults and "configuration".
+default_prefix=${XDG_DATA_HOME:-$HOME/.local/share}
+datadir=${GITODO_DATA:-$default_prefix/gitodo.items}
 EDITOR=${EDITOR:-vim}
-itemsbase=${XDG_DATA_HOME:-"$(dirname "$0")"}
-itemsdir="$itemsbase/gitodo.items"
 
 # These are essential.
 shopt -s nullglob
@@ -368,8 +368,8 @@ checkrepo()
 {
 	# Initialize the repo (if needed) and cd to it.
 
-	mkdir -p "$itemsdir"
-	cd "$itemsdir"
+	mkdir -p "$datadir"
+	cd "$datadir"
 	[[ -d .git ]] || git init
 }
 
