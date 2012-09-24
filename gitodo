@@ -3,7 +3,7 @@
 # Defaults and "configuration".
 default_prefix=${XDG_DATA_HOME:-$HOME/.local/share}
 datadir=${GITODO_DATA:-$default_prefix/gitodo.items}
-EDITOR=${EDITOR:-vim}
+editor=${EDITOR:-vim}
 
 # These are essential.
 shopt -s nullglob
@@ -299,7 +299,7 @@ new_items()
 			next=$((RANDOM % 9999))
 		done
 
-		$EDITOR "$(complete_id $next)"
+		$editor "$(complete_id $next)"
 	done
 }
 
@@ -411,7 +411,7 @@ case "${opt#-}" in
 		do
 			for id in $(resolve_id "$i")
 			do
-				$EDITOR $id
+				$editor $id
 			done
 		done
 		commit
