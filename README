@@ -18,6 +18,7 @@ SYNOPSIS
        gitodo --cron-outdated
        gitodo --count
        gitodo --raw
+       gitodo --rotting [n]
 
 DESCRIPTION
        gitodo is a simple personal task manager for your command line.
@@ -112,6 +113,13 @@ OPTIONS
 
        --raw  Don't  do  pretty  printing.  This  option  is meant for
               scripting.
+
+       --rotting [n]
+              When using gitodo for a long time, you might lose  track
+              of  some  items  —  especially those without a deadline.
+              --rotting lists all tasks which have  not  been  changed
+              for  n  months.  Default  is 3 months. This only affects
+              tasks without a deadline.
 
 SYNTAX
        Items are simple text files. They look like this:

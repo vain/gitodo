@@ -25,6 +25,8 @@ gitodo \- a personal task manager.
 \fBgitodo\fP \fB\-\-count\fP
 .br
 \fBgitodo\fP \fB\-\-raw\fP
+.br
+\fBgitodo\fP \fB\-\-rotting\fP [\fIn\fP]
 .SH DESCRIPTION
 gitodo is a simple personal task manager for your command line.
 .P
@@ -114,6 +116,12 @@ tasks).
 .TP
 \fB\-\-raw\fP
 Don't do pretty printing. This option is meant for scripting.
+.TP
+\fB\-\-rotting\fP [\fIn\fP]
+When using \fBgitodo\fP for a long time, you might lose track of some
+items \(em especially those without a deadline. \fB\-\-rotting\fP lists
+all tasks which have not been changed for \fIn\fP months. Default is 3
+months. This only affects tasks without a deadline.
 .SH SYNTAX
 Items are simple text files. They look like this:
 .P

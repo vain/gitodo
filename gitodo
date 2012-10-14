@@ -233,6 +233,31 @@ list_items()
 	fi
 }
 
+list_rotting_items()
+{
+	# Roughly 3 months.
+	months=${1:-"3"}
+	threshold=$((60 * 60 * 24 * 30 * months))
+	stampnow=$(date '+%s')
+
+	# Due to a very different output format, we can't use
+	# pretty_print_items() here.
+	read_items_raw |
+	while read -r prio day time warn nocron timetype id subject
+	do
+		if [[ "$timetype" == 3 ]]
+		then
+			fname=$(complete_id $id)
+			lchange=$(git log '--pretty=format:%ct' -n 1 -- "$fname")
+			if (( stampnow - lchange > threshold ))
+			then
+				rchange=$(git log '--pretty=format:%cr' -n 1 -- "$fname")
+				printf "%s\t%4d\t%s\n" "$rchange" "$id" "$subject"
+			fi
+		fi
+	done
+}
+
 count_tasks()
 {
 	# Count outdated tasks, those whose deadline is close and all tasks
@@ -451,6 +476,10 @@ case "${opt#-}" in
 	raw)
 		read_items_raw
 		;;
+	rotting)
+		shift
+		list_rotting_items "$1"
+		;;
 	*)
 		cat <<EOM
 Usage: $(basename "$0") [options]...
@@ -476,6 +505,9 @@ Usage: $(basename "$0") [options]...
                              deadline and outdated tasks).
   --raw                      Don't do pretty printing. This option is
                              meant for scripting.
+  --rotting [n]              List items which have not been changed for
+                             over n months. This only affects itmes
+                             without a deadline. Default is 3 months.
   -h, --help                 Show this help page.
 
   If no options are given, a list of all TODO items is shown.
