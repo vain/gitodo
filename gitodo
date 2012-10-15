@@ -264,6 +264,8 @@ count_tasks()
 	# in total.
 
 	out=$(use_tput= list_items)
+	[[ -z "$out" ]] && { echo 0 0 0; return; }
+
 	outdated=$(echo "$out" | grep '^!' | wc -l)
 	warning=$(echo "$out" | grep '^\*' | wc -l)
 	echo $outdated $warning $(echo "$out" | wc -l)
