@@ -265,7 +265,7 @@ list_rotting_items()
 	# Due to a very different output format, we can't use
 	# pretty_print_items() here.
 	read_items_raw |
-	while read -r prio day time warn nocron timetype id subject
+	while read -r _ _ _ _ _ timetype id subject
 	do
 		if [[ "$timetype" == 3 ]]
 		then
@@ -365,7 +365,7 @@ resolve_id()
 	if [[ "${1:0:2}" == ':/' ]]
 	then
 		read_items_raw |
-		while read -r a b c d e f id subject
+		while read -r _ _ _ _ _ _ id subject
 		do
 			if echo "$subject" | egrep -q "${1:2}"
 			then
@@ -430,7 +430,7 @@ searchbody()
 	# Read all IDs, then grep through all bodies. $1 is expected to be a
 	# regular expression.
 	read_items_raw |
-	while read -r a b c d e f id rest
+	while read -r _ _ _ _ _ _ id _
 	do
 		cid=$(complete_id "$id")
 		egrep -q "$1" "$cid" && printid "$cid"
