@@ -73,7 +73,7 @@ OPTIONS
 
        As you'll see, all important commands have a short alias.
 
-       -i, --list id [id ...]
+       -l, --list id [id ...]
               List all matching items.
 
        -e, --edit id [id ...]
@@ -96,7 +96,7 @@ OPTIONS
               (including    their    bodies).    term   must   be   an
               egrep(1)-regex.
 
-       -l, --log [options]
+       --log [options]
               Show log of the items repository. This  calls  git  log,
               any options will be passed on to git.
 
@@ -120,6 +120,10 @@ OPTIONS
               --rotting lists all tasks which have  not  been  changed
               for  n  months.  Default  is 3 months. This only affects
               tasks without a deadline.
+
+       id can be an explicit ID  or  string  beginning  with  :/  (see
+       SEARCHING)  or  a  special  identifier: dead means all outdated
+       items, close means all items close to their deadline.
 
 SYNTAX
        Items are simple text files. They look like this:
@@ -352,4 +356,4 @@ SEE ALSO
 
 
 
-Git-TODO                    September 2012                   GITODO(1)
+Git-TODO                     October 2012                    GITODO(1)
