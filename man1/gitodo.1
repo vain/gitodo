@@ -122,6 +122,10 @@ When using \fBgitodo\fP for a long time, you might lose track of some
 items \(em especially those without a deadline. \fB\-\-rotting\fP lists
 all tasks which have not been changed for \fIn\fP months. Default is 3
 months. This only affects tasks without a deadline.
+.P
+\fIid\fP can be an explicit ID or string beginning with \fB:/\fP (see
+\fBSEARCHING\fP) or a special identifier: \fBdead\fP means all outdated
+items, \fBclose\fP means all items close to their deadline.
 .SH SYNTAX
 Items are simple text files. They look like this:
 .P

@@ -34,6 +34,29 @@ header()
 	__tput sgr0
 }
 
+classify_item_dead()
+{
+	day=$1
+	time=$2
+	warn=$3
+
+	# 0 = okay, 1 = close, 2 = dead
+	class=0
+
+	stampnow=$(date '+%s')
+	stampitem=$(date -d "$day $time" '+%s')
+	taskdiff=$((stampnow - stampitem))
+	if (( taskdiff > 0 ))
+	then
+		class=2
+	elif (( taskdiff > -warn * 3600 ))
+	then
+		class=1
+	fi
+
+	echo $class
+}
+
 read_items_raw()
 {
 	# Read either specific files or glob "i*".
@@ -140,18 +163,17 @@ pretty_print_items()
 		# Pretty printing. This function is meant to be fed the output
 		# of read_items_raw().
 
-		# Find out if the deadline has passed.
-		stampitem=$(date -d "$day $time" '+%s')
-		taskdiff=$((stampnow - stampitem))
 		if ! (( cron & nocron )) && (( timetype != 3 ))
 		then
-			if (( taskdiff > 0 ))
+			# Find out if the deadline has passed.
+			class=$(classify_item_dead $day $time $warn)
+			if (( class == 2 ))
 			then
 				__tput bold
 				__tput setaf 1
 				echo -n '! '
 				__tput sgr0
-			elif (( taskdiff > -warn * 3600 ))
+			elif (( class == 1 ))
 			then
 				__tput setaf 1
 				echo -n '* '
@@ -351,6 +373,30 @@ resolve_id()
 				echo
 			fi
 		done
+	elif [[ "$1" == 'dead' ]]
+	then
+		read_items_raw |
+		while read -r _ day time _ _ _ id _
+		do
+			class=$(classify_item_dead $day $time $warn)
+			if (( class == 2 ))
+			then
+				complete_id "$id"
+				echo
+			fi
+		done
+	elif [[ "$1" == 'close' ]]
+	then
+		read_items_raw |
+		while read -r _ day time warn _ _ id _
+		do
+			class=$(classify_item_dead $day $time $warn)
+			if (( class == 1 ))
+			then
+				complete_id "$id"
+				echo
+			fi
+		done
 	else
 		complete_id "$1"
 	fi
@@ -517,6 +563,9 @@ Usage: $(basename "$0") [options]...
   Note: If an "id" starts with ":/", then a search takes place. For
   example, "gitodo -e ':/(j|di)ane'" edits all items whose subject
   matches "jane" or "diane".
+
+  "id" can also be "dead" or "close" which means outdated items or items
+  close to their deadline.
 
   regexes must be egrep-regexes.
 EOM
