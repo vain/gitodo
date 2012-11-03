@@ -46,13 +46,13 @@ header()
 
 classify_item_dead()
 {
-	stampitem=$1
-	warn=$2
+	stampnow=$1
+	stampitem=$2
+	warn=$3
 
 	# 0 = okay, 1 = close, 2 = dead
 	class=0
 
-	stampnow=$(date '+%s')
 	taskdiff=$((stampnow - stampitem))
 	if (( taskdiff > 0 ))
 	then
@@ -155,6 +155,8 @@ read_items_raw()
 
 pretty_print_items()
 {
+	stampnow=$(date '+%s')
+
 	while read -r prio day time stamp warn nocron timetype id subject
 	do
 		# Pretty printing. This function is meant to be fed the output
@@ -163,7 +165,7 @@ pretty_print_items()
 		if ! (( cron & nocron )) && (( timetype != 3 ))
 		then
 			# Find out if the deadline has passed.
-			class=$(classify_item_dead $stamp $warn)
+			class=$(classify_item_dead $stampnow $stamp $warn)
 			if (( class == 2 ))
 			then
 				echo -n "$col_bold$col_red"
@@ -359,6 +361,8 @@ complete_id()
 
 resolve_id()
 {
+	stampnow=$(date '+%s')
+
 	if [[ "${1:0:2}" == ':/' ]]
 	then
 		read_items_raw |
@@ -375,7 +379,7 @@ resolve_id()
 		read_items_raw |
 		while read -r _ _ _ stamp warn _ _ id _
 		do
-			class=$(classify_item_dead $stamp $warn)
+			class=$(classify_item_dead $stampnow $stamp $warn)
 			if (( class == 2 ))
 			then
 				complete_id "$id"
@@ -387,7 +391,7 @@ resolve_id()
 		read_items_raw |
 		while read -r _ _ _ stamp warn _ _ id _
 		do
-			class=$(classify_item_dead $stamp $warn)
+			class=$(classify_item_dead $stampnow $stamp $warn)
 			if (( class == 1 ))
 			then
 				complete_id "$id"
