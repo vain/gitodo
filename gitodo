@@ -372,7 +372,7 @@ resolve_id()
 		read_items_raw |
 		while read -r _ _ _ _ _ _ _ id subject
 		do
-			if echo "$subject" | egrep -q "${1:2}"
+			if echo "$subject" | egrep -i -q "${1:2}"
 			then
 				complete_id "$id"
 				echo
@@ -438,7 +438,7 @@ searchbody()
 	while read -r _ _ _ _ _ _ _ id _
 	do
 		cid=$(complete_id "$id")
-		egrep -q "$1" "$cid" && printid "$cid"
+		egrep -i -q "$1" "$cid" && printid "$cid"
 	done
 }
 

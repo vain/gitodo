@@ -253,6 +253,8 @@ SEARCHING
 
        Again, you can use egrep-regexes with --body.
 
+       Searching is always case insensitive.
+
 SETUP
        First, clone the code repository:
 
