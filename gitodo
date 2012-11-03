@@ -46,15 +46,13 @@ header()
 
 classify_item_dead()
 {
-	day=$1
-	time=$2
-	warn=$3
+	stampitem=$1
+	warn=$2
 
 	# 0 = okay, 1 = close, 2 = dead
 	class=0
 
 	stampnow=$(date '+%s')
-	stampitem=$(date -d "$day $time" '+%s')
 	taskdiff=$((stampnow - stampitem))
 	if (( taskdiff > 0 ))
 	then
@@ -112,7 +110,7 @@ read_items_raw()
 		done < "$i"
 
 		# Normalize deadline.
-		whennorm=$(date -d "$when" '+%F %T')
+		whennorm=$(date -d "$when" '+%F %T %s')
 
 		# Find out whether it's date + time, only date or only time.
 		spaces=${when//[^ ]/}
@@ -141,7 +139,7 @@ read_items_raw()
 		then
 			# No date or time.
 			timetype=3
-			whennorm='2038-01-01 00:00:00'
+			whennorm='2038-01-01 00:00:00 2145913200'
 		fi
 
 		# Get the ID by removing the "i" and leading zeros from the
@@ -157,7 +155,7 @@ read_items_raw()
 
 pretty_print_items()
 {
-	while read -r prio day time warn nocron timetype id subject
+	while read -r prio day time stamp warn nocron timetype id subject
 	do
 		# Pretty printing. This function is meant to be fed the output
 		# of read_items_raw().
@@ -165,7 +163,7 @@ pretty_print_items()
 		if ! (( cron & nocron )) && (( timetype != 3 ))
 		then
 			# Find out if the deadline has passed.
-			class=$(classify_item_dead $day $time $warn)
+			class=$(classify_item_dead $stamp $warn)
 			if (( class == 2 ))
 			then
 				echo -n "$col_bold$col_red"
@@ -262,7 +260,7 @@ list_rotting_items()
 	# Due to a very different output format, we can't use
 	# pretty_print_items() here.
 	read_items_raw |
-	while read -r _ _ _ _ _ timetype id subject
+	while read -r _ _ _ _ _ _ timetype id subject
 	do
 		if [[ "$timetype" == 3 ]]
 		then
@@ -364,7 +362,7 @@ resolve_id()
 	if [[ "${1:0:2}" == ':/' ]]
 	then
 		read_items_raw |
-		while read -r _ _ _ _ _ _ id subject
+		while read -r _ _ _ _ _ _ _ id subject
 		do
 			if echo "$subject" | egrep -q "${1:2}"
 			then
@@ -375,9 +373,9 @@ resolve_id()
 	elif [[ "$1" == 'dead' ]]
 	then
 		read_items_raw |
-		while read -r _ day time warn _ _ id _
+		while read -r _ _ _ stamp warn _ _ id _
 		do
-			class=$(classify_item_dead $day $time $warn)
+			class=$(classify_item_dead $stamp $warn)
 			if (( class == 2 ))
 			then
 				complete_id "$id"
@@ -387,9 +385,9 @@ resolve_id()
 	elif [[ "$1" == 'close' ]]
 	then
 		read_items_raw |
-		while read -r _ day time warn _ _ id _
+		while read -r _ _ _ stamp warn _ _ id _
 		do
-			class=$(classify_item_dead $day $time $warn)
+			class=$(classify_item_dead $stamp $warn)
 			if (( class == 1 ))
 			then
 				complete_id "$id"
@@ -429,7 +427,7 @@ searchbody()
 	# Read all IDs, then grep through all bodies. $1 is expected to be a
 	# regular expression.
 	read_items_raw |
-	while read -r _ _ _ _ _ _ id _
+	while read -r _ _ _ _ _ _ _ id _
 	do
 		cid=$(complete_id "$id")
 		egrep -q "$1" "$cid" && printid "$cid"
