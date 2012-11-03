@@ -144,11 +144,9 @@ read_items_raw()
 		fi
 
 		# Get the ID by removing the "i" and leading zeros from the
-		# filename. Usage of expr is a nice trick: It doesn't recognize
-		# octal numbers and doesn't output leading zeros. Hence, adding
-		# 0 effectively strips leading zeros.
+		# filename by interpreting the id as a decimal number.
 		id=${i//i/}
-		id=$(expr "$id" + 0)
+		id=$((10#$id))
 
 		# Print these infos so they can be sorted. Then read them again.
 		echo "$prio $whennorm $warn $nocron $timetype $id $subject"
