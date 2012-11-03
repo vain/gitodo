@@ -65,27 +65,17 @@ read_items_raw()
 	# Process all item files and extract relevant fields.
 	for i in "${files[@]}"
 	do
-		# Read the file and ensure compatibility with "broken" files.
-		item=$(< "$i")
-		item=${item//$'\r'/}
-
-		# Process the file line by line and read header fields. Do word
-		# splitting but don't do globbing.
-		set -o noglob
-
-		OIFS=$IFS
-		IFS=$'\n'
-		lines=($item)
-		IFS=$OIFS
-
 		prio=0
 		when=""
 		warn=1
 		subject=""
 		nocron=0
 
-		for line in "${lines[@]}"
+		while read -r line
 		do
+			# Fix "broken" lines (Windows).
+			line=${line//$'\r'/}
+
 			set -- $line
 			case $1 in
 				prio:)
@@ -106,9 +96,10 @@ read_items_raw()
 
 			# Exclude this item from cron warnings?
 			[[ "$line" == "nocron" ]] && nocron=1
-		done
 
-		set +o noglob
+			# Empty line? No more headers follow.
+			[[ "$line" == "" ]] && break
+		done < "$i"
 
 		# Normalize deadline.
 		whennorm=$(date -d "$when" '+%F %T')
