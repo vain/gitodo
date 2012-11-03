@@ -277,15 +277,21 @@ list_rotting_items()
 
 count_tasks()
 {
-	# Count outdated tasks, those whose deadline is close and all tasks
-	# in total.
+	total=0
+	close=0
+	dead=0
 
-	out=$(clear_colors; list_items)
-	[[ -z "$out" ]] && { echo 0 0 0; return; }
+	stampnow=$(date '+%s')
 
-	outdated=$(echo "$out" | grep '^!' | wc -l)
-	warning=$(echo "$out" | grep '^\*' | wc -l)
-	echo $outdated $warning $(echo "$out" | wc -l)
+	while read -r prio _ _ stamp warn _ _ _ _
+	do
+		classify_item_dead $stampnow $stamp $warn
+		((total++))
+		[[ $class == 1 ]] && ((close++))
+		[[ $class == 2 ]] && ((dead++))
+	done < <(read_items_raw)
+
+	echo $dead $close $total
 }
 
 cron_output()
