@@ -61,8 +61,6 @@ classify_item_dead()
 	then
 		class=1
 	fi
-
-	echo $class
 }
 
 read_items_raw()
@@ -165,7 +163,7 @@ pretty_print_items()
 		if ! (( cron & nocron )) && (( timetype != 3 ))
 		then
 			# Find out if the deadline has passed.
-			class=$(classify_item_dead $stampnow $stamp $warn)
+			classify_item_dead $stampnow $stamp $warn
 			if (( class == 2 ))
 			then
 				echo -n "$col_bold$col_red"
@@ -379,7 +377,7 @@ resolve_id()
 		read_items_raw |
 		while read -r _ _ _ stamp warn _ _ id _
 		do
-			class=$(classify_item_dead $stampnow $stamp $warn)
+			classify_item_dead $stampnow $stamp $warn
 			if (( class == 2 ))
 			then
 				complete_id "$id"
@@ -391,7 +389,7 @@ resolve_id()
 		read_items_raw |
 		while read -r _ _ _ stamp warn _ _ id _
 		do
-			class=$(classify_item_dead $stampnow $stamp $warn)
+			classify_item_dead $stampnow $stamp $warn
 			if (( class == 1 ))
 			then
 				complete_id "$id"
