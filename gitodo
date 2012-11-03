@@ -376,7 +376,7 @@ resolve_id()
 	elif [[ "$1" == 'dead' ]]
 	then
 		read_items_raw |
-		while read -r _ day time _ _ _ id _
+		while read -r _ day time warn _ _ id _
 		do
 			class=$(classify_item_dead $day $time $warn)
 			if (( class == 2 ))
