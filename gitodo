@@ -82,6 +82,10 @@ class Item
 		end
 	end
 
+	def hide?
+		classify == :normal && @prio > 99 && !ENV['GITODO_SHOW_UNIMPORTANT']
+	end
+
 	def show_brief
 		case classify
 		when :dead
@@ -199,9 +203,7 @@ def load_all_items
 			end
 		end
 
-		if item.prio <= 99 || ENV['GITODO_SHOW_UNIMPORTANT']
-			items << item
-		end
+		items << item
 	end
 
 	items.sort!
@@ -225,10 +227,12 @@ end
 def list_items(items, indent=false)
 	print_header(indent)
 	items.each do |i|
-		if indent
-			print("\t")
+		if !i.hide?
+			if indent
+				print("\t")
+			end
+			i.show_brief
 		end
-		i.show_brief
 	end
 end
 
