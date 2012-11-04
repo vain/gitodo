@@ -198,7 +198,7 @@ def load_all_items
 				item.warn = $2.to_i
 			elsif line =~ /^(what|subject): (.*)/
 				item.what = $2
-			elsif line == 'nocron'
+			elsif line.strip == 'nocron'
 				item.nocron = true
 			end
 		end
@@ -288,6 +288,7 @@ end
 
 def print_cron(items, selection)
 	outdated = filter_ids(items, ['dead'])
+	outdated.select! { |i| !i.nocron }
 	if outdated.size > 0
 		puts('OUTDATED TASKS:')
 		puts('===============')
@@ -297,6 +298,7 @@ def print_cron(items, selection)
 
 	if selection == :all
 		close = filter_ids(items, ['close'])
+		close.select! { |i| !i.nocron }
 		if close.size > 0
 			if outdated.size > 0
 				puts
