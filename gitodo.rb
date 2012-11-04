@@ -16,7 +16,7 @@ module Colors
 	}
 
 	def Colors.[](which)
-		if not STDOUT.tty?
+		if !STDOUT.tty? && !ENV['GITODO_FORCE_COLOR']
 			return ''
 		end
 
