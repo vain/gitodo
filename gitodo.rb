@@ -32,6 +32,7 @@ class Item
 	include Comparable
 
 	attr_accessor :id
+	attr_accessor :filename
 	attr_accessor :prio
 	attr_accessor :when
 	attr_accessor :warn
@@ -42,6 +43,7 @@ class Item
 
 	def initialize
 		@id = 0
+		@filename = ''
 		@prio = 0
 		@when = Time.local(2037)
 		@warn = 1
@@ -72,8 +74,10 @@ class Item
 			0
 		when :date
 			1
-		else
+		when :datetime
 			2
+		else
+			3
 		end
 	end
 
@@ -147,10 +151,10 @@ class Item
 	end
 end
 
-def load_all_items(dir)
+def load_all_items
 	items = []
 
-	Dir.glob(dir + '/i*').each do |filename|
+	Dir.glob('i*').each do |filename|
 		f = File.new(filename, 'r')
 		lines = f.readlines()
 		f.close()
@@ -159,6 +163,7 @@ def load_all_items(dir)
 
 		filename =~ /.*i0*([[:digit:]]+)$/
 		item.id = $1
+		item.filename = filename
 
 		item.content = lines.join('')
 
@@ -200,7 +205,9 @@ def load_all_items(dir)
 end
 
 def checkrepo(dir)
-	Dir.exists?(dir + '/.git')
+	if Dir.exists?(dir + '/.git')
+		Dir.chdir(dir)
+	end
 end
 
 def print_header(indent=false)
@@ -261,6 +268,15 @@ def filter_bodies(items, filter)
 	items.select { |i| i.content =~ /#{filter}/i }
 end
 
+def filter_rotting(items, months)
+	now = Time.now
+	items.select do |i|
+		lchange = `git log '--pretty=format:%ct' -n 1 -- "#{i.filename}"`
+		lchange = Time.at(lchange.to_i)
+		now - lchange > months * 60 * 60 * 24 * 30
+	end
+end
+
 def print_cron(items, selection)
 	puts('OUTDATED TASKS:')
 	puts('===============')
@@ -278,13 +294,38 @@ def print_cron(items, selection)
 	end
 end
 
+def new_items(editor, how_many)
+	how_many.times do
+		filename = 'i' + ('%04d' % rand(0..9999))
+		while File.exists? filename
+			filename = 'i' + ('%04d' % rand(0..9999))
+		end
+
+		system "#{editor} #{filename}"
+	end
+end
+
+def delete_items(items)
+	items.each do |i|
+		File.delete(i.filename)
+	end
+end
+
+def commit
+	system 'git add .'
+	system 'git commit -a -m "Auto-commit $(hostname)."'
+end
+
 
 default_prefix = ENV['XDG_DATA_HOME'] || (ENV['HOME'] + '/.local/share')
 datadir = ENV['GITODO_DATA'] || (default_prefix + '/gitodo.items')
 editor = ENV['EDITOR'] || 'vim'
 
-checkrepo(datadir) || exit(1)
-items = load_all_items(datadir)
+if not checkrepo(datadir)
+	$stderr.puts "`#{datadir}' is not a Git repository."
+	exit 1
+end
+items = load_all_items
 
 if ARGV.size == 0
 	list_items(items)
@@ -294,12 +335,26 @@ end
 opt = ARGV[0].sub(/^-+/, '')
 ARGV.shift
 case opt
+when 'new', 'n'
+	new_items(editor, ARGV[0] ? ARGV[0].to_i : 1)
+	commit
 when 'list', 'l'
 	list_items(filter_ids(items, ARGV))
 when 'print', 'p'
 	print_items(filter_ids(items, ARGV))
 when 'body', 'b'
 	print_items(filter_bodies(items, ARGV[0]))
+when 'edit', 'e'
+	filter_ids(items, ARGV).each do |i|
+		system "#{editor} #{i.filename}"
+	end
+	commit
+when 'delete', 'd'
+	filter_ids(items, ARGV).each do |i|
+		puts "Deleting #{i.id_fmt}: #{i.what}"
+		File.delete(i.filename)
+	end
+	commit
 when 'count'
 	total = items.size
 	dead = items.count { |i| i.classify == :dead }
@@ -311,4 +366,8 @@ when 'cron-outdated', 'o'
 	print_cron(items, :no_close)
 when 'raw'
 	items.each { |i| i.show_raw }
+when 'rotting'
+	list_items(filter_rotting(items, ARGV[0] ? ARGV[0].to_i : 3))
+else
+	puts 'Invalid option. See manpage.'
 end
