@@ -199,7 +199,9 @@ def load_all_items
 			end
 		end
 
-		items << item
+		if item.prio <= 99 || ENV['GITODO_SHOW_UNIMPORTANT']
+			items << item
+		end
 	end
 
 	items.sort!
