@@ -56,7 +56,7 @@ class Item
 
 	# "Formatted" id.
 	def id_fmt
-		'%04d' % @id
+		'[%4s]' % @id.to_s
 	end
 
 	# Check if this item is okay, close to the deadline or dead.
@@ -130,7 +130,7 @@ class Item
 			print(@when.strftime('%F %T'))
 		end
 		print(']')
-		printf(' [%4s]', @id.to_s)
+		print(' ' + id_fmt)
 		print(' ' + @what)
 		print(Colors[:reset])
 
