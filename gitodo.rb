@@ -20,6 +20,7 @@ module Colors
 			return ''
 		end
 
+		# Lazy allocation to save useless forks.
 		if @table[which][1] == nil
 			@table[which][1] = `#{@table[which][0]}`
 		end
@@ -171,6 +172,8 @@ def load_all_items
 			if line =~ /^(prio): (.*)/
 				item.prio = $2.to_i
 			elsif line =~ /^(when|dead): (.*)/
+				# XXX: Hackaround to be able to use DateTime.parse in
+				# the local timezone.
 				item.when = DateTime.parse($2)
 				item.when -= Time.now.utc_offset / 86400.0
 				item.when = item.when.to_time
@@ -204,7 +207,7 @@ def load_all_items
 	return items
 end
 
-def checkrepo(dir)
+def check_and_chdir_repo(dir)
 	if Dir.exists?(dir + '/.git')
 		Dir.chdir(dir)
 	end
@@ -321,7 +324,7 @@ default_prefix = ENV['XDG_DATA_HOME'] || (ENV['HOME'] + '/.local/share')
 datadir = ENV['GITODO_DATA'] || (default_prefix + '/gitodo.items')
 editor = ENV['EDITOR'] || 'vim'
 
-if not checkrepo(datadir)
+if not check_and_chdir_repo(datadir)
 	$stderr.puts "`#{datadir}' is not a Git repository."
 	exit 1
 end
