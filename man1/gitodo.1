@@ -16,8 +16,6 @@ gitodo \- a personal task manager.
 .br
 \fBgitodo\fP \fB\-\-body\fP \fIterm\fP
 .br
-\fBgitodo\fP \fB\-\-log\fP [\fIOPTIONS ...\fP]
-.br
 \fBgitodo\fP \fB\-\-cron\fP
 .br
 \fBgitodo\fP \fB\-\-cron\-outdated\fP
@@ -74,8 +72,8 @@ less than 1 hour left, can be set), the task is marked with a \fB*\fP.
 .SH OPTIONS
 \fBgitodo\fP is meant to be used on the command line. To make things
 easier for you, you can leave out leading dashes. That is, instead of
-using \fB\-\-list\fP you could just write \fBlist\fP or even \fBi\fP
-because \fB\-i\fP is the short alias for \fB\-\-list\fP.
+using \fB\-\-list\fP you could just write \fBlist\fP or even \fBl\fP
+because \fB\-l\fP is the short alias for \fB\-\-list\fP.
 .P
 As you'll see, all important commands have a short alias.
 .TP
@@ -97,11 +95,8 @@ Delete all matching items.
 .TP
 \fB\-b\fP, \fB\-\-body\fP \fIterm\fP
 Search in bodies of items and print matching items (including their
-bodies). \fIterm\fP must be an \fBegrep\fP(1)-regex.
-.TP
-\fB\-\-log\fP [\fIoptions\fP]
-Show log of the items repository. This calls \fBgit log\fP, any
-\fIoptions\fP will be passed on to \fBgit\fP.
+bodies). \fIterm\fP must be a regular expressions understood by Ruby (no
+modifiers allowed). See \fBSEARCHING\fP.
 .TP
 \fB\-c\fP, \fB\-\-cron\fP
 Show a list of outdated tasks and tasks close to the deadline, suitable
@@ -141,9 +136,12 @@ Items are simple text files. They look like this:
 \fP
 .P
 Deadline and priority are optional. In fact, only a subject line is
-mandatory. The default priority is 0 and no deadline means 2038-01-01
+mandatory. The default priority is 0 and no deadline means 2037-01-01
 00:00:00. ;-) A negative number means higher priority (just like Linux'
 \fBnice\fP(1) values). The priority is meant to range from -99 to 99.
+.P
+\fBwhen\fP can be anything that is understood by Ruby's
+\fBDateTime.parse()\fP function.
 .P
 \fBwarn: 4\fP means that this task gets marked as \(lqclose to
 deadline\(rq four hours before the deadline will be reached. If this
@@ -196,10 +194,10 @@ ranging from 0 to 9999. This is done to avoid merge conflicts.
 Add the items repo to your synching mechanism if you want them to be
 synched.
 .SH SEARCHING
-Instead of giving explicit IDs, you can also use egrep-regexes to search
-the subjects of your items. The following command edits all items
-matching \(lqjane\(rq or \(lqdiane\(rq, your TODO item with ID 432 and
-all items matching \(lqgnu\(rq:
+Instead of giving explicit IDs, you can also use Ruby regular
+expressions to search the subjects of your items. The following command
+edits all items matching \(lqjane\(rq or \(lqdiane\(rq, your TODO item
+with ID 432 and all items matching \(lqgnu\(rq:
 .P
 \f(CW
 .nf
@@ -213,7 +211,7 @@ repeat: This only searches in \fBsubject lines\fB.
 .P
 To filter your list of TODO items, you can use the \fB\-\-list\fP
 command. Again, you can either start your search term with \fB:/\fP to
-perform an egrep-search:
+perform a searching using Ruby regular expressions:
 .P
 \f(CW
 .nf
@@ -260,9 +258,10 @@ The \fB:/\fP is only needed to distinguish IDs from search terms. As
 .fi
 \fP
 .P
-Again, you can use egrep-regexes with \fB\-\-body\fP.
+Again, you can use Ruby regexes with \fB\-\-body\fP.
 .P
-Searching is always case insensitive.
+Searching is always case insensitive. For example, if you specify
+\fI:/foo\fP, internally \fI/foo/i\fP will be used.
 .SH SETUP
 First, clone the code repository:
 .P
@@ -311,16 +310,10 @@ You'll see the current month plus the two following months. The current
 day is marked as well as all deadlines for TODO items (as long as there
 is one).
 .SH PORTABILITY
-Until commit \fBcfe3c9d\fP, this script was \fBmeant\fP to be able to
-run in the \fBmsysgit\fP (http://code.google.com/p/msysgit/) environment
-on Windows. That's because I needed that at work (sigh). However, I am
-no longer forced to use Windows. As I now mainly use Arch Linux, I
-cannot guarantee for portability. YMMV.
-.P
-I don't know when I'll be forced to use Windows again. When this
-happens, I want to continue using gitodo. So I try to keep most of the
-original code which is proven to run on msysgit. Unfortunately, this
-also means that I have to keep a lot of ugly and slow code.
+\fBgitodo\fP once was a shell script that could be run in the
+\fBmsysgit\fP (http://code.google.com/p/msysgit/) environment on
+Windows. This is no longer true. \fBgitodo\fP is now implemented in Ruby
+1.9 and only tested on current versions of Arch Linux.
 .P
 Anyway, a little advice: If you ever think about putting the task items
 repo on a USB stick and if you want to use that repo from both Windows
@@ -365,4 +358,4 @@ started in December 2010.
 .SH "SEE ALSO"
 .BR highcal (1),
 .BR git (1),
-.BR tput (1).
+.BR ruby (1).
