@@ -1,579 +1,378 @@
-#!/bin/bash
+#!/usr/bin/env ruby
+# encoding: UTF-8
 
-# Defaults and "configuration".
-default_prefix=${XDG_DATA_HOME:-$HOME/.local/share}
-datadir=${GITODO_DATA:-$default_prefix/gitodo.items}
-editor=${EDITOR:-vim}
+require 'date'
 
-# These are essential.
-shopt -s nullglob
-shopt -u dotglob
+module Colors
+	@table = {
+		:dead      => ['tput bold; tput setaf 1', nil],
+		:close     => ['tput setaf 1', nil],
+		:very_high => ['tput bold; tput setaf 1', nil],
+		:high      => ['tput setaf 1', nil],
+		:low       => ['tput setaf 4', nil],
+		:very_low  => ['tput setaf 2', nil],
+		:header    => ['tput bold', nil],
+		:reset     => ['tput sgr0', nil],
+	}
 
-init_colors()
-{
-	# Only use tput if it's available and if stdout is a terminal. Usage
-	# of color may be enforced, though.
-	if which tput >/dev/null 2>&1
-	then
-		if [[ -t 1 ]] || [[ -n $GITODO_FORCE_COLOR ]]
-		then
-			col_bold=$(tput bold)
-			col_reset=$(tput sgr0)
-			col_red=$(tput setaf 1)
-			col_green=$(tput setaf 2)
-			col_blue=$(tput setaf 4)
-		fi
-	fi
-}
+	def Colors.[](which)
+		if !STDOUT.tty? && !ENV['GITODO_FORCE_COLOR']
+			return ''
+		end
 
-clear_colors()
-{
-	col_bold=
-	col_reset=
-	col_red=
-	col_green=
-	col_blue=
-}
+		# Lazy allocation to save useless forks.
+		if @table[which][1] == nil
+			@table[which][1] = `#{@table[which][0]}`
+		end
 
-header()
-{
-	# Header.
-	echo -n "$col_bold"
-	echo 'O Prio        Deadline          ID   Subject'
-	echo '- ----- --------------------- ------ -------'
-	echo -n "$col_reset"
-}
+		return @table[which][1]
+	end
+end
 
-classify_item_dead()
-{
-	stampnow=$1
-	stampitem=$2
-	warn=$3
+class Item
+	include Comparable
 
-	# 0 = okay, 1 = close, 2 = dead
-	class=0
+	attr_accessor :id
+	attr_accessor :filename
+	attr_accessor :prio
+	attr_accessor :when
+	attr_accessor :warn
+	attr_accessor :what
+	attr_accessor :nocron
+	attr_accessor :content
+	attr_accessor :timetype
 
-	taskdiff=$((stampnow - stampitem))
-	if (( taskdiff > 0 ))
-	then
-		class=2
-	elif (( taskdiff > -warn * 3600 ))
-	then
-		class=1
-	fi
-}
+	def initialize
+		@id = 0
+		@filename = ''
+		@prio = 0
+		@when = Time.local(2037)
+		@warn = 1
+		@what = ''
+		@nocron = false
+		@content = ''
+		@timetype = :none
+	end
 
-read_items_raw()
-{
-	# Read either specific files or glob "i*".
-	[[ -n "$1" ]] && files=("$@") || files=(i*)
+	def id_fmt
+		'%04d' % @id
+	end
 
-	# Process all item files and extract relevant fields.
-	for i in "${files[@]}"
-	do
-		prio=0
-		when=""
-		warn=1
-		subject=""
-		nocron=0
-
-		while read -r line
-		do
-			# Fix "broken" lines (Windows).
-			line=${line//$'\r'/}
-
-			set -- $line
-			case $1 in
-				prio:)
-					prio=$2
-					;;
-				when:|dead:)
-					shift
-					when=$@
-					;;
-				warn:)
-					warn=$2
-					;;
-				what:|subject:)
-					shift
-					subject=$@
-					;;
-			esac
-
-			# Exclude this item from cron warnings?
-			[[ "$line" == "nocron" ]] && nocron=1
-
-			# Empty line? No more headers follow.
-			[[ "$line" == "" ]] && break
-		done < "$i"
-
-		# Normalize deadline.
-		whennorm=$(date -d "$when" '+%F %T %s')
-
-		# Find out whether it's date + time, only date or only time.
-		spaces=${when//[^ ]/}
-		spaces=${#spaces}
-		colons=${when//[^:]/}
-		colons=${#colons}
-
-		case $spaces in
-			0)
-				if (( colons > 0 ))
-				then
-					# Only time.
-					timetype=0
-				else
-					# Only date.
-					timetype=1
-				fi
-				;;
-			*)
-				# Date + time or something like "next tuesday 8am".
-				timetype=2
-				;;
-		esac
-
-		if [[ "$when" == "" ]]
-		then
-			# No date or time.
-			timetype=3
-			whennorm='2038-01-01 00:00:00 2145913200'
-		fi
-
-		# Get the ID by removing the "i" and leading zeros from the
-		# filename by interpreting the id as a decimal number.
-		id=${i//i/}
-		id=$((10#$id))
-
-		# Print these infos so they can be sorted. Then read them again.
-		echo "$prio $whennorm $warn $nocron $timetype $id $subject"
-	done |
-	sort -n
-}
-
-pretty_print_items()
-{
-	stampnow=$(date '+%s')
-
-	while read -r prio day time stamp warn nocron timetype id subject
-	do
-		# Pretty printing. This function is meant to be fed the output
-		# of read_items_raw().
-
-		if ! (( cron & nocron )) && (( timetype != 3 ))
-		then
-			# Find out if the deadline has passed.
-			classify_item_dead $stampnow $stamp $warn
-			if (( class == 2 ))
-			then
-				echo -n "$col_bold$col_red"
-				echo -n '! '
-				echo -n "$col_reset"
-			elif (( class == 1 ))
-			then
-				echo -n "$col_red"
-				echo -n '* '
-				echo -n "$col_reset"
-			elif (( prio <= 99 )) || [[ -n $GITODO_SHOW_UNIMPORTANT ]]
-			then
-				echo -n '  '
-			else
-				# Skip items with a priority lower than 99 if they have
-				# a deadline.
-				continue
-			fi
+	def classify
+		now = Time.now
+		if now > @when
+			return :dead
+		elsif now > @when - @warn * 3600
+			return :close
 		else
-			echo -n '  '
-		fi
+			return :normal
+		end
+	end
 
-		# Highlight according to priority.
-		if (( prio < -5 ))
-		then
-			echo -n "$col_bold$col_red"
-		elif (( prio < 0 ))
-		then
-			echo -n "$col_red"
-		elif (( prio > 5 ))
-		then
-			echo -n "$col_blue"
-		elif (( prio > 0 ))
-		then
-			echo -n "$col_green"
-		fi
-		printf '[%3s] ' "$prio"
+	def timetype_num
+		case @timetype
+		when :time
+			0
+		when :date
+			1
+		when :datetime
+			2
+		else
+			3
+		end
+	end
 
-		# Show only those time fields that are set in the item's file.
-		case $timetype in
-			0) echo -n "[           $time]" ;;
-			1) echo -n "[$day         ]" ;;
-			2) echo -n "[$day $time]" ;;
-			3) echo -n "[                   ]" ;;
-		esac
+	def show_brief
+		case classify
+		when :dead
+			print(Colors[:dead])
+			print('! ')
+		when :close
+			print(Colors[:close])
+			print('* ')
+		else
+			print('  ')
+		end
 
-		# ID and subject.
-		printf ' [%4d] ' "$id"
-		echo "$subject"
+		print(Colors[:reset])
 
-		echo -n "$col_reset"
-	done
-}
+		if prio < -5
+			print(Colors[:very_high])
+		elsif prio < 0
+			print(Colors[:high])
+		elsif prio > 5
+			print(Colors[:low])
+		elsif prio > 0
+			print(Colors[:very_low])
+		end
 
-list_items()
-{
-	# List all items.
+		printf('[%3s]', @prio.to_s)
 
-	# Is this output meant for cronjobs?
-	cron=0
-	if [[ -n "$1" ]]
-	then
-		[[ $1 == cron ]] && cron=1
-		shift
-	fi
+		print(' [')
+		case @timetype
+		when :none
+			print('                   ')
+		when :time
+			print('           ' + @when.strftime('%T'))
+		when :date
+			print(@when.strftime('%F') + '         ')
+		when :datetime
+			print(@when.strftime('%F %T'))
+		end
+		print(']')
+		printf(' [%4s]', @id.to_s)
+		print(' ' + @what)
+		print(Colors[:reset])
 
-	# Get the current timestamp.
-	stampnow=$(date '+%s')
+		puts
+	end
 
-	# Apply a filter? Can be some search regexes or some ids or both.
-	if [[ -n "$1" ]]
-	then
-		ires=()
-		for i
-		do
-			ires+=($(resolve_id "$i"))
-		done
-		if (( "${#ires[@]}" > 0 ))
-		then
-			read_items_raw "${ires[@]}" | pretty_print_items
-		fi
-	else
-		read_items_raw | pretty_print_items
-	fi
-}
+	def show_detail
+		print(Colors[:header])
+		puts(id_fmt)
+		puts(id_fmt.gsub(/./, '-'))
+		print(Colors[:reset])
+		puts
 
-list_rotting_items()
-{
-	# Roughly 3 months.
-	months=${1:-"3"}
-	threshold=$((60 * 60 * 24 * 30 * months))
-	stampnow=$(date '+%s')
+		puts(@content)
 
-	# Due to a very different output format, we can't use
-	# pretty_print_items() here.
-	read_items_raw |
-	while read -r _ _ _ _ _ _ timetype id subject
-	do
-		if [[ "$timetype" == 3 ]]
-		then
-			fname=$(complete_id $id)
-			lchange=$(git log '--pretty=format:%ct' -n 1 -- "$fname")
-			if (( stampnow - lchange > threshold ))
-			then
-				rchange=$(git log '--pretty=format:%cr' -n 1 -- "$fname")
-				printf "%s\t%4d\t%s\n" "$rchange" "$id" "$subject"
-			fi
-		fi
-	done
-}
+		puts
+	end
 
-count_tasks()
-{
-	total=0
-	close=0
-	dead=0
+	def show_raw
+		print("#{@prio} #{@when.strftime('%F %T %s')} ")
+		print("#{@warn} #{@nocron ? '1' : '0'} #{timetype_num} ")
+		print("#{@id} #{@what}")
 
-	stampnow=$(date '+%s')
+		puts
+	end
 
-	while read -r prio _ _ stamp warn _ _ _ _
-	do
-		classify_item_dead $stampnow $stamp $warn
-		((total++))
-		[[ $class == 1 ]] && ((close++))
-		[[ $class == 2 ]] && ((dead++))
-	done < <(read_items_raw)
+	def <=>(other)
+		[@prio, @when] <=> [other.prio, other.when]
+	end
+end
 
-	echo $dead $close $total
-}
+def load_all_items
+	items = []
 
-cron_output()
-{
-	# Show outdated tasks and those whose deadline is close.
+	Dir.glob('i*').each do |filename|
+		f = File.new(filename, 'r')
+		lines = f.readlines()
+		f.close()
 
-	# Find relevant tasks.
-	out=$(clear_colors; list_items cron)
-	outdated=$(echo "$out" | grep '^!')
-	warning=$(echo "$out" | grep '^\*')
+		item = Item.new
 
-	# Pretty printing.
-	if [[ "$outdated" != "" ]]
-	then
-		echo 'OUTDATED TASKS:'
-		echo '==============='
-		echo
-		(
-			clear_colors
-			header
-			echo "$outdated"
-		) | sed 's/^/    /'
+		filename =~ /.*i0*([[:digit:]]+)$/
+		item.id = $1
+		item.filename = filename
 
-		if [[ "$warning" != "" ]]
-		then
-			echo
-			echo
-		fi
-	fi
-	if [[ "$warning" != "" ]] && [[ $1 == 1 ]]
-	then
-		echo 'DEADLINE CLOSE:'
-		echo '==============='
-		echo
-		(
-			clear_colors
-			header
-			echo "$warning"
-		) | sed 's/^/    /'
-	fi
-}
+		item.content = lines.join('')
 
-new_items()
-{
-	# Create $1 new items.
+		lines.each do |line|
+			if line =~ /^(prio): (.*)/
+				item.prio = $2.to_i
+			elsif line =~ /^(when|dead): (.*)/
+				# XXX: Hackaround to be able to use DateTime.parse in
+				# the local timezone.
+				item.when = DateTime.parse($2)
+				item.when -= Time.now.utc_offset / 86400.0
+				item.when = item.when.to_time
 
-	for (( i = 0; i < $1; i++ ))
-	do
-		# Get a random free ID. This is done in order to reduce the
-		# possibility of conflicts. Imagine you add a new item on
-		# computer A and (in parallel) a new item on computer B. When
-		# merging the two branches, you'd get a conflict.
+				spaces = $2.count(' ')
+				colons = $2.count(':')
+				case spaces
+				when 0
+					if colons > 0
+						item.timetype = :time
+					else
+						item.timetype = :date
+					end
+				else
+					item.timetype = :datetime
+				end
+			elsif line =~ /^(warn): (.*)/
+				item.warn = $2.to_i
+			elsif line =~ /^(what|subject): (.*)/
+				item.what = $2
+			elsif line == 'nocron'
+				item.nocron = true
+			end
+		end
 
-		next=$((RANDOM % 9999))
-		while [[ -f "$(complete_id $next)" ]]
-		do
-			next=$((RANDOM % 9999))
-		done
+		if item.prio <= 99 || ENV['GITODO_SHOW_UNIMPORTANT']
+			items << item
+		end
+	end
 
-		$editor "$(complete_id $next)"
-	done
-}
+	items.sort!
 
-complete_id()
-{
-	# Complete an ID (like "03") by properly padding it and by adding
-	# the "i" (result: "i0003").
+	return items
+end
 
-	printf 'i%04d' $(expr $1 + 0)
-}
+def check_and_chdir_repo(dir)
+	if Dir.exists?(dir + '/.git')
+		Dir.chdir(dir)
+	end
+end
 
-resolve_id()
-{
-	stampnow=$(date '+%s')
+def print_header(indent=false)
+	print(Colors[:header])
+	puts((indent ? "\t" : '') + 'O Prio        Deadline          ID   Subject')
+	puts((indent ? "\t" : '') + '- ----- --------------------- ------ -------')
+	print(Colors[:reset])
+end
 
-	if [[ "${1:0:2}" == ':/' ]]
-	then
-		read_items_raw |
-		while read -r _ _ _ _ _ _ _ id subject
-		do
-			if echo "$subject" | egrep -i -q "${1:2}"
-			then
-				complete_id "$id"
-				echo
-			fi
-		done
-	elif [[ "$1" == 'dead' ]]
-	then
-		read_items_raw |
-		while read -r _ _ _ stamp warn _ _ id _
-		do
-			classify_item_dead $stampnow $stamp $warn
-			if (( class == 2 ))
-			then
-				complete_id "$id"
-				echo
-			fi
-		done
-	elif [[ "$1" == 'close' ]]
-	then
-		read_items_raw |
-		while read -r _ _ _ stamp warn _ _ id _
-		do
-			classify_item_dead $stampnow $stamp $warn
-			if (( class == 1 ))
-			then
-				complete_id "$id"
-				echo
-			fi
-		done
-	else
-		complete_id "$1"
-	fi
-}
+def list_items(items, indent=false)
+	print_header(indent)
+	items.each do |i|
+		if indent
+			print("\t")
+		end
+		i.show_brief
+	end
+end
 
-printid()
-{
-	echo -n "$col_bold"
-	echo "$1"
-	echo "${1//?/-}"
-	echo -n "$col_reset"
-	cat $1
-	echo
-}
+def print_items(items)
+	items.each do |i|
+		i.show_detail
+	end
+end
 
-printall()
-{
-	# Each argument ...
-	for i
-	do
-		# ... may expand to multiple IDs if it's a search expression.
-		for id in $(resolve_id "$i")
-		do
-			printid "$id"
-		done
-	done
-}
+def filter_ids(items, filter)
+	# TODO: This works but feels very odd.
+	items.select do |i|
+		match = false
+		filter.each do |f|
+			if f.start_with?(':/')
+				if i.what =~ /#{f[2..-1]}/i
+					match = true
+					next
+				end
+			elsif f == 'dead'
+				if i.classify == :dead
+					match = true
+					next
+				end
+			elsif f == 'close'
+				if i.classify == :close
+					match = true
+					next
+				end
+			else
+				if i.id == f
+					match = true
+					next
+				end
+			end
+		end
+		match
+	end
+end
 
-searchbody()
-{
-	# Read all IDs, then grep through all bodies. $1 is expected to be a
-	# regular expression.
-	read_items_raw |
-	while read -r _ _ _ _ _ _ _ id _
-	do
-		cid=$(complete_id "$id")
-		egrep -i -q "$1" "$cid" && printid "$cid"
-	done
-}
+def filter_bodies(items, filter)
+	items.select { |i| i.content =~ /#{filter}/i }
+end
 
-checkrepo()
-{
-	# Check if the directory exists and if it's a git repo. cd to it.
+def filter_rotting(items, months)
+	now = Time.now
+	items.select do |i|
+		lchange = `git log '--pretty=format:%ct' -n 1 -- "#{i.filename}"`
+		lchange = Time.at(lchange.to_i)
+		now - lchange > months * 60 * 60 * 24 * 30
+	end
+end
 
-	if [[ ! -d "$datadir"/.git ]]
-	then
-		echo "\`$datadir' is not a Git repository." >&2
-		return 1
-	fi
+def print_cron(items, selection)
+	puts('OUTDATED TASKS:')
+	puts('===============')
+	puts
+	list_items(filter_ids(items, ['dead']), true)
 
-	cd "$datadir"
-}
+	if selection == :all
+		puts
+		puts
 
-commit()
-{
-	# Commit all changes in the repo.
+		puts('DEADLINE CLOSE:')
+		puts('===============')
+		puts
+		list_items(filter_ids(items, ['close']), true)
+	end
+end
 
-	git add .
-	git commit -a -m "Auto-commit $HOSTNAME."
-}
+def new_items(editor, how_many)
+	how_many.times do
+		filename = 'i' + ('%04d' % rand(0..9999))
+		while File.exists? filename
+			filename = 'i' + ('%04d' % rand(0..9999))
+		end
 
-checkrepo || exit 1
-init_colors
+		system "#{editor} #{filename}"
+	end
+end
 
-if [[ -z "$1" ]]
-then
-	header
-	list_items
+def delete_items(items)
+	items.each do |i|
+		File.delete(i.filename)
+	end
+end
+
+def commit
+	system 'git add .'
+	system 'git commit -a -m "Auto-commit $(hostname)."'
+end
+
+
+default_prefix = ENV['XDG_DATA_HOME'] || (ENV['HOME'] + '/.local/share')
+datadir = ENV['GITODO_DATA'] || (default_prefix + '/gitodo.items')
+editor = ENV['EDITOR'] || 'vim'
+
+if !check_and_chdir_repo(datadir)
+	$stderr.puts "`#{datadir}' is not a Git repository."
+	exit 1
+end
+items = load_all_items
+
+if ARGV.size == 0
+	list_items(items)
 	exit
-fi
+end
 
-opt=${1#-}
-case "${opt#-}" in
-	list|l)
-		shift
-		header
-		list_items nocron "$@"
-		;;
-	body|b)
-		shift
-		searchbody "$@"
-		;;
-	edit|e)
-		shift
-		for i
-		do
-			for id in $(resolve_id "$i")
-			do
-				$editor $id
-			done
-		done
-		commit
-		;;
-	print|p)
-		shift
-		printall "$@"
-		;;
-	new|n)
-		new_items "${2:-1}"
-		commit
-		;;
-	delete|d)
-		shift
-		for i
-		do
-			for id in $(resolve_id "$i")
-			do
-				rm -v $id
-			done
-		done
-		commit
-		;;
-	log)
-		shift
-		git log "$@"
-		;;
-	cron|c)
-		cron_output 1
-		;;
-	cron-outdated|o)
-		cron_output 0
-		;;
-	count)
-		count_tasks
-		;;
-	raw)
-		read_items_raw
-		;;
-	rotting)
-		shift
-		list_rotting_items "$1"
-		;;
-	*)
-		cat <<EOM
-Usage: $(basename "$0") [options]...
-
-  -l, --list id [id...]      List all matching items.
-  -e, --edit id [id...]      Edit all given IDs using \$EDITOR.
-  -p, --print id [id...]     Dump all given IDs to stdout.
-  -n, --new [n]              Add a new task. You'll be put in your
-                             \$EDITOR to do so. If you specify 'n',
-                             then 'n' new tasks will be created.
-                             ('n' defaults to 1).
-  -d, --delete id [id...]    Delete all given IDs.
-  -b, --body term            Search in bodies of items and print
-                             matching items (including their bodies).
-  --log [options]            Show log of the items repository. Add
-                             options to "git log" if desired.
-  -c, --cron                 Show a list of outdated tasks and tasks
-                             close to the deadline, suitable for a cron
-                             job.
-  -o, --cron-outdated        Show a list of outdated tasks, suitable for
-                             a cron job.
-  --count                    Count tasks (all open tasks, tasks close to
-                             deadline and outdated tasks).
-  --raw                      Don't do pretty printing. This option is
-                             meant for scripting.
-  --rotting [n]              List items which have not been changed for
-                             over n months. This only affects itmes
-                             without a deadline. Default is 3 months.
-  -h, --help                 Show this help page.
-
-  If no options are given, a list of all TODO items is shown.
-
-  Note: If an "id" starts with ":/", then a search takes place. For
-  example, "gitodo -e ':/(j|di)ane'" edits all items whose subject
-  matches "jane" or "diane".
-
-  "id" can also be "dead" or "close" which means outdated items or items
-  close to their deadline.
-
-  regexes must be egrep-regexes.
-EOM
-		;;
-esac
+opt = ARGV[0].sub(/^-+/, '')
+ARGV.shift
+case opt
+when 'new', 'n'
+	new_items(editor, ARGV[0] ? ARGV[0].to_i : 1)
+	commit
+when 'list', 'l'
+	list_items(filter_ids(items, ARGV))
+when 'print', 'p'
+	print_items(filter_ids(items, ARGV))
+when 'body', 'b'
+	print_items(filter_bodies(items, ARGV[0]))
+when 'edit', 'e'
+	filter_ids(items, ARGV).each do |i|
+		system "#{editor} #{i.filename}"
+	end
+	commit
+when 'delete', 'd'
+	filter_ids(items, ARGV).each do |i|
+		puts "Deleting #{i.id_fmt}: #{i.what}"
+		File.delete(i.filename)
+	end
+	commit
+when 'count'
+	total = items.size
+	dead = items.count { |i| i.classify == :dead }
+	close = items.count { |i| i.classify == :close }
+	puts("#{dead} #{close} #{total}")
+when 'cron', 'c'
+	print_cron(items, :all)
+when 'cron-outdated', 'o'
+	print_cron(items, :no_close)
+when 'raw'
+	items.each { |i| i.show_raw }
+when 'rotting'
+	list_items(filter_rotting(items, ARGV[0] ? ARGV[0].to_i : 3))
+else
+	puts 'Invalid option. See manpage.'
+end
