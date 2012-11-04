@@ -287,19 +287,27 @@ def filter_rotting(items, months)
 end
 
 def print_cron(items, selection)
-	puts('OUTDATED TASKS:')
-	puts('===============')
-	puts
-	list_items(filter_ids(items, ['dead']), true)
-
-	if selection == :all
-		puts
-		puts
-
-		puts('DEADLINE CLOSE:')
+	outdated = filter_ids(items, ['dead'])
+	if outdated.size > 0
+		puts('OUTDATED TASKS:')
 		puts('===============')
 		puts
-		list_items(filter_ids(items, ['close']), true)
+		list_items(outdated, true)
+	end
+
+	if selection == :all
+		close = filter_ids(items, ['close'])
+		if close.size > 0
+			if outdated.size > 0
+				puts
+				puts
+			end
+
+			puts('DEADLINE CLOSE:')
+			puts('===============')
+			puts
+			list_items(close, true)
+		end
 	end
 end
 
