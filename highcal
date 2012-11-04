@@ -4,6 +4,8 @@ import datetime
 import calendar
 import os
 import sys
+import locale
+locale.setlocale(locale.LC_ALL, '')
 
 def makeCal(year, month, highlights, colors):
     # Build header: Name of the month/year and a list of the days of the
