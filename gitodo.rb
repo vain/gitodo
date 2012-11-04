@@ -326,7 +326,7 @@ default_prefix = ENV['XDG_DATA_HOME'] || (ENV['HOME'] + '/.local/share')
 datadir = ENV['GITODO_DATA'] || (default_prefix + '/gitodo.items')
 editor = ENV['EDITOR'] || 'vim'
 
-if not check_and_chdir_repo(datadir)
+if !check_and_chdir_repo(datadir)
 	$stderr.puts "`#{datadir}' is not a Git repository."
 	exit 1
 end
