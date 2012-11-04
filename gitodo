@@ -54,10 +54,12 @@ class Item
 		@timetype = :none
 	end
 
+	# "Formatted" id.
 	def id_fmt
 		'%04d' % @id
 	end
 
+	# Check if this item is okay, close to the deadline or dead.
 	def classify
 		now = Time.now
 		if now > @when
@@ -69,6 +71,8 @@ class Item
 		end
 	end
 
+	# timetype as a number. Required for compatibility with legacy
+	# "gitodo --raw".
 	def timetype_num
 		case @timetype
 		when :time
@@ -82,10 +86,12 @@ class Item
 		end
 	end
 
+	# Hide unimportant items?
 	def hide?
 		classify == :normal && @prio > 99 && !ENV['GITODO_SHOW_UNIMPORTANT']
 	end
 
+	# Show a line suitable for output in the traditional listing.
 	def show_brief
 		case classify
 		when :dead
@@ -131,6 +137,7 @@ class Item
 		puts
 	end
 
+	# Show an item's body.
 	def show_detail
 		print(Colors[:header])
 		puts(id_fmt)
@@ -143,6 +150,7 @@ class Item
 		puts
 	end
 
+	# Compatible with legacy "gitodo --raw".
 	def show_raw
 		print("#{@prio} #{@when.strftime('%F %T %s')} ")
 		print("#{@warn} #{@nocron ? '1' : '0'} #{timetype_num} ")
@@ -151,6 +159,7 @@ class Item
 		puts
 	end
 
+	# Make Item sortable. Sort by priority, then by deadline.
 	def <=>(other)
 		[@prio, @when] <=> [other.prio, other.when]
 	end
@@ -250,6 +259,7 @@ def filter_ids(items, filter)
 			if f.start_with?(':/')
 				if i.what =~ /#{f[2..-1]}/i
 					match = true
+					# Break inner block.
 					next
 				end
 			elsif f == 'dead'
@@ -336,14 +346,20 @@ def commit
 end
 
 
+# Use $HOME/.local/share as a fallback if $XDG_DATA_HOME is not set.
+# $GITODO_DATA can override the location anyway. Vim is our default
+# editor.
 default_prefix = ENV['XDG_DATA_HOME'] || (ENV['HOME'] + '/.local/share')
 datadir = ENV['GITODO_DATA'] || (default_prefix + '/gitodo.items')
 editor = ENV['EDITOR'] || 'vim'
 
+# See if the repo exists and cd to it. We need to chdir for commit() to
+# work.
 if !check_and_chdir_repo(datadir)
 	$stderr.puts "`#{datadir}' is not a Git repository."
 	exit 1
 end
+
 items = load_all_items
 
 if ARGV.size == 0
@@ -351,8 +367,10 @@ if ARGV.size == 0
 	exit
 end
 
+# Options may be given as "--foo", "-foo" or "foo".
 opt = ARGV[0].sub(/^-+/, '')
 ARGV.shift
+
 case opt
 when 'new', 'n'
 	new_items(editor, ARGV[0] ? ARGV[0].to_i : 1)
@@ -388,5 +406,5 @@ when 'raw'
 when 'rotting'
 	list_items(filter_rotting(items, ARGV[0] ? ARGV[0].to_i : 3))
 else
-	puts 'Invalid option. See manpage.'
+	puts 'gitodo: Invalid option. See manpage.'
 end

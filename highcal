@@ -40,6 +40,9 @@ class DatePos
 		@at.month == @my_month
 	end
 
+	# Print the current day (maybe highlight it) and advance to the next
+	# day. If the current day is not in "my" month, then simply print
+	# spaces.
 	def show_and_advance(highlights)
 		if is_my_month?
 			if @at == Date.today
