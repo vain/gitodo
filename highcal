@@ -1,93 +1,120 @@
-#!/usr/bin/env python3
+#!/usr/bin/env ruby
+# encoding: UTF-8
 
-import datetime
-import calendar
-import os
-import sys
+require 'date'
 
-def makeCal(year, month, highlights, colors):
-    # Build header: Name of the month/year and a list of the days of the
-    # week. Pad both to 21 chars.
-    d = datetime.date(year, month, 1)
-    out = d.strftime('%B %Y').center(20) + ' \n'
-    header = ''
-    for i in range(3, 10):
-        d = datetime.date(2011, 10, i)
-        header += d.strftime('%a')[0:2] + ' '
-    out += header + '\n'
+module Colors
+	@table = {
+		:today     => ['tput rev', nil],
+		:highlight => ['tput bold; tput setaf 1', nil],
+		:reset     => ['tput sgr0', nil],
+	}
 
-    # "calendar" can serve as an easy way to build a calendar like
-    # cal(1). Count the number of lines and pad to 6 lines (so each and
-    # every month has the same amount of lines).
-    c = calendar.Calendar()
-    weeks = c.monthdays2calendar(year, month)
-    hadLines = 0
-    for w in weeks:
-        for (day, weekday) in w:
-            if day == 0:
-                out += '   '
-            else:
-                # Check if we have to highlight this day (a highlight
-                # may exist or that the is equal to "today").
-                d = datetime.date(year, month, day)
-                high = d.strftime('%Y-%m-%d') in highlights
-                isToday = (d == datetime.date.today())
-                if isToday:
-                    out += colors['today']
-                if high:
-                    out += colors['high']
-                out += '{0:2d}'.format(day)
-                if high or isToday:
-                    out += colors['reset']
-                out += ' '
-            if weekday == 6:
-                out += '\n'
-                hadLines += 1
-    out += ((' ' * 21) + '\n') * (6 - hadLines)
-    return out
+	def Colors.[](which)
+		if !STDOUT.tty? &&
+		   !(ENV['GITODO_FORCE_COLOR'] || ENV['HIGHCAL_FORCE_COLOR'])
+			return ''
+		end
 
-def readHighlights():
-    # Expect a list of dates according to the format "year-month-day",
-    # like "2011-10-16".
-    lines = sys.stdin.readlines()
-    dates = [l.strip().split()[0] for l in lines]
-    return set(dates)
+		# Lazy allocation to save useless forks.
+		if @table[which][1] == nil
+			@table[which][1] = `#{@table[which][0]}`
+		end
 
-# Use tput(1) to retrieve the colors for the current terminal.
-colors = {
-        'high': os.popen('tput bold').read() + os.popen('tput setaf 1').read(),
-        'today': os.popen('tput rev').read(),
-        'reset': os.popen('tput sgr0').read()
-        }
+		return @table[which][1]
+	end
+end
 
-# Read dates to highlight from STDIN if it's not a terminal.
-highlights = set()
-if not os.isatty(0):
-    highlights = readHighlights()
+class DatePos
+	attr_accessor :at
+	attr_accessor :first
+	attr_accessor :month
 
-# Build the calendars for this month and the following two months. As we
-# know there's only going to be two additional months, year-wrapping
-# will be easy.
-today = datetime.date.today()
-year = today.year
-month = today.month
-outs = []
-for i in range(3):
-    outs += [makeCal(year, month, highlights, colors)]
-    month += 1
-    if month > 12:
-        month -= 12
-        year += 1
+	def initialize(at)
+		@first = true
+		@at = at
+		@my_month = at.month
+	end
 
-# Emulate paste(1), that is place the three calendars side by side.
-side = ''
-outs = [o.split('\n') for o in outs]
-for i in range(8):
-    side += outs[0][i] + '   '
-    side += outs[1][i] + '   '
-    side += outs[2][i]
-    side += '\n'
+	def is_my_month?
+		@at.month == @my_month
+	end
 
-print(side.rstrip())
+	def show_and_advance(highlights)
+		if is_my_month?
+			if @at == Date.today
+				print Colors[:today]
+			end
 
-# vim: set ts=4 sw=4 et :
+			if highlights.include? at
+				print Colors[:highlight]
+			end
+
+			printf '%2d', @at.day
+			@at = @at.next_day
+			print Colors[:reset]
+			print ' '
+		else
+			print '   '
+		end
+	end
+end
+
+
+# Do not read from STDIN if it's not a tty. I want to be able to simply
+# call this script and see the calendar without being *forced* to
+# specify highlights.
+highlights = []
+if !STDIN.tty?
+	highlights << DateTime.parse(STDIN.readline.strip).to_date
+end
+
+# Show the current month and the following two months. Each DatePos
+# object holds the position in the n'th month.
+start = Date.today
+start = Date.new(start.year, start.month, 1)
+positions = [DatePos.new(start),
+             DatePos.new(start.next_month()),
+             DatePos.new(start.next_month().next_month())]
+
+# Header: Month name + year.
+for month_add in 0..2
+	pos = positions[month_add]
+	print pos.at.strftime('%B %Y').center(21)
+	print '   '
+end
+print "\n"
+
+# Weekdays.
+for month_add in 0..2
+	d = Date.new(2011, 10, 3)
+	for i in 1..7
+		print d.strftime('%a')[0..1] + ' '
+		d = d.next_day
+	end
+	print '   '
+end
+print "\n"
+
+# Show the calendars line by line.
+for line in 1..6
+	for month_add in 0..2
+		pos = positions[month_add]
+		if pos.first
+			# If this is the first line of this month, then skip those
+			# days which are in the previous month.
+			pos.first = false
+			print '   ' * (pos.at.cwday - 1)
+			for i in pos.at.cwday..7
+				pos.show_and_advance(highlights)
+			end
+		else
+			for i in 1..7
+				pos.show_and_advance(highlights)
+			end
+		end
+		positions[month_add] = pos
+		print '   '
+	end
+	print "\n"
+end
