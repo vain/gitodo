@@ -68,8 +68,8 @@ DESCRIPTION
 OPTIONS
        gitodo is meant to be used on the command line. To make  things
        easier  for  you,  you  can  leave out leading dashes. That is,
-       instead of using --list you could just write  list  or  even  i
-       because -i is the short alias for --list.
+       instead of using --list you could just write  list  or  even  l
+       because -l is the short alias for --list.
 
        As you'll see, all important commands have a short alias.
 
