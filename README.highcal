@@ -23,10 +23,19 @@ DESCRIPTION
        The  current month will be shown plus the two following months.
        The script will highlight the dates from stdin.
 
+       If stdin is a terminal, highcal will not read any dates.   This
+       allows you to simply call highcal like you call cal.
+
        highcal requires tput(1) in order to set colors.
 
 OPTIONS
        highcal does not know any options.
+
+ENVIRONMENT
+       HIGHCAL_FORCE_COLOR
+       GITODO_FORCE_COLOR
+              If  either  of these variables are set, color is used in
+              any case, even if stdout is not a terminal.
 
 BUGS
        Currently, no bugs are known. If you find one, we invite you to
@@ -42,8 +51,8 @@ HISTORY
        started in December 2010. highcal was added in October 2011.
 
 SEE ALSO
-       gitodo(1), git(1), tput(1).
+       gitodo(1), git(1), tput(1), ruby(1).
 
 
 
-highcal                        June 2012                    HIGHCAL(1)
+highcal                      November 2012                  HIGHCAL(1)
