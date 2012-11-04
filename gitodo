@@ -1,6 +1,15 @@
 #!/usr/bin/env ruby
 # encoding: UTF-8
 
+# Global todo items:
+# XXX: Get rid of tput.
+# XXX: I need to find good guideline when to place parentheses.
+#      Sometimes omitting them increases readability. Sometimes it
+#      doesn't.
+# XXX: Maybe move Colors into a separate file so it can be shared with
+#      highcal.
+# XXX: Better inline documentation.
+
 require 'date'
 
 module Colors
@@ -252,7 +261,7 @@ def print_items(items)
 end
 
 def filter_ids(items, filter)
-	# TODO: This works but feels very odd.
+	# XXX: This works but feels very odd.
 	items.select do |i|
 		match = false
 		filter.each do |f|
