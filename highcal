@@ -69,7 +69,9 @@ end
 # specify highlights.
 highlights = []
 if !STDIN.tty?
-	highlights << DateTime.parse(STDIN.readline.strip).to_date
+	STDIN.readlines.each do |line|
+		highlights << DateTime.parse(line.strip).to_date
+	end
 end
 
 # Show the current month and the following two months. Each DatePos
