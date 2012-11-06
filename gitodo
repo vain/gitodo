@@ -268,23 +268,22 @@ def filter_ids(items, filter)
 			if f.start_with?(':/')
 				if i.what =~ /#{f[2..-1]}/i
 					match = true
-					# Break inner block.
-					next
+					break
 				end
 			elsif f == 'dead'
 				if i.classify == :dead
 					match = true
-					next
+					break
 				end
 			elsif f == 'close'
 				if i.classify == :close
 					match = true
-					next
+					break
 				end
 			else
 				if i.id == f
 					match = true
-					next
+					break
 				end
 			end
 		end
