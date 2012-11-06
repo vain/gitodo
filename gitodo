@@ -5,8 +5,6 @@
 # XXX: I need to find good guideline when to place parentheses.
 #      Sometimes omitting them increases readability. Sometimes it
 #      doesn't.
-# XXX: Maybe move Colors into a separate file so it can be shared with
-#      highcal.
 # XXX: Better inline documentation.
 
 require 'date'
