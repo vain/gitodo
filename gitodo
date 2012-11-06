@@ -2,7 +2,6 @@
 # encoding: UTF-8
 
 # Global todo items:
-# XXX: Get rid of tput.
 # XXX: I need to find good guideline when to place parentheses.
 #      Sometimes omitting them increases readability. Sometimes it
 #      doesn't.
@@ -14,27 +13,22 @@ require 'date'
 
 module Colors
 	@table = {
-		:dead      => ['tput bold; tput setaf 1', nil],
-		:close     => ['tput setaf 1', nil],
-		:very_high => ['tput bold; tput setaf 1', nil],
-		:high      => ['tput setaf 1', nil],
-		:low       => ['tput setaf 4', nil],
-		:very_low  => ['tput setaf 2', nil],
-		:header    => ['tput bold', nil],
-		:reset     => ['tput sgr0', nil],
+		:dead      => "\e[1;31m",
+		:close     => "\e[31m",
+		:very_high => "\e[1;31m",
+		:high      => "\e[31m",
+		:low       => "\e[34m",
+		:very_low  => "\e[32m",
+		:header    => "\e[1m",
+		:reset     => "\e[0m",
 	}
 
 	def Colors.[](which)
 		if !STDOUT.tty? && !ENV['GITODO_FORCE_COLOR']
 			return ''
+		else
+			return @table[which]
 		end
-
-		# Lazy allocation to save useless forks.
-		if @table[which][1] == nil
-			@table[which][1] = `#{@table[which][0]}`
-		end
-
-		return @table[which][1]
 	end
 end
 

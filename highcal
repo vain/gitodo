@@ -5,23 +5,18 @@ require 'date'
 
 module Colors
 	@table = {
-		:today     => ['tput rev', nil],
-		:highlight => ['tput bold; tput setaf 1', nil],
-		:reset     => ['tput sgr0', nil],
+		:today     => "\e[7m",
+		:highlight => "\e[1;31m",
+		:reset     => "\e[0m",
 	}
 
 	def Colors.[](which)
 		if !STDOUT.tty? &&
 		   !(ENV['GITODO_FORCE_COLOR'] || ENV['HIGHCAL_FORCE_COLOR'])
 			return ''
+		else
+			return @table[which]
 		end
-
-		# Lazy allocation to save useless forks.
-		if @table[which][1] == nil
-			@table[which][1] = `#{@table[which][0]}`
-		end
-
-		return @table[which][1]
 	end
 end
 
