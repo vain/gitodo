@@ -252,35 +252,21 @@ def print_items(items)
 	end
 end
 
-def filter_ids(items, filter)
-	# XXX: This works but feels very odd.
-	items.select do |i|
-		match = false
-		filter.each do |f|
-			if f.start_with?(':/')
-				if i.what =~ /#{f[2..-1]}/i
-					match = true
-					break
-				end
-			elsif f == 'dead'
-				if i.classify == :dead
-					match = true
-					break
-				end
-			elsif f == 'close'
-				if i.classify == :close
-					match = true
-					break
-				end
-			else
-				if i.id == f
-					match = true
-					break
-				end
-			end
+def filter_ids(items, filters_str)
+	filters = filters_str.map do |f|
+		case f
+		when %r{^:/(.*)}
+			f = Regexp.new($1, Regexp::IGNORECASE)
+			lambda { |i| i.what =~ f }
+		when 'dead'
+			lambda { |i| i.classify == :dead }
+		when 'close'
+			lambda { |i| i.classify == :close }
+		else
+			lambda { |i| i.id == f }
 		end
-		match
 	end
+	items.select { |i| filters.any? { |f| f.call(i) } }
 end
 
 def filter_bodies(items, filter)
