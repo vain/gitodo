@@ -64,8 +64,6 @@ DESCRIPTION
        (usually less than 1 hour left, can be set), the task is marked
        with a *.
 
-       gitodo requires tput(1) in order to set colors.
-
 OPTIONS
        gitodo is meant to be used on the command line. To make  things
        easier  for  you,  you  can  leave out leading dashes. That is,
@@ -238,8 +236,9 @@ SEARCHING
 
 
             $ gitodo --body party
-            i1156
-            -----
+            [1156]
+            ------
+
             what: time_t party
             when: 2012-07-13 11:01
             prio: 50
@@ -349,7 +348,7 @@ HISTORY
        started in December 2010.
 
 SEE ALSO
-       highcal(1), git(1), tput(1), ruby(1).
+       highcal(1), git(1), ruby(1).
 
 
 

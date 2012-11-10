@@ -69,8 +69,6 @@ moved to the bottom.
 If the deadline for a task has already passed, it's marked with a
 \fB!\fP at the beginning of the line. If the deadline is close (usually
 less than 1 hour left, can be set), the task is marked with a \fB*\fP.
-.P
-\fBgitodo\fP requires \fBtput\fP(1) in order to set colors.
 .SH OPTIONS
 \fBgitodo\fP is meant to be used on the command line. To make things
 easier for you, you can leave out leading dashes. That is, instead of
@@ -245,8 +243,9 @@ The \fB:/\fP is only needed to distinguish IDs from search terms. As
 \f(CW
 .nf
 	$ gitodo --body party
-	i1156
-	-----
+	[1156]
+	------
+
 	what: time_t party
 	when: 2012-07-13 11:01
 	prio: 50
@@ -360,5 +359,4 @@ started in December 2010.
 .SH "SEE ALSO"
 .BR highcal (1),
 .BR git (1),
-.BR tput (1),
 .BR ruby (1).

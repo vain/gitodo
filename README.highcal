@@ -26,8 +26,6 @@ DESCRIPTION
        If stdin is a terminal, highcal will not read any dates.   This
        allows you to simply call highcal like you call cal.
 
-       highcal requires tput(1) in order to set colors.
-
 OPTIONS
        highcal does not know any options.
 
@@ -51,7 +49,7 @@ HISTORY
        started in December 2010. highcal was added in October 2011.
 
 SEE ALSO
-       gitodo(1), git(1), tput(1), ruby(1).
+       gitodo(1), git(1), ruby(1).
 
 
 
