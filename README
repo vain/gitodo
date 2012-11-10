@@ -13,7 +13,6 @@ SYNOPSIS
        gitodo --delete id [id ...]
        gitodo --new [n]
        gitodo --body term
-       gitodo --log [OPTIONS ...]
        gitodo --cron
        gitodo --cron-outdated
        gitodo --count
@@ -65,6 +64,8 @@ DESCRIPTION
        (usually less than 1 hour left, can be set), the task is marked
        with a *.
 
+       gitodo requires tput(1) in order to set colors.
+
 OPTIONS
        gitodo is meant to be used on the command line. To make  things
        easier  for  you,  you  can  leave out leading dashes. That is,
@@ -93,12 +94,9 @@ OPTIONS
 
        -b, --body term
               Search in bodies  of  items  and  print  matching  items
-              (including    their    bodies).    term   must   be   an
-              egrep(1)-regex.
-
-       --log [options]
-              Show log of the items repository. This  calls  git  log,
-              any options will be passed on to git.
+              (including their bodies). term must be a regular expres‐
+              sions understood by Ruby  (no  modifiers  allowed).  See
+              SEARCHING.
 
        -c, --cron
               Show  a  list  of  outdated tasks and tasks close to the
@@ -139,12 +137,15 @@ SYNTAX
 
        Deadline and priority are optional. In  fact,  only  a  subject
        line  is  mandatory.  The default priority is 0 and no deadline
-       means 2038-01-01 00:00:00. ;-) A negative number  means  higher
+       means 2037-01-01 00:00:00. ;-) A negative number  means  higher
        priority  (just  like  Linux'  nice(1) values). The priority is
        meant to range from -99 to 99.
 
+       when can  be  anything  that  is  understood  by  Ruby's  Date‐
+       Time.parse() function.
+
        warn: 4 means that this task gets marked as “close to deadline”
-       four  hours before the deadline will be reached. If this fields
+       four hours before the deadline will be reached. If this  fields
        is left out, it defaults to one hour.
 
        subject: is an alias for what: and dead: is an alias for when:.
@@ -152,15 +153,15 @@ SYNTAX
        If there's a line containing only nocron, then this item is not
        shown when gitodo is called with --cron or --cron-outdated.
 
-       To  help  you  procrastinate, gitodo knows a special item type:
-       Items with a priority less than 99 (i.e., 100, 101,  102,  ...)
-       which  do  have  a  deadline set are hidden from listings. Such
-       items are not included in --cron output  and  --count,  either.
-       They're  only shown if they are close to their deadline or even
+       To help you procrastinate, gitodo knows a  special  item  type:
+       Items  with  a priority less than 99 (i.e., 100, 101, 102, ...)
+       which do have a deadline set are  hidden  from  listings.  Such
+       items  are  not  included in --cron output and --count, either.
+       They're only shown if they are close to their deadline or  even
        outdated.
 
-       This is meant for TODO items that are so unimportant  that  you
-       don't  want  to  be bothered by them — until it really is about
+       This  is  meant for TODO items that are so unimportant that you
+       don't want to be bothered by them — until it  really  is  about
        time.
 
 
@@ -171,46 +172,46 @@ SYNTAX
             I really should do this. Some day.
 
 
-       If you do want to see such items, you can set  the  environment
+       If  you  do want to see such items, you can set the environment
        variable $GITODO_SHOW_UNIMPORTANT.
 
 TASK ITEM FILES, THE REPOSITORY AND SYNCHING
-       All  your  task  items  are  kept  in a single directory. Every
-       change of your task list will  be  automatically  committed  to
-       that  repository.  By default, $XDG_DATA_HOME/gitodo.items will
+       All your task items are  kept  in  a  single  directory.  Every
+       change  of  your  task  list will be automatically committed to
+       that repository. By default,  $XDG_DATA_HOME/gitodo.items  will
        be used or $HOME/.local/share/gitodo.items if $XDG_DATA_HOME is
-       not  set.  Use  the environment variable $GITODO_DATA to change
+       not set. Use the environment variable  $GITODO_DATA  to  change
        this. If it's set, then this directory is used.
 
-       Important note: Your items directory must  exist  and  it  must
-       already  be initialized as a Git repository. gitodo will not do
+       Important  note:  Your  items  directory must exist and it must
+       already be initialized as a Git repository. gitodo will not  do
        this for you.
 
-       Common task items will be named like i0123: That would  be  the
-       file  for the 123rd item. Note that new items will get a random
-       free ID ranging from 0 to 9999. This is  done  to  avoid  merge
+       Common  task  items will be named like i0123: That would be the
+       file for the 123rd item. Note that new items will get a  random
+       free  ID  ranging  from  0 to 9999. This is done to avoid merge
        conflicts.
 
-       Add  the items repo to your synching mechanism if you want them
+       Add the items repo to your synching mechanism if you want  them
        to be synched.
 
 SEARCHING
-       Instead of giving explicit IDs, you can also use  egrep-regexes
-       to  search  the  subjects  of your items. The following command
-       edits all items matching “jane” or “diane”, your TODO item with
-       ID 432 and all items matching “gnu”:
+       Instead  of  giving explicit IDs, you can also use Ruby regular
+       expressions to search the subjects of your items. The following
+       command  edits  all items matching “jane” or “diane”, your TODO
+       item with ID 432 and all items matching “gnu”:
 
 
             $ gitodo -e ':/(j|di)ane' 432 ':/gnu'
 
 
-       Searching  using :/ as a prefix works with the --edit, --print,
+       Searching using :/ as a prefix works with the --edit,  --print,
        --delete and --list commands. Let me repeat: This only searches
        in subject lines.
 
-       To  filter your list of TODO items, you can use the --list com‐
-       mand. Again, you can either start your search term with  :/  to
-       perform an egrep-search:
+       To filter your list of TODO items, you can use the --list  com‐
+       mand.  Again,  you can either start your search term with :/ to
+       perform a searching using Ruby regular expressions:
 
 
             $ gitodo --list :/time
@@ -230,9 +231,9 @@ SEARCHING
               [  1] [                   ] [2436] aoi patches
 
 
-       To  search  in bodies of items, you can use --body. Note: Don't
-       prefix your search term with :/ when using --body.  The  :/  is
-       only  needed  to  distinguish  IDs from search terms. As --body
+       To search in bodies of items, you can use --body.  Note:  Don't
+       prefix  your  search term with :/ when using --body.  The :/ is
+       only needed to distinguish IDs from  search  terms.  As  --body
        does not understand IDs, there's no need for :/.
 
 
@@ -251,9 +252,10 @@ SEARCHING
             http://en.wikipedia.org/wiki/Unix_time
 
 
-       Again, you can use egrep-regexes with --body.
+       Again, you can use Ruby regexes with --body.
 
-       Searching is always case insensitive.
+       Searching is always case insensitive. For example, if you spec‐
+       ify :/foo, internally /foo/i will be used.
 
 SETUP
        First, clone the code repository:
@@ -298,21 +300,14 @@ USING GITODO WITH HIGHCAL
        (as long as there is one).
 
 PORTABILITY
-       Until  commit  cfe3c9d, this script was meant to be able to run
-       in the msysgit (http://code.google.com/p/msysgit/)  environment
-       on  Windows.  That's because I needed that at work (sigh). How‐
-       ever, I am no longer forced to use Windows. As I now mainly use
-       Arch Linux, I cannot guarantee for portability. YMMV.
+       gitodo once was a shell script that could be run in the msysgit
+       (http://code.google.com/p/msysgit/)  environment  on   Windows.
+       This  is  no longer true. gitodo is now implemented in Ruby 1.9
+       and only tested on current versions of Arch Linux.
 
-       I  don't  know  when  I'll be forced to use Windows again. When
-       this happens, I want to continue using gitodo. So I try to keep
-       most  of  the  original code which is proven to run on msysgit.
-       Unfortunately, this also means that I have to  keep  a  lot  of
-       ugly and slow code.
-
-       Anyway,  a  little  advice: If you ever think about putting the
+       Anyway, a little advice: If you ever think  about  putting  the
        task items repo on a USB stick and if you want to use that repo
-       from  both  Windows  and  GNU,  make  sure to disable msysgit's
+       from both Windows and  GNU,  make  sure  to  disable  msysgit's
        “autocrlf” feature.  For more information, see:
 
        http://www.tigraine.at/2010/02/03/disable-autcrlf-in-msysgit/
@@ -321,8 +316,8 @@ PORTABILITY
 
 ENVIRONMENT
        GITODO_DATA
-              If this variable is set, it must point  to  a  directory
-              where  your  git  repository will be stored. You can use
+              If  this  variable  is set, it must point to a directory
+              where your git repository will be stored.  You  can  use
               this to override the default location (see FILES below).
 
        GITODO_FORCE_COLOR
@@ -330,19 +325,19 @@ ENVIRONMENT
               if stdout is not a terminal.
 
        GITODO_SHOW_UNIMPORTANT
-              If  this  variable  is  set,  filtering  of “unimportant
+              If this  variable  is  set,  filtering  of  “unimportant
               items” (see above) will be disabled.
 
 FILES
        $XDG_DATA_HOME/gitodo.items/
        $HOME/.local/share/gitodo.items/
-              Default per-user data directory if $GITODO_DATA  is  not
+              Default  per-user  data directory if $GITODO_DATA is not
               set. The $HOME variant is only used if $XDG_DATA_HOME is
               not set.
 
 BUGS
        Currently, no bugs are known. If you find one, we invite you to
-       report      it      at     the     GitHub     Issue     tracker
+       report     it     at     the     GitHub      Issue      tracker
        (http://github.com/vain/gitodo/issues).
 
 LICENSE
@@ -354,8 +349,8 @@ HISTORY
        started in December 2010.
 
 SEE ALSO
-       highcal(1), git(1), tput(1).
+       highcal(1), git(1), tput(1), ruby(1).
 
 
 
-Git-TODO                     October 2012                    GITODO(1)
+Git-TODO                     November 2012                   GITODO(1)
