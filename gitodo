@@ -14,7 +14,7 @@ module Colors
 		:dead      => "\e[1;31m",
 		:close     => "\e[31m",
 		:very_high => "\e[1;31m",
-		:high      => "\e[31m",
+		:high      => "\e[33m",
 		:low       => "\e[34m",
 		:very_low  => "\e[32m",
 		:header    => "\e[1m",
@@ -97,12 +97,12 @@ class Item
 		case classify
 		when :dead
 			print(Colors[:dead])
-			print('! ')
+			print(' D ')
 		when :close
 			print(Colors[:close])
-			print('* ')
+			print(' C ')
 		else
-			print('  ')
+			print('   ')
 		end
 
 		print(Colors[:reset])
@@ -229,8 +229,8 @@ end
 
 def print_header(indent=false)
 	print(Colors[:header])
-	puts((indent ? "\t" : '') + 'O Prio        Deadline          ID   Subject')
-	puts((indent ? "\t" : '') + '- ----- --------------------- ------ -------')
+	puts((indent ? "\t" : '') + ' S Prio        Deadline          ID   Subject')
+	puts((indent ? "\t" : '') + ' - ----- --------------------- ------ -------')
 	print(Colors[:reset])
 end
 

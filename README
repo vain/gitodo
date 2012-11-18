@@ -39,18 +39,18 @@ DESCRIPTION
        deadline.  Typical output from the script might look like this:
 
 
-       O Prio        Deadline          ID   Subject
-       - ----- --------------------- ------ -------
-         [-15] [                   ] [   1] Mail to jane: Dinner.
-         [ -3] [                   ] [   2] Christmas presents.
-       ! [  0] [           22:00:00] [   9] Remove garbage from your bed.
-         [  0] [           23:30:00] [   8] Go to sleep. Yes, it's important.
-         [  0] [2010-12-10 23:59:00] [  10] Still awake?
-         [  0] [2010-12-13         ] [   6] Prepare talk about Git.
-         [  0] [2010-12-24         ] [   7] Remove SVN from all computers.
-         [  0] [                   ] [   4] Wash dishes.
-         [  0] [                   ] [   5] Buy new milk.
-         [  5] [                   ] [   3] Wash the car.
+        S Prio        Deadline          ID   Subject
+        - ----- --------------------- ------ -------
+          [-15] [                   ] [   1] Mail to jane: Dinner.
+          [ -3] [                   ] [   2] Christmas presents.
+        D [  0] [           22:00:00] [   9] Remove garbage from your bed.
+          [  0] [           23:30:00] [   8] Go to sleep. Yes, it's important.
+          [  0] [2010-12-10 23:59:00] [  10] Still awake?
+          [  0] [2010-12-13         ] [   6] Prepare talk about Git.
+          [  0] [2010-12-24         ] [   7] Remove SVN from all computers.
+          [  0] [                   ] [   4] Wash dishes.
+          [  0] [                   ] [   5] Buy new milk.
+          [  5] [                   ] [   3] Wash the car.
 
 
        Note  the  order: Items with a higher importance come first. If
@@ -60,9 +60,9 @@ DESCRIPTION
        important” and is moved to the bottom.
 
        If the deadline for a task has already passed, it's marked with
-       a ! at the beginning of the line.  If  the  deadline  is  close
+       a D at the beginning of the line.  If  the  deadline  is  close
        (usually less than 1 hour left, can be set), the task is marked
-       with a *.
+       with a C.
 
 OPTIONS
        gitodo is meant to be used on the command line. To make  things
@@ -213,20 +213,20 @@ SEARCHING
 
 
             $ gitodo --list :/time
-            O Prio        Deadline          ID   Subject
-            - ----- --------------------- ------ -------
-              [  0] [2012-07-13 11:01:00] [1156] time_t party
+             S Prio        Deadline          ID   Subject
+             - ----- --------------------- ------ -------
+               [  0] [2012-07-13 11:01:00] [1156] time_t party
 
 
        Or, you can supply one or more ids and even mix both variants:
 
 
             $ gitodo --list 7458 2436 :/time
-            O Prio        Deadline          ID   Subject
-            - ----- --------------------- ------ -------
-              [  0] [2012-07-01         ] [7458] lico-update
-              [  0] [2012-07-13 11:01:00] [1156] time_t party
-              [  1] [                   ] [2436] aoi patches
+             S Prio        Deadline          ID   Subject
+             - ----- --------------------- ------ -------
+               [  0] [2012-07-01         ] [7458] lico-update
+               [  0] [2012-07-13 11:01:00] [1156] time_t party
+               [  1] [                   ] [2436] aoi patches
 
 
        To search in bodies of items, you can use --body.  Note:  Don't
