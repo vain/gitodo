@@ -186,11 +186,16 @@ def load_all_items
 			if line =~ /^(prio): (.*)/
 				item.prio = $2.to_i
 			elsif line =~ /^(when|dead): (.*)/
-				# XXX: Hackaround to be able to use DateTime.parse in
-				# the local timezone.
-				item.when = DateTime.parse($2)
-				item.when -= Time.now.utc_offset / 86400.0
-				item.when = item.when.to_time
+				begin
+					# XXX: Hackaround to be able to use DateTime.parse in
+					# the local timezone.
+					item.when = DateTime.parse($2)
+					item.when -= Time.now.utc_offset / 86400.0
+					item.when = item.when.to_time
+				rescue ArgumentError
+					$stderr.puts("#{filename}'s deadline is not a valid date.")
+					item.when = Time.now()
+				end
 
 				spaces = $2.count(' ')
 				colons = $2.count(':')
