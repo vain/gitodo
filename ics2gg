@@ -1,0 +1,32 @@
+#!/bin/bash
+
+unescape() { sed 's/\\n/\n/g; s/\\,/,/g'; }
+
+for i
+do
+	tmp=$(mktemp)
+
+	joined=$(sed -n \
+		-e '1 { h; n }' \
+		-e '/^[^ ]/ { x; s/\n//g; p }' \
+		-e '/^ / { s/^ //; H }' \
+		-e '$ { x; s/\n//g; p }' "$i")
+	summ=$(echo "$joined" | sed -n 's/^SUMMARY://p' | unescape)
+	loca=$(echo "$joined" | sed -n 's/^LOCATION://p' | unescape)
+	star=$(echo "$joined" | sed -rn 's/^DTSTART(:|;)?.*://p' | tail -n 1 | unescape)
+	desc=$(echo "$joined" | sed -n 's/^DESCRIPTION://p' | unescape)
+
+	star="${star:0:4}-${star:4:2}-${star:6:2} ${star:9:2}:${star:11:2}"
+
+	(
+		echo "what: $summ"
+		echo "when: $star"
+		echo
+		echo "location: $loca"
+		echo
+		echo "$desc"
+	) >"$tmp"
+
+	gitodo f "$tmp"
+	rm "$tmp"
+done
