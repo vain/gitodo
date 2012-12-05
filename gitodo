@@ -8,6 +8,7 @@
 # XXX: Better inline documentation.
 
 require 'date'
+require 'fileutils'
 
 module Colors
 	@table = {
@@ -314,14 +315,25 @@ def print_cron(items, selection)
 	end
 end
 
+def new_filename()
+	filename = 'i' + ('%04d' % rand(0..9999))
+	while File.exists? filename
+		filename = 'i' + ('%04d' % rand(0..9999))
+	end
+	return filename
+end
+
 def new_items(editor, how_many)
 	how_many.times do
-		filename = 'i' + ('%04d' % rand(0..9999))
-		while File.exists? filename
-			filename = 'i' + ('%04d' % rand(0..9999))
-		end
+		system "#{editor} #{new_filename()}"
+	end
+end
 
-		system "#{editor} #{filename}"
+def new_items_from_files(editor, orig_pwd, sources)
+	sources.each do |s|
+		f = new_filename()
+		FileUtils.cp(s, f)
+		system "#{editor} #{f}"
 	end
 end
 
@@ -346,6 +358,7 @@ editor = ENV['EDITOR'] || 'vim'
 
 # See if the repo exists and cd to it. We need to chdir for commit() to
 # work.
+orig_pwd = Dir.pwd()
 if !check_and_chdir_repo(datadir)
 	$stderr.puts "`#{datadir}' is not a Git repository."
 	exit 1
@@ -365,6 +378,9 @@ ARGV.shift
 case opt
 when 'new', 'n'
 	new_items(editor, ARGV[0] ? ARGV[0].to_i : 1)
+	commit
+when 'new-from-files', 'f'
+	new_items_from_files(editor, orig_pwd, ARGV)
 	commit
 when 'list', 'l'
 	list_items(filter_ids(items, ARGV))

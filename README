@@ -12,6 +12,7 @@ SYNOPSIS
        gitodo --print id [id ...]
        gitodo --delete id [id ...]
        gitodo --new [n]
+       gitodo --new-from-files file [file ...]
        gitodo --body term
        gitodo --cron
        gitodo --cron-outdated
@@ -86,6 +87,11 @@ OPTIONS
               Add n new tasks. You'll be put in your $EDITOR to do so.
               If  you  don't  specify  n, exactly one new task will be
               created.
+
+       -f, --new-from-files file [file ...]
+              Creates a new task from each file. You can use  this  in
+              scripts.  Note  that  the editor will be opened for each
+              new task.
 
        -d, --delete id [id ...]
               Delete all matching items.

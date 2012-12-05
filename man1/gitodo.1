@@ -14,6 +14,8 @@ gitodo \- a personal task manager.
 .br
 \fBgitodo\fP \fB\-\-new\fP [\fIn\fP]
 .br
+\fBgitodo\fP \fB\-\-new\-from\-files\fP \fIfile\fP [\fIfile\fP ...]
+.br
 \fBgitodo\fP \fB\-\-body\fP \fIterm\fP
 .br
 \fBgitodo\fP \fB\-\-cron\fP
@@ -89,6 +91,10 @@ Print all matching items including their body to \fBstdout\fP.
 \fB\-n\fP, \fB\-\-new\fP [\fIn\fP]
 Add \fIn\fP new tasks. You'll be put in your $\fBEDITOR\fP to do so. If
 you don't specify \fIn\fP, exactly one new task will be created.
+.TP
+\fB\-f\fP, \fB\-\-new\-from\-files\fP \fIfile\fP [\fIfile\fP ...]
+Creates a new task from each file. You can use this in scripts. Note
+that the editor will be opened for each new task.
 .TP
 \fB\-d\fP, \fB\-\-delete\fP \fIid [id ...]\fP
 Delete all matching items.
