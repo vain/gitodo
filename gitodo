@@ -228,8 +228,21 @@ def load_all_items
 end
 
 def check_and_chdir_repo(dir)
+	while Dir.pwd != '/'
+		if Dir.exists?('.gitodo/.git')
+			Dir.chdir('.gitodo')
+			return true
+		end
+
+		Dir.chdir('..')
+	end
+
 	if Dir.exists?(dir + '/.git')
 		Dir.chdir(dir)
+		return true
+	else
+		$stderr.puts "`#{datadir}' is not a Git repository."
+		return false
 	end
 end
 
@@ -356,11 +369,11 @@ default_prefix = ENV['XDG_DATA_HOME'] || (ENV['HOME'] + '/.local/share')
 datadir = ENV['GITODO_DATA'] || (default_prefix + '/gitodo.items')
 editor = ENV['EDITOR'] || 'vim'
 
-# See if the repo exists and cd to it. We need to chdir for commit() to
-# work.
+# We need to chdir for commit() to work. Try to find a gitodo
+# repository. This can be "datadir" or a ".gitodo" in a parent
+# directory.
 orig_pwd = Dir.pwd()
 if !check_and_chdir_repo(datadir)
-	$stderr.puts "`#{datadir}' is not a Git repository."
 	exit 1
 end
 
