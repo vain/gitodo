@@ -36,7 +36,10 @@ DESCRIPTION
        ·   Be  able  to  synchronize  your  tasks  with other machines
            because they're kept in a Git repository.
 
-       When listing tasks, they're first sorted by importance then  by
+       ·   Support for per-user TODO  lists  as  well  as  per-project
+           lists.
+
+       When  listing tasks, they're first sorted by importance then by
        deadline.  Typical output from the script might look like this:
 
 
@@ -54,21 +57,21 @@ DESCRIPTION
           [  5] [                   ] [   3] Wash the car.
 
 
-       Note  the  order: Items with a higher importance come first. If
-       two items have the same importance,  they're  sorted  by  their
-       deadline.  Deadlines can be a date, a time (meaning “today”) or
+       Note the order: Items with a higher importance come  first.  If
+       two  items  have  the  same importance, they're sorted by their
+       deadline. Deadlines can be a date, a time (meaning “today”)  or
        both. If there's no deadline, the task is considered to be “not
        important” and is moved to the bottom.
 
        If the deadline for a task has already passed, it's marked with
-       a D at the beginning of the line.  If  the  deadline  is  close
+       a  D  at  the  beginning  of the line. If the deadline is close
        (usually less than 1 hour left, can be set), the task is marked
        with a C.
 
 OPTIONS
-       gitodo is meant to be used on the command line. To make  things
-       easier  for  you,  you  can  leave out leading dashes. That is,
-       instead of using --list you could just write  list  or  even  l
+       gitodo  is meant to be used on the command line. To make things
+       easier for you, you can leave  out  leading  dashes.  That  is,
+       instead  of  using  --list  you could just write list or even l
        because -l is the short alias for --list.
 
        As you'll see, all important commands have a short alias.
@@ -77,7 +80,7 @@ OPTIONS
               List all matching items.
 
        -e, --edit id [id ...]
-              Edit   all  matching  items  using  $EDITOR,  one  after
+              Edit  all  matching  items  using  $EDITOR,  one   after
               another.
 
        -p, --print id [id ...]
@@ -85,25 +88,25 @@ OPTIONS
 
        -n, --new [n]
               Add n new tasks. You'll be put in your $EDITOR to do so.
-              If  you  don't  specify  n, exactly one new task will be
+              If you don't specify n, exactly one  new  task  will  be
               created.
 
        -f, --new-from-files file [file ...]
-              Creates a new task from each file. You can use  this  in
-              scripts.  Note  that  the editor will be opened for each
+              Creates  a  new task from each file. You can use this in
+              scripts. Note that the editor will be  opened  for  each
               new task.
 
        -d, --delete id [id ...]
               Delete all matching items.
 
        -b, --body term
-              Search in bodies  of  items  and  print  matching  items
+              Search  in  bodies  of  items  and  print matching items
               (including their bodies). term must be a regular expres‐
-              sions understood by Ruby  (no  modifiers  allowed).  See
+              sions  understood  by  Ruby  (no modifiers allowed). See
               SEARCHING.
 
        -c, --cron
-              Show  a  list  of  outdated tasks and tasks close to the
+              Show a list of outdated tasks and  tasks  close  to  the
               deadline, suitable for a cron job.
 
        -o, --cron-outdated
@@ -113,18 +116,18 @@ OPTIONS
               Count tasks (all open tasks, tasks close to deadline and
               outdated tasks).
 
-       --raw  Don't  do  pretty  printing.  This  option  is meant for
+       --raw  Don't do pretty  printing.  This  option  is  meant  for
               scripting.
 
        --rotting [n]
-              When using gitodo for a long time, you might lose  track
-              of  some  items  —  especially those without a deadline.
-              --rotting lists all tasks which have  not  been  changed
-              for  n  months.  Default  is 3 months. This only affects
+              When  using gitodo for a long time, you might lose track
+              of some items — especially  those  without  a  deadline.
+              --rotting  lists  all  tasks which have not been changed
+              for n months. Default is 3  months.  This  only  affects
               tasks without a deadline.
 
-       id can be an explicit ID  or  string  beginning  with  :/  (see
-       SEARCHING)  or  a  special  identifier: dead means all outdated
+       id  can  be  an  explicit  ID  or string beginning with :/ (see
+       SEARCHING) or a special identifier:  dead  means  all  outdated
        items, close means all items close to their deadline.
 
 SYNTAX
@@ -139,17 +142,17 @@ SYNTAX
             Some other lines describing the task in detail.
 
 
-       Deadline and priority are optional. In  fact,  only  a  subject
-       line  is  mandatory.  The default priority is 0 and no deadline
-       means 2037-01-01 00:00:00. ;-) A negative number  means  higher
-       priority  (just  like  Linux'  nice(1) values). The priority is
+       Deadline  and  priority  are  optional. In fact, only a subject
+       line is mandatory. The default priority is 0  and  no  deadline
+       means  2037-01-01  00:00:00. ;-) A negative number means higher
+       priority (just like Linux' nice(1)  values).  The  priority  is
        meant to range from -99 to 99.
 
-       when can  be  anything  that  is  understood  by  Ruby's  Date‐
+       when  can  be  anything  that  is  understood  by  Ruby's Date‐
        Time.parse() function.
 
        warn: 4 means that this task gets marked as “close to deadline”
-       four hours before the deadline will be reached. If this  fields
+       four  hours before the deadline will be reached. If this fields
        is left out, it defaults to one hour.
 
        subject: is an alias for what: and dead: is an alias for when:.
@@ -157,15 +160,15 @@ SYNTAX
        If there's a line containing only nocron, then this item is not
        shown when gitodo is called with --cron or --cron-outdated.
 
-       To help you procrastinate, gitodo knows a  special  item  type:
-       Items  with  a priority less than 99 (i.e., 100, 101, 102, ...)
-       which do have a deadline set are  hidden  from  listings.  Such
-       items  are  not  included in --cron output and --count, either.
-       They're only shown if they are close to their deadline or  even
+       To  help  you  procrastinate, gitodo knows a special item type:
+       Items with a priority less than 99 (i.e., 100, 101,  102,  ...)
+       which  do  have  a  deadline set are hidden from listings. Such
+       items are not included in --cron output  and  --count,  either.
+       They're  only shown if they are close to their deadline or even
        outdated.
 
-       This  is  meant for TODO items that are so unimportant that you
-       don't want to be bothered by them — until it  really  is  about
+       This is meant for TODO items that are so unimportant  that  you
+       don't  want  to  be bothered by them — until it really is about
        time.
 
 
@@ -176,16 +179,21 @@ SYNTAX
             I really should do this. Some day.
 
 
-       If  you  do want to see such items, you can set the environment
+       If you do want to see such items, you can set  the  environment
        variable $GITODO_SHOW_UNIMPORTANT.
 
 TASK ITEM FILES, THE REPOSITORY AND SYNCHING
-       All your task items are  kept  in  a  single  directory.  Every
-       change  of  your  task  list will be automatically committed to
-       that repository. By default,  $XDG_DATA_HOME/gitodo.items  will
+       All  your  task  items  are  kept  in a single directory. Every
+       change of your task list will  be  automatically  committed  to
+       that  repository.  By default, $XDG_DATA_HOME/gitodo.items will
        be used or $HOME/.local/share/gitodo.items if $XDG_DATA_HOME is
-       not set. Use the environment variable  $GITODO_DATA  to  change
+       not  set.  Use  the environment variable $GITODO_DATA to change
        this. If it's set, then this directory is used.
+
+       gitodo also checks for  a  .gitodo  directory  in  the  current
+       directory and in all parent directories. That way, you can eas‐
+       ily create multiple TODO repositories. A common scenario is  to
+       have one TODO repo for each project you're working on.
 
        Important  note:  Your  items  directory must exist and it must
        already be initialized as a Git repository. gitodo will not  do

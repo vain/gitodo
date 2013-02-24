@@ -41,6 +41,8 @@ Set a deadline for tasks.
 .IP \(bu 4
 Be able to synchronize your tasks with other machines because they're
 kept in a Git repository.
+.IP \(bu 4
+Support for per-user TODO lists as well as per-project lists.
 .P
 When listing tasks, they're first sorted by importance then by deadline.
 Typical output from the script might look like this:
@@ -188,6 +190,11 @@ default, \fI$XDG_DATA_HOME/gitodo.items\fP will be used or
 \fI$HOME/.local/share/gitodo.items\fP if $\fBXDG_DATA_HOME\fP is not
 set. Use the environment variable $\fBGITODO_DATA\fP to change this. If
 it's set, then this directory is used.
+.P
+\fBgitodo\fP also checks for a \fI.gitodo\fP directory in the current
+directory and in all parent directories. That way, you can easily create
+multiple TODO repositories. A common scenario is to have one TODO repo
+for each project you're working on.
 .P
 \fBImportant note:\fP Your items directory must exist and it must
 already be initialized as a Git repository. \fBgitodo\fP will not do
