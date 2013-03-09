@@ -91,7 +91,7 @@ OPTIONS
        -f, --new-from-files file [file ...]
               Creates a new task from each file. You can use  this  in
               scripts.  Note  that  the editor will be opened for each
-              new task.
+              new task. Furthermore, absolute paths are required.
 
        -d, --delete id [id ...]
               Delete all matching items.
