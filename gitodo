@@ -345,7 +345,7 @@ end
 
 def commit
 	system 'git add .'
-	system 'git commit -a -m "Auto-commit $(hostname)."'
+	system 'git commit -a -m "Auto-commit $(hostname)"'
 end
 
 
