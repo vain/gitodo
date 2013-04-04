@@ -40,6 +40,8 @@ class DatePos
 	# spaces.
 	def show_and_advance(highlights)
 		if is_my_month?
+			print ' '
+
 			if @at == Date.today
 				print Colors[:today]
 			end
@@ -51,7 +53,14 @@ class DatePos
 			printf '%2d', @at.day
 			@at = @at.next_day
 			print Colors[:reset]
-			print ' '
+		else
+			print '   '
+		end
+	end
+
+	def show_cweek
+		if is_my_month?
+			printf '%2d ', @at.cweek
 		else
 			print '   '
 		end
@@ -79,20 +88,32 @@ positions = [DatePos.new(start),
 
 # Header: Month name + year.
 for month_add in 0..2
+	# Left padding for centered month name.
+	print '    '
+
 	pos = positions[month_add]
-	print pos.at.strftime('%B %Y').center(21)
-	print '   '
+	print pos.at.strftime('%B %Y').center(20)
+	if month_add != 2
+		# Separator between two months.
+		print '    '
+	end
 end
 print "\n"
 
 # Weekdays.
 for month_add in 0..2
+	# Left padding for week lines.
+	print '   '
+
 	d = Date.new(2011, 10, 3)
 	for i in 1..7
-		print d.strftime('%a')[0..1] + ' '
+		print ' ' + d.strftime('%a')[0..1]
 		d = d.next_day
 	end
-	print '   '
+	if month_add != 2
+		# Separator between two months.
+		print '    '
+	end
 end
 print "\n"
 
@@ -100,6 +121,7 @@ print "\n"
 for line in 1..6
 	for month_add in 0..2
 		pos = positions[month_add]
+		pos.show_cweek
 		if pos.first
 			# If this is the first line of this month, then skip those
 			# days which are in the previous month.
@@ -114,7 +136,10 @@ for line in 1..6
 			end
 		end
 		positions[month_add] = pos
-		print '   '
+		if month_add != 2
+			# Separator between two months.
+			print '    '
+		end
 	end
 	print "\n"
 end
