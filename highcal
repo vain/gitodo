@@ -7,6 +7,7 @@ module Colors
 	@table = {
 		:today     => "\e[7m",
 		:highlight => "\e[1;31m",
+		:header    => "\e[4m",
 		:reset     => "\e[0m",
 	}
 
@@ -106,10 +107,16 @@ for month_add in 0..2
 	print '   '
 
 	d = Date.new(2011, 10, 3)
+	print ' '
+	print Colors[:header]
 	for i in 1..7
-		print ' ' + d.strftime('%a')[0..1]
+		if i != 1
+			print ' '
+		end
+		print d.strftime('%a')[0..1]
 		d = d.next_day
 	end
+	print Colors[:reset]
 	if month_add != 2
 		# Separator between two months.
 		print '    '
