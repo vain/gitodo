@@ -1,7 +1,7 @@
 " Vim syntax file
 " Language:     Gitodo
 " Maintainer:   Vain <pcode@uninformativ.de>
-" Last Change:  2011 May 04
+" Last Change:  2013 April 27
 
 " For version 5.x: Clear all syntax items
 " For version 6.x: Quit when a syntax file was already loaded
