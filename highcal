@@ -96,7 +96,7 @@ for month_add in 0..2
 	print pos.at.strftime('%B %Y').center(20)
 	if month_add != 2
 		# Separator between two months.
-		print '    '
+		print '   '
 	end
 end
 print "\n"
@@ -119,7 +119,7 @@ for month_add in 0..2
 	print Colors[:reset]
 	if month_add != 2
 		# Separator between two months.
-		print '    '
+		print '   '
 	end
 end
 print "\n"
@@ -145,7 +145,7 @@ for line in 1..6
 		positions[month_add] = pos
 		if month_add != 2
 			# Separator between two months.
-			print '    '
+			print '   '
 		end
 	end
 	print "\n"
