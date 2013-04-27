@@ -13,7 +13,7 @@ endif
 
 syn match gtkey "\v^(prio|when|dead|what|subject|warn):"
 syn match gtkey "^nocron$"
-syn match gtsubjectline "\v(^(what|subject): )@<=.*"
+syn match gtsubjectline "\v(^(what|subject): )@<=.{0,40}"
 
 hi def link gtkey Identifier
 hi def link gtsubjectline String
