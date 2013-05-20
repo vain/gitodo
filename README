@@ -325,9 +325,21 @@ ENVIRONMENT
               the editor you wish to use to edit your items.  Defaults
               to vim if both are unset.
 
+       GITODO_EDIT_SINGLE
+              If  this variable is set, the editor will only be called
+              once for all edit operations. For example,  suppose  you
+              do  a  gitodo  e :/foo and :/foo matches the items i1000
+              and  i2000.  If  GITODO_EDIT_SINGLE  is  set,  only  one
+              instance  of your editor will be started, e.g. vim i1000
+              i2000.  If  the  variable  is  NOT  set,  then   several
+              instances  will  be started, e.g. vim i1000 and then vim
+              i2000 after the first Vim has finished. The use case  of
+              GITODO_EDIT_SINGLE  is  to  make  use  of Vim buffers or
+              using vim -p as an editor.
+
        GITODO_DATA
-              If  this  variable  is set, it must point to a directory
-              where your git repository will be stored.  You  can  use
+              If this variable is set, it must point  to  a  directory
+              where  your  git  repository will be stored. You can use
               this to override the default location (see FILES below).
 
        GITODO_FORCE_COLOR
@@ -335,19 +347,19 @@ ENVIRONMENT
               if stdout is not a terminal.
 
        GITODO_SHOW_UNIMPORTANT
-              If this  variable  is  set,  filtering  of  “unimportant
+              If  this  variable  is  set,  filtering  of “unimportant
               items” (see above) will be disabled.
 
 FILES
        $XDG_DATA_HOME/gitodo.items/
        $HOME/.local/share/gitodo.items/
-              Default  per-user  data directory if $GITODO_DATA is not
+              Default per-user data directory if $GITODO_DATA  is  not
               set. The $HOME variant is only used if $XDG_DATA_HOME is
               not set.
 
 BUGS
        Currently, no bugs are known. If you find one, we invite you to
-       report     it     at     the     GitHub      Issue      tracker
+       report      it      at     the     GitHub     Issue     tracker
        (http://github.com/vain/gitodo/issues).
 
 LICENSE

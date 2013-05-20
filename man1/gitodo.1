@@ -338,6 +338,17 @@ If you leave it enabled, it's going to be nasty.
 editor you wish to use to edit your items. Defaults to \fIvim\fP if both
 are unset.
 .TP
+.B GITODO_EDIT_SINGLE
+If this variable is set, the editor will only be called once for all
+edit operations. For example, suppose you do a \fIgitodo e :/foo\fP and
+\fI:/foo\fP matches the items \fIi1000\fP and \fIi2000\fP. If
+\fBGITODO_EDIT_SINGLE\fP is set, only one instance of your editor will
+be started, e.g. \fIvim i1000 i2000\fP. If the variable is \fBNOT\fP
+set, then several instances will be started, e.g. \fIvim i1000\fP and
+then \fIvim i2000\fP after the first Vim has finished. The use case of
+\fBGITODO_EDIT_SINGLE\fP is to make use of Vim buffers or using \fIvim
+-p\fP as an editor.
+.TP
 .B GITODO_DATA
 If this variable is set, it must point to a directory where your git
 repository will be stored. You can use this to override the default

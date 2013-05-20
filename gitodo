@@ -327,17 +327,31 @@ def new_filename()
 	return filename
 end
 
-def new_items(editor, how_many)
+def new_items(how_many)
+	out = []
 	how_many.times do
-		system "#{editor} #{new_filename()}"
+		out << new_filename()
 	end
+	out
 end
 
-def new_items_from_files(editor, orig_pwd, sources)
+def new_items_from_files(orig_pwd, sources)
+	out = []
 	sources.each do |s|
 		f = new_filename()
 		FileUtils.cp(s, f)
-		system "#{editor} #{f}"
+		out << f
+	end
+	out
+end
+
+def edit(editor, edit_single, filenames)
+	if edit_single
+		system "#{editor} #{filenames.join(' ')}"
+	else
+		filenames.each do |f|
+			system "#{editor} #{f}"
+		end
 	end
 end
 
@@ -359,6 +373,7 @@ end
 default_prefix = ENV['XDG_DATA_HOME'] || (ENV['HOME'] + '/.local/share')
 datadir = ENV['GITODO_DATA'] || (default_prefix + '/gitodo.items')
 editor = ENV['GITODO_EDITOR'] || ENV['EDITOR'] || 'vim'
+edit_single = ENV['GITODO_EDIT_SINGLE'] || false
 
 # See if the repo exists and cd to it. We need to chdir for commit() to
 # work.
@@ -381,10 +396,10 @@ ARGV.shift
 
 case opt
 when 'new', 'n'
-	new_items(editor, ARGV[0] ? ARGV[0].to_i : 1)
+	edit(editor, edit_single, new_items(ARGV[0] ? ARGV[0].to_i : 1))
 	commit
 when 'new-from-files', 'f'
-	new_items_from_files(editor, orig_pwd, ARGV)
+	edit(editor, edit_single, new_items_from_files(orig_pwd, ARGV))
 	commit
 when 'list', 'l'
 	list_items(filter_ids(items, ARGV))
@@ -393,9 +408,7 @@ when 'print', 'p'
 when 'body', 'b'
 	print_items(filter_bodies(items, ARGV[0]))
 when 'edit', 'e'
-	filter_ids(items, ARGV).each do |i|
-		system "#{editor} #{i.filename}"
-	end
+	edit(editor, edit_single, filter_ids(items, ARGV).map { |i| i.filename })
 	commit
 when 'delete', 'd'
 	filter_ids(items, ARGV).each do |i|
