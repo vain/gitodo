@@ -270,7 +270,13 @@ def filter_ids(items, filters_str)
 			lambda { |i| i.id == f }
 		end
 	end
-	items.select { |i| filters.any? { |f| f.call(i) } }
+	out = []
+	filters.each do |f|
+		selected = items.select { |i| f.call(i) }
+		selected.sort!
+		out.push(*selected)
+	end
+	return out
 end
 
 def filter_bodies(items, filter)
