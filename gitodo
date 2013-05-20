@@ -222,8 +222,6 @@ def load_all_items
 		items << item
 	end
 
-	items.sort!
-
 	return items
 end
 
@@ -242,7 +240,7 @@ end
 
 def list_items(items, indent=false)
 	print_header(indent)
-	items.each do |i|
+	items.sort.each do |i|
 		if !i.hide?
 			if indent
 				print("\t")
