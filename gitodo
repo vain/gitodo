@@ -9,6 +9,7 @@
 
 require 'date'
 require 'fileutils'
+require 'pathname'
 
 module Colors
 	@table = {
@@ -337,9 +338,15 @@ end
 
 def new_items_from_files(orig_pwd, sources)
 	out = []
+	orig_pwd_path = Pathname.new(orig_pwd)
 	sources.each do |s|
 		f = new_filename()
-		FileUtils.cp(s, f)
+		s_path = Pathname.new(s)
+		if s_path.absolute?
+			FileUtils.cp(s, f)
+		else
+			FileUtils.cp(orig_pwd_path + s, f)
+		end
 		out << f
 	end
 	out
