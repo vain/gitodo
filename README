@@ -320,6 +320,11 @@ PORTABILITY
        If you leave it enabled, it's going to be nasty.
 
 ENVIRONMENT
+       GITODO_EDITOR, EDITOR
+              GITODO_EDITOR  has  priority  over EDITOR. They point to
+              the editor you wish to use to edit your items.  Defaults
+              to vim if both are unset.
+
        GITODO_DATA
               If  this  variable  is set, it must point to a directory
               where your git repository will be stored.  You  can  use

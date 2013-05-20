@@ -333,6 +333,11 @@ http://www.tigraine.at/2010/02/03/disable-autcrlf-in-msysgit/
 If you leave it enabled, it's going to be nasty.
 .SH ENVIRONMENT
 .TP
+\fBGITODO_EDITOR\fP, \fBEDITOR\fP
+\fBGITODO_EDITOR\fP has priority over \fBEDITOR\fP. They point to the
+editor you wish to use to edit your items. Defaults to \fIvim\fP if both
+are unset.
+.TP
 .B GITODO_DATA
 If this variable is set, it must point to a directory where your git
 repository will be stored. You can use this to override the default

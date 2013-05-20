@@ -358,7 +358,7 @@ end
 # editor.
 default_prefix = ENV['XDG_DATA_HOME'] || (ENV['HOME'] + '/.local/share')
 datadir = ENV['GITODO_DATA'] || (default_prefix + '/gitodo.items')
-editor = ENV['EDITOR'] || 'vim'
+editor = ENV['GITODO_EDITOR'] || ENV['EDITOR'] || 'vim'
 
 # See if the repo exists and cd to it. We need to chdir for commit() to
 # work.
