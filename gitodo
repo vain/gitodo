@@ -369,8 +369,8 @@ def delete_items(items)
 end
 
 def commit
-	system 'git add .'
-	system 'git commit -a -m "Auto-commit $(hostname)"'
+	system 'git add -A .'
+	system 'git commit -m "Auto-commit $(hostname)"'
 end
 
 
