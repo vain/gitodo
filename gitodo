@@ -2,7 +2,7 @@
 # encoding: UTF-8
 
 # Global todo items:
-# XXX: I need to find good guideline when to place parentheses.
+# XXX: I need to find a good guideline when to place parentheses.
 #      Sometimes omitting them increases readability. Sometimes it
 #      doesn't.
 # XXX: Better inline documentation.
