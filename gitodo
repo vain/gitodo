@@ -353,6 +353,10 @@ def new_items_from_files(orig_pwd, sources)
 end
 
 def edit(editor, edit_single, filenames)
+	if filenames.size == 0
+		return
+	end
+
 	if edit_single
 		system "#{editor} #{filenames.join(' ')}"
 	else
