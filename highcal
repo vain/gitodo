@@ -5,6 +5,7 @@ require 'date'
 
 module Colors
 	@table = {
+		:curweek   => "\e[1m",
 		:today     => "\e[7m",
 		:highlight => "\e[1;31m",
 		:header    => "\e[4m",
@@ -61,7 +62,14 @@ class DatePos
 
 	def show_cweek
 		if is_my_month?
-			printf '%2d ', @at.cweek
+			if @at.cweek == Date.today.cweek
+				print Colors[:curweek]
+				printf '%2d', @at.cweek
+				print Colors[:reset]
+				print ' '
+			else
+				printf '%2d ', @at.cweek
+			end
 		else
 			print '   '
 		end
