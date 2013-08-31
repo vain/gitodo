@@ -374,7 +374,7 @@ end
 
 def commit
 	system 'git add -A .'
-	system 'git commit -m "Auto-commit $(hostname)"'
+	system 'git commit -m "Auto-Commit by gitodo on $(hostname)"'
 end
 
 
