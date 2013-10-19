@@ -220,6 +220,10 @@ def load_all_items
 			end
 		end
 
+		if item.what.strip == ''
+			item.what = '<NO SUBJECT>'
+		end
+
 		items << item
 	end
 
