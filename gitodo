@@ -230,6 +230,19 @@ def load_all_items
 	return items
 end
 
+def clean_empty
+	Dir.glob('i*').each do |filename|
+		f = File.new(filename, 'r')
+		content = f.read()
+		f.close()
+
+		if content.strip == ''
+			puts "Cleaning up empty file '#{filename}'"
+			File.delete(filename)
+		end
+	end
+end
+
 def check_and_chdir_repo(dir)
 	if Dir.exists?(dir + '/.git')
 		Dir.chdir(dir)
@@ -413,9 +426,11 @@ ARGV.shift
 case opt
 when 'new', 'n'
 	edit(editor, edit_single, new_items(ARGV[0] ? ARGV[0].to_i : 1))
+	clean_empty
 	commit
 when 'new-from-files', 'f'
 	edit(editor, edit_single, new_items_from_files(orig_pwd, ARGV))
+	clean_empty
 	commit
 when 'list', 'l'
 	list_items(filter_ids(items, ARGV))
@@ -425,12 +440,14 @@ when 'body', 'b'
 	print_items(filter_bodies(items, ARGV[0]))
 when 'edit', 'e'
 	edit(editor, edit_single, filter_ids(items, ARGV).map { |i| i.filename })
+	clean_empty
 	commit
 when 'delete', 'd'
 	filter_ids(items, ARGV).each do |i|
 		puts "Deleting #{i.id_fmt}: #{i.what}"
 		File.delete(i.filename)
 	end
+	clean_empty
 	commit
 when 'count'
 	total = items.size

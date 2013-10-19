@@ -199,6 +199,17 @@ ranging from 0 to 9999. This is done to avoid merge conflicts.
 .P
 Add the items repo to your synching mechanism if you want them to be
 synched.
+.SH "HANDLING EMPTY ITEMS"
+\fBgitodo\fP will automatically remove empty items from your repository.
+\(lqEmpty\(rq means a completely empty file or a file containing only
+whitespace. This is a useful housekeeping mechanism.
+.P
+It's also relevant if you create new items using \fBgitodo \-\-new\fP.
+If you change your mind (\(lqnah, actually, I don't care about this TODO
+item\(rq), then just delete all lines while you're still in the editor
+and the new item will be dropped. This is similar to commit messages in
+\fBgit\fP: When entering an empty commit message, no commit will be
+made.
 .SH SEARCHING
 Instead of giving explicit IDs, you can also use Ruby regular
 expressions to search the subjects of your items. The following command
