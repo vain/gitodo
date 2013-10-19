@@ -172,9 +172,8 @@ def load_all_items
 	items = []
 
 	Dir.glob('i*').each do |filename|
-		f = File.new(filename, 'r')
-		lines = f.readlines()
-		f.close()
+		lines = []
+		File.open(filename, 'r') { |f| lines = f.readlines() }
 
 		item = Item.new
 
@@ -232,9 +231,8 @@ end
 
 def clean_empty
 	Dir.glob('i*').each do |filename|
-		f = File.new(filename, 'r')
-		content = f.read()
-		f.close()
+		content = ''
+		File.open(filename, 'r') { |f| content = f.read() }
 
 		if content.strip == ''
 			puts "Cleaning up empty file '#{filename}'"
