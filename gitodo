@@ -332,6 +332,7 @@ def new_items(how_many)
 	out = []
 	how_many.times do
 		out << new_filename()
+		File.open(out.last, 'w') { |f| f.write("what: \n") }
 	end
 	out
 end
