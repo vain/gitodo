@@ -109,11 +109,11 @@ class Item
 
 		print(Colors[:reset])
 
-		if prio < -5
+		if prio < -50
 			print(Colors[:very_high])
 		elsif prio < 0
 			print(Colors[:high])
-		elsif prio > 5
+		elsif prio > 50
 			print(Colors[:low])
 		elsif prio > 0
 			print(Colors[:very_low])
