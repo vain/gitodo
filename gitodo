@@ -146,7 +146,6 @@ class Item
 		puts(id_fmt)
 		puts(id_fmt.gsub(/./, '-'))
 		print(Colors[:reset])
-		puts
 
 		puts(@content)
 
