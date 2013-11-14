@@ -57,11 +57,6 @@ class Item
 		@timetype = :none
 	end
 
-	# "Formatted" id.
-	def id_fmt
-		'[%4s]' % @id.to_s
-	end
-
 	# Check if this item is okay, close to the deadline or dead.
 	def classify
 		now = Time.now
@@ -133,7 +128,7 @@ class Item
 			print(@when.strftime('%F %T'))
 		end
 		print(']')
-		print(' ' + id_fmt)
+		print(' [%4d]' % @id)
 		print(' ' + @what)
 		print(Colors[:reset])
 
@@ -143,8 +138,8 @@ class Item
 	# Show an item's body.
 	def show_detail
 		print(Colors[:header])
-		puts(id_fmt)
-		puts(id_fmt.gsub(/./, '-'))
+		puts('[%4d]' % @id)
+		puts('------')
 		print(Colors[:reset])
 
 		puts(@content)
@@ -441,7 +436,7 @@ when 'edit', 'e'
 	commit
 when 'delete', 'd'
 	filter_ids(items, ARGV).each do |i|
-		puts "Deleting #{i.id_fmt}: #{i.what}"
+		puts "Deleting #{i.id}: #{i.what}"
 		File.delete(i.filename)
 	end
 	clean_empty
