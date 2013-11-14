@@ -40,18 +40,18 @@ DESCRIPTION
        deadline.  Typical output from the script might look like this:
 
 
-        S Prio        Deadline          ID   Subject
-        - ----- --------------------- ------ -------
-          [-15] [                   ] [   1] Mail to Jane: Dinner
-          [ -3] [                   ] [   2] Christmas presents
-        D [  0] [           22:00:00] [   9] Remove garbage from your bed
-        C [  0] [           23:30:00] [   8] Go to sleep -- yes, it's important
-          [  0] [2010-12-10 23:59:00] [  10] Still awake?
-          [  0] [2010-12-13         ] [   6] Prepare talk about Git
-          [  0] [2010-12-24         ] [   7] Remove SVN from all computers
-          [  0] [                   ] [   4] Wash dishes
-          [  0] [                   ] [   5] Buy new milk
-          [  5] [                   ] [   3] Wash the car
+        S   Pri      Deadline         ID    Subject
+       ---+-----+------------------+------+-----------------------------------
+          | -15 |                  |    1 | Mail to Jane: Dinner
+          |  -3 |                  |    2 | Christmas presents
+        D |   0 |            22:00 |    9 | Remove garbage from your bed
+        C |   0 |            23:30 |    8 | Go to sleep -- yes, it's important
+          |   0 | 2010-12-10 23:59 |   10 | Still awake?
+          |   0 | 2010-12-13       |    6 | Prepare talk about Git
+          |   0 | 2010-12-24       |    7 | Remove SVN from all computers
+          |   0 |                  |    4 | Wash dishes
+          |   0 |                  |    5 | Buy new milk
+          |   5 |                  |    3 | Wash the car
 
 
        Note  the  order: Items with a higher importance come first. If
@@ -231,20 +231,20 @@ SEARCHING
 
 
             $ gitodo --list :/time
-             S Prio        Deadline          ID   Subject
-             - ----- --------------------- ------ -------
-               [  0] [2012-07-13 11:01:00] [1156] time_t party
+             S   Pri      Deadline         ID    Subject
+            ---+-----+------------------+------+-----------------
+               |   0 | 2012-07-13 11:01 | 1156 | time_t party
 
 
        Or, you can supply one or more ids and even mix both variants:
 
 
             $ gitodo --list 7458 2436 :/time
-             S Prio        Deadline          ID   Subject
-             - ----- --------------------- ------ -------
-               [  0] [2012-07-01         ] [7458] lico-update
-               [  0] [2012-07-13 11:01:00] [1156] time_t party
-               [  1] [                   ] [2436] aoi patches
+             S   Pri      Deadline         ID    Subject
+            ---+-----+------------------+------+-----------------
+               |   0 | 2012-07-01       | 7458 | lico-update
+               |   0 | 2012-07-13 11:01 | 1156 | time_t party
+               |   1 |                  | 2436 | aoi patches
 
 
        To  search  in bodies of items, you can use --body. Note: Don't
@@ -254,9 +254,8 @@ SEARCHING
 
 
             $ gitodo --body party
-            [1156]
+             1156
             ------
-
             what: time_t party
             when: 2012-07-13 11:01
             prio: 50
@@ -387,4 +386,4 @@ SEE ALSO
 
 
 
-Git-TODO                     October 2013                    GITODO(1)
+Git-TODO                     November 2013                   GITODO(1)

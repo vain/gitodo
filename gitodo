@@ -91,15 +91,17 @@ class Item
 
 	# Show a line suitable for output in the traditional listing.
 	def show_brief
+		print(' ')
+
 		case classify
 		when :dead
 			print(Colors[:dead])
-			print(' D ')
+			print('D')
 		when :close
 			print(Colors[:close])
-			print(' C ')
+			print('C')
 		else
-			print('   ')
+			print(' ')
 		end
 
 		print(Colors[:reset])
@@ -114,22 +116,25 @@ class Item
 			print(Colors[:very_low])
 		end
 
-		printf('[%3s]', @prio.to_s)
+		print(' | ')
+		printf('%3s', @prio.to_s)
 
-		print(' [')
+		print(' | ')
 		case @timetype
 		when :none
-			print('                   ')
+			print('                ')
 		when :time
-			print('           ' + @when.strftime('%T'))
+			print('           ' + @when.strftime('%H:%M'))
 		when :date
-			print(@when.strftime('%F') + '         ')
+			print(@when.strftime('%F') + '      ')
 		when :datetime
-			print(@when.strftime('%F %T'))
+			print(@when.strftime('%F %H:%M'))
 		end
-		print(']')
-		print(' [%4d]' % @id)
-		print(' ' + @what)
+
+		print(' | ')
+		print('%4d' % @id)
+		print(' | ')
+		print(@what)
 		print(Colors[:reset])
 
 		puts
@@ -138,8 +143,8 @@ class Item
 	# Show an item's body.
 	def show_detail
 		print(Colors[:header])
-		puts('[%4d]' % @id)
-		puts('------')
+		puts(' ' + @id.to_s + ' ')
+		puts('-' * (@id.to_s.size + 2))
 		print(Colors[:reset])
 
 		puts(@content)
@@ -243,8 +248,9 @@ end
 
 def print_header(indent=false)
 	print(Colors[:header])
-	puts((indent ? "\t" : '') + ' S Prio        Deadline          ID   Subject')
-	puts((indent ? "\t" : '') + ' - ----- --------------------- ------ -------')
+	puts((indent ? "\t" : '') + ' S   Pri      Deadline         ID    Subject')
+	puts((indent ? "\t" : '') + '---+-----+------------------+------+--------' \
+	                          + '-' * 34)
 	print(Colors[:reset])
 end
 
