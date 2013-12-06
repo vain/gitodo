@@ -1,11 +1,11 @@
-.TH HIGHCAL 1 "November 2012" "highcal" "Highlight dates in a calendar"
+.TH HIGHCAL 1 "December 2013" "highcal" "Highlight dates in a calendar"
 .SH NAME
 highcal \- highlight dates in a calendar
 .SH SYNOPSIS
-\fBhighcal\fP
+\fBhighcal\fP [\fIyear\fP]
 .SH DESCRIPTION
-Create calendars like \fBcal\fP(1) but optionally highlight some days.
-Feed this script a list of days on \fBstdin\fP, one day per line:
+Create calendars similar to \fBcal\fP(1) but optionally highlight some
+days. Feed this script a list of days on \fBstdin\fP, one day per line:
 .P
 \f(CW
 .nf
@@ -16,13 +16,12 @@ Feed this script a list of days on \fBstdin\fP, one day per line:
 .fi
 \fP
 .P
-The current month will be shown plus the two following months. The
-script will highlight the dates from \fBstdin\fP.
-.P
 If \fBstdin\fP is a terminal, \fBhighcal\fP will not read any dates.
 This allows you to simply call \fBhighcal\fP like you call \fBcal\fP.
 .SH OPTIONS
-\fBhighcal\fP does not know any options.
+If \fIyear\fP is given, \fBhighcal\fP will print the calender for the
+whole year. Otherwise, the current month will be shown plus the two
+following months.
 .SH ENVIRONMENT
 .TP
 .PD 0

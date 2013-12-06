@@ -6,12 +6,12 @@ NAME
        highcal - highlight dates in a calendar
 
 SYNOPSIS
-       highcal
+       highcal [year]
 
 DESCRIPTION
-       Create  calendars  like  cal(1)  but  optionally highlight some
-       days.  Feed this script a list of days on stdin,  one  day  per
-       line:
+       Create  calendars  similar  to  cal(1) but optionally highlight
+       some days. Feed this script a list of days on  stdin,  one  day
+       per line:
 
 
             $ ./highcal <<EOF
@@ -20,28 +20,27 @@ DESCRIPTION
             EOF
 
 
-       The  current month will be shown plus the two following months.
-       The script will highlight the dates from stdin.
-
-       If stdin is a terminal, highcal will not read any dates.   This
+       If  stdin is a terminal, highcal will not read any dates.  This
        allows you to simply call highcal like you call cal.
 
 OPTIONS
-       highcal does not know any options.
+       If year is given, highcal will print the calender for the whole
+       year.  Otherwise,  the current month will be shown plus the two
+       following months.
 
 ENVIRONMENT
        HIGHCAL_FORCE_COLOR
        GITODO_FORCE_COLOR
-              If  either  of these variables are set, color is used in
+              If either of these variables are set, color is  used  in
               any case, even if stdout is not a terminal.
 
 BUGS
        Currently, no bugs are known. If you find one, we invite you to
-       report      it      at     the     GitHub     Issue     tracker
+       report     it     at     the     GitHub      Issue      tracker
        (http://github.com/vain/gitodo/issues).
 
 LICENSE
-       highcal is  released  as  “PIZZA-WARE”.  See  the  accompanying
+       highcal  is  released  as  “PIZZA-WARE”.  See  the accompanying
        LICENSE file.
 
 HISTORY
@@ -53,4 +52,4 @@ SEE ALSO
 
 
 
-highcal                      November 2012                  HIGHCAL(1)
+highcal                      December 2013                  HIGHCAL(1)

@@ -39,7 +39,7 @@ class DatePos
 
 	# Print the current day (maybe highlight it) and advance to the next
 	# day. If the current day is not in "my" month, then simply print
-	# spaces.
+	# spaces -- and return "false". Otherwise return "true".
 	def show_and_advance(highlights)
 		if is_my_month?
 			print ' '
@@ -55,14 +55,16 @@ class DatePos
 			printf '%2d', @at.day
 			@at = @at.next_day
 			print Colors[:reset]
+			return true
 		else
 			print '   '
+			return false
 		end
 	end
 
 	def show_cweek
 		if is_my_month?
-			if @at.cweek == Date.today.cweek
+			if @at.cweek == Date.today.cweek && @at.year == Date.today.year
 				print Colors[:curweek]
 				printf '%2d', @at.cweek
 				print Colors[:reset]
@@ -70,8 +72,10 @@ class DatePos
 			else
 				printf '%2d ', @at.cweek
 			end
+			return true
 		else
 			print '   '
+			return false
 		end
 	end
 end
@@ -87,74 +91,93 @@ if !STDIN.tty?
 	end
 end
 
-# Show the current month and the following two months. Each DatePos
-# object holds the position in the n'th month.
-start = Date.today
-start = Date.new(start.year, start.month, 1)
-positions = [DatePos.new(start),
-             DatePos.new(start.next_month()),
-             DatePos.new(start.next_month().next_month())]
-
-# Header: Month name + year.
-for month_add in 0..2
-	# Left padding for centered month name.
-	print '    '
-
-	pos = positions[month_add]
-	print pos.at.strftime('%B %Y').center(20)
-	if month_add != 2
-		# Separator between two months.
-		print '   '
+# We're going to draw the months in packs of three. The starting month
+# of each pack is stored in "starts".
+if ARGV[0]
+	starts = []
+	for i in (1..10).step(3)
+		starts << Date.new(ARGV[0].to_i, i)
 	end
+else
+	starts = [Date.new(Date.today.year, Date.today.month, 1)]
 end
-print "\n"
 
-# Weekdays.
-for month_add in 0..2
-	# Left padding for week lines.
-	print '   '
-
-	d = Date.new(2011, 10, 3)
-	print ' '
-	print Colors[:header]
-	for i in 1..7
-		if i != 1
-			print ' '
-		end
-		print d.strftime('%a')[0..1]
-		d = d.next_day
+starts.each_with_index do |start, start_index|
+	# Each DatePos object holds the position in the n'th month.
+	positions = []
+	for i in 0..2
+		positions << DatePos.new(start >> i)
 	end
-	print Colors[:reset]
-	if month_add != 2
-		# Separator between two months.
-		print '   '
-	end
-end
-print "\n"
 
-# Show the calendars line by line.
-for line in 1..6
-	for month_add in 0..2
+	# Header: Month name + year.
+	for month_add in 0..(positions.size - 1)
+		# Left padding for centered month name.
+		print '    '
+
 		pos = positions[month_add]
-		pos.show_cweek
-		if pos.first
-			# If this is the first line of this month, then skip those
-			# days which are in the previous month.
-			pos.first = false
-			print '   ' * (pos.at.cwday - 1)
-			for i in pos.at.cwday..7
-				pos.show_and_advance(highlights)
-			end
-		else
-			for i in 1..7
-				pos.show_and_advance(highlights)
-			end
-		end
-		positions[month_add] = pos
-		if month_add != 2
+		print pos.at.strftime('%B %Y').center(20)
+		if month_add != positions.size - 1
 			# Separator between two months.
 			print '   '
 		end
 	end
 	print "\n"
+
+	# Weekdays.
+	for month_add in 0..(positions.size - 1)
+		# Left padding for week lines.
+		print '   '
+
+		d = Date.new(2011, 10, 3)
+		print ' '
+		print Colors[:header]
+		for i in 1..7
+			if i != 1
+				print ' '
+			end
+			print d.strftime('%a')[0..1]
+			d = d.next_day
+		end
+		print Colors[:reset]
+		if month_add != positions.size - 1
+			# Separator between two months.
+			print '   '
+		end
+	end
+	print "\n"
+
+	# Show the calendars line by line.
+	for line in 1..6
+		last_line_full = false
+		for month_add in 0..(positions.size - 1)
+			pos = positions[month_add]
+			last_line_full |= pos.show_cweek
+			if pos.first
+				# If this is the first line of this month, then skip those
+				# days which are in the previous month.
+				pos.first = false
+				print '   ' * (pos.at.cwday - 1)
+				for i in pos.at.cwday..7
+					last_line_full |= pos.show_and_advance(highlights)
+				end
+			else
+				for i in 1..7
+					last_line_full |= pos.show_and_advance(highlights)
+				end
+			end
+			positions[month_add] = pos
+			if month_add != positions.size - 1
+				# Separator between two months.
+				print '   '
+			end
+		end
+		print "\n"
+	end
+
+	# Print extra lines only if it's appropriate. (We won't omit an
+	# empty sixth line, that one is always shown. But we can easily
+	# suppress extra separator lines.)
+	if starts.length > 1 && start_index < starts.length && last_line_full
+		print "\n"
+	end
 end
