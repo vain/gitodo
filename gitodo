@@ -2,9 +2,6 @@
 # encoding: UTF-8
 
 # Global todo items:
-# XXX: I need to find a good guideline when to place parentheses.
-#      Sometimes omitting them increases readability. Sometimes it
-#      doesn't.
 # XXX: Better inline documentation.
 
 require 'date'
@@ -24,7 +21,7 @@ module Colors
 	}
 
 	def Colors.[](which)
-		if !STDOUT.tty? && !ENV['GITODO_FORCE_COLOR']
+		if !STDOUT.tty?() && !ENV['GITODO_FORCE_COLOR']
 			return ''
 		else
 			return @table[which]
@@ -35,17 +32,17 @@ end
 class Item
 	include Comparable
 
-	attr_accessor :id
-	attr_accessor :filename
-	attr_accessor :prio
-	attr_accessor :when
-	attr_accessor :warn
-	attr_accessor :what
-	attr_accessor :nocron
-	attr_accessor :content
-	attr_accessor :timetype
+	attr_accessor(:id)
+	attr_accessor(:filename)
+	attr_accessor(:prio)
+	attr_accessor(:when)
+	attr_accessor(:warn)
+	attr_accessor(:what)
+	attr_accessor(:nocron)
+	attr_accessor(:content)
+	attr_accessor(:timetype)
 
-	def initialize
+	def initialize()
 		@id = 0
 		@filename = ''
 		@prio = 0
@@ -58,8 +55,8 @@ class Item
 	end
 
 	# Check if this item is okay, close to the deadline or dead.
-	def classify
-		now = Time.now
+	def classify()
+		now = Time.now()
 		if now > @when
 			return :dead
 		elsif now > @when - @warn * 3600
@@ -71,7 +68,7 @@ class Item
 
 	# timetype as a number. Required for compatibility with legacy
 	# "gitodo --raw".
-	def timetype_num
+	def timetype_num()
 		case @timetype
 		when :time
 			0
@@ -85,15 +82,15 @@ class Item
 	end
 
 	# Hide unimportant items?
-	def hide?
-		classify == :normal && @prio > 99 && !ENV['GITODO_SHOW_UNIMPORTANT']
+	def hide?()
+		classify() == :normal && @prio > 99 && !ENV['GITODO_SHOW_UNIMPORTANT']
 	end
 
 	# Show a line suitable for output in the traditional listing.
-	def show_brief
+	def show_brief()
 		print(' ')
 
-		case classify
+		case classify()
 		when :dead
 			print(Colors[:dead])
 			print('D')
@@ -106,18 +103,18 @@ class Item
 
 		print(Colors[:reset])
 
-		if prio < -50
+		if @prio < -50
 			print(Colors[:very_high])
-		elsif prio < 0
+		elsif @prio < 0
 			print(Colors[:high])
-		elsif prio > 50
+		elsif @prio > 50
 			print(Colors[:low])
-		elsif prio > 0
+		elsif @prio > 0
 			print(Colors[:very_low])
 		end
 
 		print(' | ')
-		printf('%3s', @prio.to_s)
+		printf('%3s', @prio.to_s())
 
 		print(' | ')
 		case @timetype
@@ -137,28 +134,28 @@ class Item
 		print(@what)
 		print(Colors[:reset])
 
-		puts
+		puts()
 	end
 
 	# Show an item's body.
-	def show_detail
+	def show_detail()
 		print(Colors[:header])
-		puts(' ' + @id.to_s + ' ')
-		puts('-' * (@id.to_s.size + 2))
+		puts(' ' + @id.to_s() + ' ')
+		puts('-' * (@id.to_s().size() + 2))
 		print(Colors[:reset])
 
 		puts(@content)
 
-		puts
+		puts()
 	end
 
 	# Compatible with legacy "gitodo --raw".
-	def show_raw
+	def show_raw()
 		print("#{@prio} #{@when.strftime('%F %T %s')} ")
 		print("#{@warn} #{@nocron ? '1' : '0'} #{timetype_num} ")
 		print("#{@id} #{@what}")
 
-		puts
+		puts()
 	end
 
 	# Make Item sortable. Sort by priority, then by deadline.
@@ -167,14 +164,14 @@ class Item
 	end
 end
 
-def load_all_items
+def load_all_items()
 	items = []
 
-	Dir.glob('i*').each do |filename|
+	Dir.glob('i*').each() do |filename|
 		lines = []
 		File.open(filename, 'r') { |f| lines = f.readlines() }
 
-		item = Item.new
+		item = Item.new()
 
 		filename =~ /.*i0*([[:digit:]]+)$/
 		item.id = $1
@@ -182,16 +179,16 @@ def load_all_items
 
 		item.content = lines.join('')
 
-		lines.each do |line|
+		lines.each() do |line|
 			if line =~ /^(prio): (.*)/
-				item.prio = $2.to_i
+				item.prio = $2.to_i()
 			elsif line =~ /^(when|dead): (.*)/
 				begin
 					# XXX: Hackaround to be able to use DateTime.parse in
 					# the local timezone.
 					item.when = DateTime.parse($2)
-					item.when -= Time.now.utc_offset / 86400.0
-					item.when = item.when.to_time
+					item.when -= Time.now().utc_offset() / 86400.0
+					item.when = item.when.to_time()
 				rescue ArgumentError
 					$stderr.puts("#{filename}'s deadline is not a valid date.")
 					item.when = Time.now()
@@ -210,15 +207,15 @@ def load_all_items
 					item.timetype = :datetime
 				end
 			elsif line =~ /^(warn): (.*)/
-				item.warn = $2.to_i
+				item.warn = $2.to_i()
 			elsif line =~ /^(what|subject): (.*)/
 				item.what = $2
-			elsif line.strip == 'nocron'
+			elsif line.strip() == 'nocron'
 				item.nocron = true
 			end
 		end
 
-		if item.what.strip == ''
+		if item.what.strip() == ''
 			item.what = '<NO SUBJECT>'
 		end
 
@@ -228,13 +225,13 @@ def load_all_items
 	return items
 end
 
-def clean_empty
-	Dir.glob('i*').each do |filename|
+def clean_empty()
+	Dir.glob('i*').each() do |filename|
 		content = ''
 		File.open(filename, 'r') { |f| content = f.read() }
 
-		if content.strip == ''
-			puts "Cleaning up empty file '#{filename}'"
+		if content.strip() == ''
+			puts("Cleaning up empty file '#{filename}'")
 			File.delete(filename)
 		end
 	end
@@ -256,52 +253,52 @@ end
 
 def list_items(items, indent=false)
 	print_header(indent)
-	items.sort.each do |i|
-		if !i.hide?
+	items.sort().each() do |i|
+		if !i.hide?()
 			if indent
 				print("\t")
 			end
-			i.show_brief
+			i.show_brief()
 		end
 	end
 end
 
 def print_items(items)
-	items.each do |i|
-		i.show_detail
+	items.each() do |i|
+		i.show_detail()
 	end
 end
 
 def filter_ids(items, filters_str)
-	filters = filters_str.map do |f|
+	filters = filters_str.map() do |f|
 		case f
 		when %r{^:/(.*)}
 			f = Regexp.new($1, Regexp::IGNORECASE)
 			lambda { |i| i.what =~ f }
 		when 'dead'
-			lambda { |i| i.classify == :dead }
+			lambda { |i| i.classify() == :dead }
 		when 'close'
-			lambda { |i| i.classify == :close }
+			lambda { |i| i.classify() == :close }
 		else
 			lambda { |i| i.id == f }
 		end
 	end
 	out = []
-	filters.each do |f|
-		selected = items.select { |i| f.call(i) }
-		selected.sort!
+	filters.each() do |f|
+		selected = items.select() { |i| f.call(i) }
+		selected.sort!()
 		out.push(*selected)
 	end
 	return out
 end
 
 def filter_bodies(items, filter)
-	items.select { |i| i.content =~ /#{filter}/i }
+	items.select() { |i| i.content =~ /#{filter}/i }
 end
 
 def filter_rotting(items, months)
-	now = Time.now
-	items.select do |i|
+	now = Time.now()
+	items.select() do |i|
 		lchange = `git log '--pretty=format:%ct' -n 1 -- "#{i.filename}"`
 		lchange = Time.at(lchange.to_i)
 		now - lchange > months * 60 * 60 * 24 * 30
@@ -310,26 +307,26 @@ end
 
 def print_cron(items, selection)
 	outdated = filter_ids(items, ['dead'])
-	outdated.select! { |i| !i.nocron }
-	if outdated.size > 0
+	outdated.select!() { |i| !i.nocron }
+	if outdated.size() > 0
 		puts('OUTDATED TASKS:')
 		puts('===============')
-		puts
+		puts()
 		list_items(outdated, true)
 	end
 
 	if selection == :all
 		close = filter_ids(items, ['close'])
-		close.select! { |i| !i.nocron }
-		if close.size > 0
-			if outdated.size > 0
-				puts
-				puts
+		close.select!() { |i| !i.nocron }
+		if close.size() > 0
+			if outdated.size() > 0
+				puts()
+				puts()
 			end
 
 			puts('DEADLINE CLOSE:')
 			puts('===============')
-			puts
+			puts()
 			list_items(close, true)
 		end
 	end
@@ -337,7 +334,7 @@ end
 
 def new_filename()
 	filename = 'i' + ('%04d' % rand(0..9999))
-	while File.exists? filename
+	while File.exists?(filename)
 		filename = 'i' + ('%04d' % rand(0..9999))
 	end
 	return filename
@@ -345,7 +342,7 @@ end
 
 def new_items(how_many)
 	out = []
-	how_many.times do
+	how_many.times() do
 		out << new_filename()
 		File.open(out.last, 'w') { |f| f.write("what: \n") }
 	end
@@ -355,10 +352,10 @@ end
 def new_items_from_files(orig_pwd, sources)
 	out = []
 	orig_pwd_path = Pathname.new(orig_pwd)
-	sources.each do |s|
+	sources.each() do |s|
 		f = new_filename()
 		s_path = Pathname.new(s)
-		if s_path.absolute?
+		if s_path.absolute?()
 			FileUtils.cp(s, f)
 		else
 			FileUtils.cp(orig_pwd_path + s, f)
@@ -369,28 +366,28 @@ def new_items_from_files(orig_pwd, sources)
 end
 
 def edit(editor, edit_single, filenames)
-	if filenames.size == 0
+	if filenames.size() == 0
 		return
 	end
 
 	if edit_single
-		system "#{editor} #{filenames.join(' ')}"
+		system("#{editor} #{filenames.join(' ')}")
 	else
-		filenames.each do |f|
-			system "#{editor} #{f}"
+		filenames.each() do |f|
+			system("#{editor} #{f}")
 		end
 	end
 end
 
 def delete_items(items)
-	items.each do |i|
+	items.each() do |i|
 		File.delete(i.filename)
 	end
 end
 
-def commit
-	system 'git add -A .'
-	system 'git commit -m "Auto-Commit by gitodo on $(hostname)"'
+def commit()
+	system('git add -A .')
+	system('git commit -m "Auto-Commit by gitodo on $(hostname)"')
 end
 
 
@@ -406,30 +403,30 @@ edit_single = ENV['GITODO_EDIT_SINGLE'] || false
 # work.
 orig_pwd = Dir.pwd()
 if !check_and_chdir_repo(datadir)
-	$stderr.puts "`#{datadir}' is not a Git repository."
+	$stderr.puts("`#{datadir}' is not a Git repository.")
 	exit 1
 end
 
-items = load_all_items
+items = load_all_items()
 
-if ARGV.size == 0
+if ARGV.size() == 0
 	list_items(items)
 	exit
 end
 
 # Options may be given as "--foo", "-foo" or "foo".
 opt = ARGV[0].sub(/^-+/, '')
-ARGV.shift
+ARGV.shift()
 
 case opt
 when 'new', 'n'
 	edit(editor, edit_single, new_items(ARGV[0] ? ARGV[0].to_i : 1))
-	clean_empty
-	commit
+	clean_empty()
+	commit()
 when 'new-from-files', 'f'
 	edit(editor, edit_single, new_items_from_files(orig_pwd, ARGV))
-	clean_empty
-	commit
+	clean_empty()
+	commit()
 when 'list', 'l'
 	list_items(filter_ids(items, ARGV))
 when 'print', 'p'
@@ -437,29 +434,29 @@ when 'print', 'p'
 when 'body', 'b'
 	print_items(filter_bodies(items, ARGV[0]))
 when 'edit', 'e'
-	edit(editor, edit_single, filter_ids(items, ARGV).map { |i| i.filename })
-	clean_empty
-	commit
+	edit(editor, edit_single, filter_ids(items, ARGV).map() { |i| i.filename })
+	clean_empty()
+	commit()
 when 'delete', 'd'
-	filter_ids(items, ARGV).each do |i|
-		puts "Deleting #{i.id}: #{i.what}"
+	filter_ids(items, ARGV).each() do |i|
+		puts("Deleting #{i.id}: #{i.what}")
 		File.delete(i.filename)
 	end
-	clean_empty
-	commit
+	clean_empty()
+	commit()
 when 'count'
-	total = items.size
-	dead = items.count { |i| i.classify == :dead }
-	close = items.count { |i| i.classify == :close }
+	total = items.size()
+	dead = items.count() { |i| i.classify == :dead }
+	close = items.count() { |i| i.classify == :close }
 	puts("#{dead} #{close} #{total}")
 when 'cron', 'c'
 	print_cron(items, :all)
 when 'cron-outdated', 'o'
 	print_cron(items, :no_close)
 when 'raw'
-	items.each { |i| i.show_raw }
+	items.each() { |i| i.show_raw() }
 when 'rotting'
 	list_items(filter_rotting(items, ARGV[0] ? ARGV[0].to_i : 3))
 else
-	puts 'gitodo: Invalid option. See manpage.'
+	puts('gitodo: Invalid option. See manpage.')
 end
