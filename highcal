@@ -177,7 +177,7 @@ starts.each_with_index do |start, start_index|
 	# Print extra lines only if it's appropriate. (We won't omit an
 	# empty sixth line, that one is always shown. But we can easily
 	# suppress extra separator lines.)
-	if starts.length > 1 && start_index < starts.length && last_line_full
+	if start_index < starts.length - 1 && last_line_full
 		print "\n"
 	end
 end
