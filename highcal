@@ -13,7 +13,7 @@ module Colors
 	}
 
 	def Colors.[](which)
-		if !STDOUT.tty? &&
+		if !STDOUT.tty?() &&
 		   !(ENV['GITODO_FORCE_COLOR'] || ENV['HIGHCAL_FORCE_COLOR'])
 			return ''
 		else
@@ -23,58 +23,59 @@ module Colors
 end
 
 class DatePos
-	attr_accessor :at
-	attr_accessor :first
-	attr_accessor :month
+	attr_accessor(:at)
+	attr_accessor(:first)
+	attr_accessor(:month)
 
 	def initialize(at)
 		@first = true
 		@at = at
-		@my_month = at.month
+		@my_month = at.month()
 	end
 
-	def is_my_month?
-		@at.month == @my_month
+	def is_my_month?()
+		@at.month() == @my_month
 	end
 
 	# Print the current day (maybe highlight it) and advance to the next
 	# day. If the current day is not in "my" month, then simply print
 	# spaces -- and return "false". Otherwise return "true".
 	def show_and_advance(highlights)
-		if is_my_month?
-			print ' '
+		if is_my_month?()
+			print(' ')
 
-			if @at == Date.today
-				print Colors[:today]
+			if @at == Date.today()
+				print(Colors[:today])
 			end
 
-			if highlights.include? at
-				print Colors[:highlight]
+			if highlights.include?(at)
+				print(Colors[:highlight])
 			end
 
-			printf '%2d', @at.day
-			@at = @at.next_day
-			print Colors[:reset]
+			printf('%2d', @at.day())
+			@at = @at.next_day()
+			print(Colors[:reset])
 			return true
 		else
-			print '   '
+			print('   ')
 			return false
 		end
 	end
 
-	def show_cweek
-		if is_my_month?
-			if @at.cweek == Date.today.cweek && @at.year == Date.today.year
-				print Colors[:curweek]
-				printf '%2d', @at.cweek
-				print Colors[:reset]
-				print ' '
+	def show_cweek()
+		if is_my_month?()
+			if @at.cweek() == Date.today().cweek() &&
+			   @at.year() == Date.today.year()
+				print(Colors[:curweek])
+				printf('%2d', @at.cweek())
+				print(Colors[:reset])
+				print(' ')
 			else
-				printf '%2d ', @at.cweek
+				printf('%2d ', @at.cweek())
 			end
 			return true
 		else
-			print '   '
+			print('   ')
 			return false
 		end
 	end
@@ -85,9 +86,9 @@ end
 # call this script and see the calendar without being *forced* to
 # specify highlights.
 highlights = []
-if !STDIN.tty?
-	STDIN.readlines.each do |line|
-		highlights << DateTime.parse(line.strip).to_date
+if !STDIN.tty?()
+	STDIN.readlines().each() do |line|
+		highlights << DateTime.parse(line.strip).to_date()
 	end
 end
 
@@ -96,13 +97,13 @@ end
 if ARGV[0]
 	starts = []
 	for i in (1..10).step(3)
-		starts << Date.new(ARGV[0].to_i, i)
+		starts << Date.new(ARGV[0].to_i(), i)
 	end
 else
-	starts = [Date.new(Date.today.year, Date.today.month, 1)]
+	starts = [Date.new(Date.today().year(), Date.today().month(), 1)]
 end
 
-starts.each_with_index do |start, start_index|
+starts.each_with_index() do |start, start_index|
 	# Each DatePos object holds the position in the n'th month.
 	positions = []
 	for i in 0..2
@@ -110,54 +111,54 @@ starts.each_with_index do |start, start_index|
 	end
 
 	# Header: Month name + year.
-	for month_add in 0..(positions.size - 1)
+	for month_add in 0..(positions.size() - 1)
 		# Left padding for centered month name.
-		print '    '
+		print('    ')
 
 		pos = positions[month_add]
 		print pos.at.strftime('%B %Y').center(20)
-		if month_add != positions.size - 1
+		if month_add != positions.size() - 1
 			# Separator between two months.
-			print '   '
+			print('   ')
 		end
 	end
-	print "\n"
+	print("\n")
 
 	# Weekdays.
-	for month_add in 0..(positions.size - 1)
+	for month_add in 0..(positions.size() - 1)
 		# Left padding for week lines.
-		print '   '
+		print('   ')
 
 		d = Date.new(2011, 10, 3)
-		print ' '
-		print Colors[:header]
+		print(' ')
+		print(Colors[:header])
 		for i in 1..7
 			if i != 1
-				print ' '
+				print(' ')
 			end
-			print d.strftime('%a')[0..1]
-			d = d.next_day
+			print(d.strftime('%a')[0..1])
+			d = d.next_day()
 		end
-		print Colors[:reset]
-		if month_add != positions.size - 1
+		print(Colors[:reset])
+		if month_add != positions.size() - 1
 			# Separator between two months.
-			print '   '
+			print('   ')
 		end
 	end
-	print "\n"
+	print("\n")
 
 	# Show the calendars line by line.
 	for line in 1..6
 		last_line_full = false
-		for month_add in 0..(positions.size - 1)
+		for month_add in 0..(positions.size() - 1)
 			pos = positions[month_add]
-			last_line_full |= pos.show_cweek
+			last_line_full |= pos.show_cweek()
 			if pos.first
 				# If this is the first line of this month, then skip those
 				# days which are in the previous month.
 				pos.first = false
-				print '   ' * (pos.at.cwday - 1)
-				for i in pos.at.cwday..7
+				print('   ' * (pos.at.cwday() - 1))
+				for i in pos.at.cwday()..7
 					last_line_full |= pos.show_and_advance(highlights)
 				end
 			else
@@ -166,18 +167,18 @@ starts.each_with_index do |start, start_index|
 				end
 			end
 			positions[month_add] = pos
-			if month_add != positions.size - 1
+			if month_add != positions.size() - 1
 				# Separator between two months.
-				print '   '
+				print('   ')
 			end
 		end
-		print "\n"
+		print("\n")
 	end
 
 	# Print extra lines only if it's appropriate. (We won't omit an
 	# empty sixth line, that one is always shown. But we can easily
 	# suppress extra separator lines.)
-	if start_index < starts.length - 1 && last_line_full
-		print "\n"
+	if start_index < starts.size() - 1 && last_line_full
+		print("\n")
 	end
 end
