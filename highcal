@@ -5,11 +5,12 @@ require 'date'
 
 module Colors
 	@table = {
-		:curweek   => "\e[1m",
-		:today     => "\e[7m",
-		:highlight => "\e[1;31m",
-		:header    => "\e[4m",
-		:reset     => "\e[0m",
+		:curweek     => "\e[1m",
+		:today       => "\e[7m",
+		:highlight   => "\e[1;31m",
+		:monthheader => "\e[1m",
+		:weekheader  => "\e[4m",
+		:reset       => "\e[0m",
 	}
 
 	def Colors.[](which)
@@ -110,13 +111,14 @@ starts.each_with_index() do |start, start_index|
 		positions << DatePos.new(start >> i)
 	end
 
-	# Header: Month name + year.
+	# Header: Month name + part of ISO 8601.
 	for month_add in 0..(positions.size() - 1)
-		# Left padding for centered month name.
-		print('    ')
-
 		pos = positions[month_add]
-		print pos.at.strftime('%B %Y').center(20)
+		print('    ')
+		print(Colors[:monthheader])
+		print(pos.at.strftime('%B').ljust(13))
+		print(pos.at.strftime('%Y-%m'))
+		print(Colors[:reset])
 		if month_add != positions.size() - 1
 			# Separator between two months.
 			print('   ')
@@ -131,7 +133,7 @@ starts.each_with_index() do |start, start_index|
 
 		d = Date.new(2011, 10, 3)
 		print(' ')
-		print(Colors[:header])
+		print(Colors[:weekheader])
 		for i in 1..7
 			if i != 1
 				print(' ')
