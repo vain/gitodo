@@ -263,7 +263,7 @@ end
 
 def list_items(items, indent=false)
 	print_header(indent)
-	items.sort().each() do |i|
+	items.sort().uniq().each() do |i|
 		if !i.hide?()
 			if indent
 				print("\t")
