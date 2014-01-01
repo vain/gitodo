@@ -66,6 +66,16 @@ class Item
 		end
 	end
 
+	# Check if this item's deadline is in a given range.
+	def dead_at?(reference)
+		if reference == :today
+			fmt = '%Y-%m-%d'
+		elsif reference == :week
+			fmt = '%Y %W'
+		end
+		@when.strftime(fmt) == Time.now().strftime(fmt)
+	end
+
 	# timetype as a number. Required for compatibility with legacy
 	# "gitodo --raw".
 	def timetype_num()
@@ -279,6 +289,8 @@ def filter_ids(items, filters_str)
 			lambda { |i| i.classify() == :dead }
 		when 'close'
 			lambda { |i| i.classify() == :close }
+		when /^(today|week)$/
+			lambda { |i| i.dead_at?($1.to_sym()) }
 		else
 			lambda { |i| i.id == f }
 		end

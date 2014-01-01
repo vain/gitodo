@@ -125,7 +125,9 @@ OPTIONS
 
        id can be an explicit ID  or  string  beginning  with  :/  (see
        SEARCHING)  or  a  special  identifier: dead means all outdated
-       items, close means all items close to their deadline.
+       items, close means all items close to their deadline, today and
+       week  means all items whose deadline is today or in the current
+       week.
 
 SYNTAX
        Items are simple text files. They look like this:
