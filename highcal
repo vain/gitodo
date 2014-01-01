@@ -66,8 +66,7 @@ class DatePos
 
 	def show_cweek()
 		if is_my_month?()
-			if @at.cweek() == Date.today().cweek() &&
-			   @at.year() == Date.today.year()
+			if @at.strftime('%G%V') == Time.now().strftime('%G%V')
 				print(Colors[:curweeknum])
 				printf('%2d', @at.cweek())
 				print(Colors[:reset])

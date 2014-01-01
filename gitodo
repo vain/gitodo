@@ -71,7 +71,7 @@ class Item
 		if reference == :today
 			fmt = '%Y-%m-%d'
 		elsif reference == :week
-			fmt = '%Y %W'
+			fmt = '%G%V'
 		end
 		@when.strftime(fmt) == Time.now().strftime(fmt)
 	end
