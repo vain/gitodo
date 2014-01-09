@@ -1,4 +1,4 @@
-.TH GITODO 1 "November 2013" "Git-TODO" "A personal task manager"
+.TH GITODO 1 "January 2014" "Git-TODO" "A personal task manager"
 .SH NAME
 gitodo \- a personal task manager
 .SH SYNOPSIS
@@ -15,6 +15,10 @@ gitodo \- a personal task manager
 \fBgitodo\fP \fB\-\-new\fP [\fIn\fP]
 .br
 \fBgitodo\fP \fB\-\-new\-from\-files\fP \fIfile\fP [\fIfile\fP ...]
+.br
+\fBgitodo\fP \fB\-\-export\-mail\fP \fIid\fP [\fIid ...\fP]
+.br
+\fBgitodo\fP \fB\-\-import\-mail\fP
 .br
 \fBgitodo\fP \fB\-\-body\fP \fIterm\fP
 .br
@@ -95,6 +99,13 @@ you don't specify \fIn\fP, exactly one new task will be created.
 \fB\-f\fP, \fB\-\-new\-from\-files\fP \fIfile\fP [\fIfile\fP ...]
 Creates a new task from each file. You can use this in scripts. Note
 that the editor will be opened for each new task.
+.TP
+\fB\-E\fP, \fB\-\-export\-mail\fP \fIid\fP [\fIid ...\fP]
+Wraps the given items in a special, simple format that you can dump into
+an e-mail.
+.TP
+\fB\-I\fP, \fB\-\-import\-mail\fP
+Imports items exported by \fB\-\-export\-mail\fP.
 .TP
 \fB\-d\fP, \fB\-\-delete\fP \fIid [id ...]\fP
 Delete all matching items.
