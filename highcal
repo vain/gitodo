@@ -99,9 +99,14 @@ end
 # We're going to draw the months in packs of three. The starting month
 # of each pack is stored in "starts".
 if ARGV[0]
+	begin
+		year = Integer(ARGV[0])
+	rescue ArgumentError
+		year = Date.today().year()
+	end
 	starts = []
 	for i in (1..10).step(3)
-		starts << Date.new(ARGV[0].to_i(), i)
+		starts << Date.new(year, i)
 	end
 else
 	starts = [Date.new(Date.today().year(), Date.today().month(), 1)]
