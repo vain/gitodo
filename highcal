@@ -6,6 +6,7 @@ require 'date'
 module Colors
 	@table = {
 		:weeknum     => "\e[32m",
+		:weekend     => "\e[1;30m",
 		:curweeknum  => "\e[7;1;32m",
 		:today       => "\e[7m",
 		:highlight   => "\e[1;31m",
@@ -45,6 +46,10 @@ class DatePos
 	def show_and_advance(highlights)
 		if is_my_month?()
 			print(' ')
+
+			if @at.saturday? || @at.sunday?
+				print(Colors[:weekend])
+			end
 
 			if @at == Date.today()
 				print(Colors[:today])
