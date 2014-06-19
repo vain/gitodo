@@ -279,37 +279,6 @@ def print_items(items)
 	end
 end
 
-def export_mail_items(items)
-	print("# GITODO_BEGIN_ITEMS\n")
-	items.each() do |i|
-		print("-\n")
-		print(i.content.gsub(/^/, '.'))
-	end
-	print("# GITODO_END_ITEMS\n")
-end
-
-def import_mail_items()
-	fp = nil
-	inside_data = false
-	$stdin.each_line() do |line|
-		if line == "# GITODO_BEGIN_ITEMS\n"
-			inside_data = true
-		elsif line == "# GITODO_END_ITEMS\n"
-			inside_data = false
-		elsif line == "-\n" && inside_data
-			if fp
-				fp.close()
-			end
-			fp = File.new(new_filename(), 'w')
-		elsif line[0] == '.'
-			fp.write(line[1..-1])
-		end
-	end
-	if fp
-		fp.close()
-	end
-end
-
 def filter_ids(items, filters_str)
 	filters = filters_str.map() do |f|
 		case f
@@ -474,12 +443,6 @@ when 'list', 'l'
 	list_items(filter_ids(items, ARGV))
 when 'print', 'p'
 	print_items(filter_ids(items, ARGV))
-when 'export-mail', 'E'
-	export_mail_items(filter_ids(items, ARGV))
-when 'import-mail', 'I'
-	import_mail_items()
-	clean_empty()
-	commit()
 when 'body', 'b'
 	print_items(filter_bodies(items, ARGV[0]))
 when 'edit', 'e'
