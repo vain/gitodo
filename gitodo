@@ -197,7 +197,7 @@ def load_all_items()
 					# XXX: Hackaround to be able to use DateTime.parse in
 					# the local timezone.
 					item.when = DateTime.parse($2)
-					item.when -= Time.now().utc_offset() / 86400.0
+					item.when -= item.when.to_time().utc_offset() / 86400.0
 					item.when = item.when.to_time()
 				rescue ArgumentError
 					$stderr.puts("#{filename}'s deadline is not a valid date.")
