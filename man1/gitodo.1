@@ -281,38 +281,6 @@ Again, you can use Ruby regexes with \fB\-\-body\fP.
 .P
 Searching is always case insensitive. For example, if you specify
 \fI:/foo\fP, internally \fI/foo/i\fP will be used.
-.SH SETUP
-First, clone the code repository:
-.P
-\f(CW
-.nf
-	$ cd ~/git
-	$ git clone git://github.com/vain/gitodo.git
-.fi
-\fP
-.P
-If you already have an existing repository for your task items, clone
-that one as well (otherwise create the directory and do a \fBgit
-init\fP):
-.P
-\f(CW
-.nf
-	$ cd "$XDG_DATA_HOME"
-	$ git clone ssh://.../gitodo.items
-.fi
-\fP
-.P
-If you decide to use the Vim syntax files, you should link them into
-your \fI~/.vim\fP directory:
-.P
-\f(CW
-.nf
-	$ cd ~/.vim/ftdetect
-	$ ln -s ~/git/gitodo/vim/ftdetect/gitodo.vim
-	$ cd ../syntax/
-	$ ln -s ~/git/gitodo/vim/syntax/gitodo.vim
-.fi
-\fP
 .SH "USING GITODO WITH HIGHCAL"
 The \fBhighcal\fP(1) script is an additional and optional Ruby script.
 It's purpose is to create a calendar similar to \fBcal\fP(1). The script
