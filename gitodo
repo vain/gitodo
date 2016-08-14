@@ -248,9 +248,8 @@ def clean_empty()
 end
 
 def check_and_chdir_repo(dir)
-	if Dir.exists?(dir + '/.git')
-		Dir.chdir(dir)
-	end
+	Dir.chdir(dir)
+	system('git status >/dev/null 2>&1')
 end
 
 def print_header(indent=false)
