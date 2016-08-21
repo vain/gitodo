@@ -2,11 +2,11 @@ Release history for gitodo
 
 next
   [Changed]
-  - Use "git status" to determine if GITODO_DATA is a git repository
-    instead of simply appending ".git" to the path. This allows
-    GITODO_DATA to be a subdirectory of a git repo -- which means that
-    you can use one single repo and have multiple "categories" of items,
-    organized in subdirectories.
+  - Use "git rev-parse HEAD" to determine if GITODO_DATA is a git
+    repository instead of simply appending ".git" to the path. This
+    allows GITODO_DATA to be a subdirectory of a git repo -- which means
+    that you can use one single repo and have multiple "categories" of
+    items, organized in subdirectories.
 
 v15.09 and earlier releases
   - Sorry, the CHANGES file did not exist back then. Please refer to the
