@@ -249,7 +249,18 @@ end
 
 def check_and_chdir_repo(dir)
 	Dir.chdir(dir)
-	system('git rev-parse HEAD >/dev/null 2>&1')
+
+	# "git status" can be very slow. We want to avoid it.
+	#
+	# If this is a Git repo with at least one commit, "git rev-parse
+	# HEAD" returns 0 and does so very fast, independent of the repo's
+	# size. If no commit has been made yet, then "HEAD" does not point
+	# to a commit hash, so "rev-parse" fails. In that case, we try "git
+	# status" which properly returns 0, even for "empty" repos.
+	#
+	# So, most of the time, "rev-parse" does the job. Only freshly
+	# initialized repos need "git status".
+	system('git rev-parse HEAD >/dev/null 2>&1 || git status >/dev/null 2>&1')
 end
 
 def print_header(indent=false)
