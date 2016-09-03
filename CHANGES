@@ -1,6 +1,6 @@
 Release history for gitodo
 
-next
+v16.09  2016-09-03
   [Changed]
   - Use "git rev-parse HEAD" to determine if GITODO_DATA is a git
     repository instead of simply appending ".git" to the path. This
