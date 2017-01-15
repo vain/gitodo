@@ -1,5 +1,12 @@
 Release history for gitodo
 
+next
+  [Fixed]
+  - We now use Time.parse() to parse the "when" field and any input to
+    highcal. Unlike DateTime.parse(), which we used before, it returns
+    the proper time zone. (Plus, we don't need a weird hackaround for
+    time zones anymore.)
+
 v16.09  2016-09-03
   [Changed]
   - Use "git rev-parse HEAD" to determine if GITODO_DATA is a git

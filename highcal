@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 # encoding: UTF-8
 
-require 'date'
+require 'time'
 
 module Colors
 	@table = {
@@ -97,7 +97,7 @@ end
 highlights = []
 if !STDIN.tty?()
 	STDIN.readlines().each() do |line|
-		highlights << DateTime.parse(line.strip).to_date()
+		highlights << Time.parse(line.strip).to_date()
 	end
 end
 

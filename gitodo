@@ -4,9 +4,9 @@
 # Global todo items:
 # XXX: Better inline documentation.
 
-require 'date'
 require 'fileutils'
 require 'pathname'
+require 'time'
 
 module Colors
 	@table = {
@@ -194,11 +194,7 @@ def load_all_items()
 				item.prio = $2.to_i()
 			elsif line =~ /^(when|dead): (.*)/
 				begin
-					# XXX: Hackaround to be able to use DateTime.parse in
-					# the local timezone.
-					item.when = DateTime.parse($2)
-					item.when -= item.when.to_time().utc_offset() / 86400.0
-					item.when = item.when.to_time()
+					item.when = Time.parse($2)
 				rescue ArgumentError
 					$stderr.puts("#{filename}'s deadline is not a valid date.")
 					item.when = Time.now()
