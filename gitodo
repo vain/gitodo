@@ -9,403 +9,403 @@ require 'pathname'
 require 'time'
 
 module Colors
-	@table = {
-		:dead      => "\e[1;31m",
-		:close     => "\e[31m",
-		:very_high => "\e[1;31m",
-		:high      => "\e[33m",
-		:low       => "\e[34m",
-		:very_low  => "\e[32m",
-		:header    => "\e[1m",
-		:reset     => "\e[0m",
-	}
+    @table = {
+        :dead      => "\e[1;31m",
+        :close     => "\e[31m",
+        :very_high => "\e[1;31m",
+        :high      => "\e[33m",
+        :low       => "\e[34m",
+        :very_low  => "\e[32m",
+        :header    => "\e[1m",
+        :reset     => "\e[0m",
+    }
 
-	def Colors.[](which)
-		if !STDOUT.tty?() && !ENV['GITODO_FORCE_COLOR']
-			return ''
-		else
-			return @table[which]
-		end
-	end
+    def Colors.[](which)
+        if !STDOUT.tty?() && !ENV['GITODO_FORCE_COLOR']
+            return ''
+        else
+            return @table[which]
+        end
+    end
 end
 
 class Item
-	include Comparable
+    include Comparable
 
-	attr_accessor(:id)
-	attr_accessor(:filename)
-	attr_accessor(:prio)
-	attr_accessor(:when)
-	attr_accessor(:warn)
-	attr_accessor(:what)
-	attr_accessor(:nocron)
-	attr_accessor(:content)
-	attr_accessor(:timetype)
+    attr_accessor(:id)
+    attr_accessor(:filename)
+    attr_accessor(:prio)
+    attr_accessor(:when)
+    attr_accessor(:warn)
+    attr_accessor(:what)
+    attr_accessor(:nocron)
+    attr_accessor(:content)
+    attr_accessor(:timetype)
 
-	def initialize()
-		@id = 0
-		@filename = ''
-		@prio = 0
-		@when = Time.local(2037)
-		@warn = 1
-		@what = ''
-		@nocron = false
-		@content = ''
-		@timetype = :none
-	end
+    def initialize()
+        @id = 0
+        @filename = ''
+        @prio = 0
+        @when = Time.local(2037)
+        @warn = 1
+        @what = ''
+        @nocron = false
+        @content = ''
+        @timetype = :none
+    end
 
-	# Check if this item is okay, close to the deadline or dead.
-	def classify()
-		now = Time.now()
-		if now > @when
-			return :dead
-		elsif now > @when - @warn * 3600
-			return :close
-		else
-			return :normal
-		end
-	end
+    # Check if this item is okay, close to the deadline or dead.
+    def classify()
+        now = Time.now()
+        if now > @when
+            return :dead
+        elsif now > @when - @warn * 3600
+            return :close
+        else
+            return :normal
+        end
+    end
 
-	# Check if this item's deadline is in a given range.
-	def dead_at?(reference)
-		if reference == :today
-			fmt = '%Y-%m-%d'
-		elsif reference == :week
-			fmt = '%G%V'
-		end
-		@when.strftime(fmt) == Time.now().strftime(fmt)
-	end
+    # Check if this item's deadline is in a given range.
+    def dead_at?(reference)
+        if reference == :today
+            fmt = '%Y-%m-%d'
+        elsif reference == :week
+            fmt = '%G%V'
+        end
+        @when.strftime(fmt) == Time.now().strftime(fmt)
+    end
 
-	# timetype as a number. Required for compatibility with legacy
-	# "gitodo --raw".
-	def timetype_num()
-		case @timetype
-		when :time
-			0
-		when :date
-			1
-		when :datetime
-			2
-		else
-			3
-		end
-	end
+    # timetype as a number. Required for compatibility with legacy
+    # "gitodo --raw".
+    def timetype_num()
+        case @timetype
+        when :time
+            0
+        when :date
+            1
+        when :datetime
+            2
+        else
+            3
+        end
+    end
 
-	# Hide unimportant items?
-	def hide?()
-		classify() == :normal && @prio > 99 && !ENV['GITODO_SHOW_UNIMPORTANT']
-	end
+    # Hide unimportant items?
+    def hide?()
+        classify() == :normal && @prio > 99 && !ENV['GITODO_SHOW_UNIMPORTANT']
+    end
 
-	# Show a line suitable for output in the traditional listing.
-	def show_brief()
-		print(' ')
+    # Show a line suitable for output in the traditional listing.
+    def show_brief()
+        print(' ')
 
-		case classify()
-		when :dead
-			print(Colors[:dead])
-			print('D')
-		when :close
-			print(Colors[:close])
-			print('C')
-		else
-			print(' ')
-		end
+        case classify()
+        when :dead
+            print(Colors[:dead])
+            print('D')
+        when :close
+            print(Colors[:close])
+            print('C')
+        else
+            print(' ')
+        end
 
-		print(Colors[:reset])
+        print(Colors[:reset])
 
-		if @prio < -50
-			print(Colors[:very_high])
-		elsif @prio < 0
-			print(Colors[:high])
-		elsif @prio > 50
-			print(Colors[:low])
-		elsif @prio > 0
-			print(Colors[:very_low])
-		end
+        if @prio < -50
+            print(Colors[:very_high])
+        elsif @prio < 0
+            print(Colors[:high])
+        elsif @prio > 50
+            print(Colors[:low])
+        elsif @prio > 0
+            print(Colors[:very_low])
+        end
 
-		print(' | ')
-		printf('%3s', @prio.to_s())
+        print(' | ')
+        printf('%3s', @prio.to_s())
 
-		print(' | ')
-		case @timetype
-		when :none
-			print('                ')
-		when :time
-			print('           ' + @when.strftime('%H:%M'))
-		when :date
-			print(@when.strftime('%F') + '      ')
-		when :datetime
-			print(@when.strftime('%F %H:%M'))
-		end
+        print(' | ')
+        case @timetype
+        when :none
+            print('                ')
+        when :time
+            print('           ' + @when.strftime('%H:%M'))
+        when :date
+            print(@when.strftime('%F') + '      ')
+        when :datetime
+            print(@when.strftime('%F %H:%M'))
+        end
 
-		print(' | ')
-		print('%4d' % @id)
-		print(' | ')
-		print(@what)
-		print(Colors[:reset])
+        print(' | ')
+        print('%4d' % @id)
+        print(' | ')
+        print(@what)
+        print(Colors[:reset])
 
-		puts()
-	end
+        puts()
+    end
 
-	# Show an item's body.
-	def show_detail()
-		print(Colors[:header])
-		puts(' ' + @id.to_s() + ' ')
-		puts('-' * (@id.to_s().size() + 2))
-		print(Colors[:reset])
+    # Show an item's body.
+    def show_detail()
+        print(Colors[:header])
+        puts(' ' + @id.to_s() + ' ')
+        puts('-' * (@id.to_s().size() + 2))
+        print(Colors[:reset])
 
-		puts(@content)
+        puts(@content)
 
-		puts()
-	end
+        puts()
+    end
 
-	# Compatible with legacy "gitodo --raw".
-	def show_raw()
-		print("#{@prio} #{@when.strftime('%F %T %s')} ")
-		print("#{@warn} #{@nocron ? '1' : '0'} #{timetype_num} ")
-		print("#{@id} #{@what}")
+    # Compatible with legacy "gitodo --raw".
+    def show_raw()
+        print("#{@prio} #{@when.strftime('%F %T %s')} ")
+        print("#{@warn} #{@nocron ? '1' : '0'} #{timetype_num} ")
+        print("#{@id} #{@what}")
 
-		puts()
-	end
+        puts()
+    end
 
-	# Make Item sortable. Sort by priority, then by deadline.
-	def <=>(other)
-		[@prio, @when] <=> [other.prio, other.when]
-	end
+    # Make Item sortable. Sort by priority, then by deadline.
+    def <=>(other)
+        [@prio, @when] <=> [other.prio, other.when]
+    end
 end
 
 def load_all_items()
-	items = []
+    items = []
 
-	Dir.glob('i*').each() do |filename|
-		lines = []
-		File.open(filename, 'r') { |f| lines = f.readlines() }
+    Dir.glob('i*').each() do |filename|
+        lines = []
+        File.open(filename, 'r') { |f| lines = f.readlines() }
 
-		item = Item.new()
+        item = Item.new()
 
-		filename =~ /.*i0*([[:digit:]]+)$/
-		item.id = $1
-		item.filename = filename
+        filename =~ /.*i0*([[:digit:]]+)$/
+        item.id = $1
+        item.filename = filename
 
-		item.content = lines.join('')
+        item.content = lines.join('')
 
-		lines.each() do |line|
-			if line =~ /^(prio): (.*)/
-				item.prio = $2.to_i()
-			elsif line =~ /^(when|dead): (.*)/
-				begin
-					item.when = Time.parse($2)
-				rescue ArgumentError
-					$stderr.puts("#{filename}'s deadline is not a valid date.")
-					item.when = Time.now()
-				end
+        lines.each() do |line|
+            if line =~ /^(prio): (.*)/
+                item.prio = $2.to_i()
+            elsif line =~ /^(when|dead): (.*)/
+                begin
+                    item.when = Time.parse($2)
+                rescue ArgumentError
+                    $stderr.puts("#{filename}'s deadline is not a valid date.")
+                    item.when = Time.now()
+                end
 
-				spaces = $2.count(' ')
-				colons = $2.count(':')
-				case spaces
-				when 0
-					if colons > 0
-						item.timetype = :time
-					else
-						item.timetype = :date
-					end
-				else
-					item.timetype = :datetime
-				end
-			elsif line =~ /^(warn): (.*)/
-				item.warn = $2.to_i()
-			elsif line =~ /^(what|subject): (.*)/
-				item.what = $2
-			elsif line.strip() == 'nocron'
-				item.nocron = true
-			end
-		end
+                spaces = $2.count(' ')
+                colons = $2.count(':')
+                case spaces
+                when 0
+                    if colons > 0
+                        item.timetype = :time
+                    else
+                        item.timetype = :date
+                    end
+                else
+                    item.timetype = :datetime
+                end
+            elsif line =~ /^(warn): (.*)/
+                item.warn = $2.to_i()
+            elsif line =~ /^(what|subject): (.*)/
+                item.what = $2
+            elsif line.strip() == 'nocron'
+                item.nocron = true
+            end
+        end
 
-		if item.what.strip() == ''
-			item.what = '<NO SUBJECT>'
-		end
+        if item.what.strip() == ''
+            item.what = '<NO SUBJECT>'
+        end
 
-		items << item
-	end
+        items << item
+    end
 
-	return items
+    return items
 end
 
 def clean_empty()
-	Dir.glob('i*').each() do |filename|
-		content = ''
-		File.open(filename, 'r') { |f| content = f.read() }
+    Dir.glob('i*').each() do |filename|
+        content = ''
+        File.open(filename, 'r') { |f| content = f.read() }
 
-		if content.strip() == ''
-			puts("Cleaning up empty file '#{filename}'")
-			File.delete(filename)
-		end
-	end
+        if content.strip() == ''
+            puts("Cleaning up empty file '#{filename}'")
+            File.delete(filename)
+        end
+    end
 end
 
 def check_and_chdir_repo(dir)
-	Dir.chdir(dir)
+    Dir.chdir(dir)
 
-	# "git status" can be very slow. We want to avoid it.
-	#
-	# If this is a Git repo with at least one commit, "git rev-parse
-	# HEAD" returns 0 and does so very fast, independent of the repo's
-	# size. If no commit has been made yet, then "HEAD" does not point
-	# to a commit hash, so "rev-parse" fails. In that case, we try "git
-	# status" which properly returns 0, even for "empty" repos.
-	#
-	# So, most of the time, "rev-parse" does the job. Only freshly
-	# initialized repos need "git status".
-	system('git rev-parse HEAD >/dev/null 2>&1 || git status >/dev/null 2>&1')
+    # "git status" can be very slow. We want to avoid it.
+    #
+    # If this is a Git repo with at least one commit, "git rev-parse
+    # HEAD" returns 0 and does so very fast, independent of the repo's
+    # size. If no commit has been made yet, then "HEAD" does not point
+    # to a commit hash, so "rev-parse" fails. In that case, we try "git
+    # status" which properly returns 0, even for "empty" repos.
+    #
+    # So, most of the time, "rev-parse" does the job. Only freshly
+    # initialized repos need "git status".
+    system('git rev-parse HEAD >/dev/null 2>&1 || git status >/dev/null 2>&1')
 end
 
 def print_header(indent=false)
-	print(Colors[:header])
-	puts((indent ? "\t" : '') + ' S   Pri      Deadline         ID    Subject')
-	puts((indent ? "\t" : '') + '---+-----+------------------+------+--------' \
-	                          + '-' * 34)
-	print(Colors[:reset])
+    print(Colors[:header])
+    puts((indent ? "\t" : '') + ' S   Pri      Deadline         ID    Subject')
+    puts((indent ? "\t" : '') + '---+-----+------------------+------+--------' \
+                              + '-' * 34)
+    print(Colors[:reset])
 end
 
 def list_items(items, indent=false)
-	print_header(indent)
-	items.sort().uniq().each() do |i|
-		if !i.hide?()
-			if indent
-				print("\t")
-			end
-			i.show_brief()
-		end
-	end
+    print_header(indent)
+    items.sort().uniq().each() do |i|
+        if !i.hide?()
+            if indent
+                print("\t")
+            end
+            i.show_brief()
+        end
+    end
 end
 
 def print_items(items)
-	items.each() do |i|
-		i.show_detail()
-	end
+    items.each() do |i|
+        i.show_detail()
+    end
 end
 
 def filter_ids(items, filters_str)
-	filters = filters_str.map() do |f|
-		case f
-		when %r{^:/(.*)}
-			f = Regexp.new($1, Regexp::IGNORECASE)
-			lambda { |i| i.what =~ f }
-		when 'dead'
-			lambda { |i| i.classify() == :dead }
-		when 'close'
-			lambda { |i| i.classify() == :close }
-		when /^(today|week)$/
-			lambda { |i| i.dead_at?($1.to_sym()) }
-		else
-			lambda { |i| i.id == f }
-		end
-	end
-	out = []
-	filters.each() do |f|
-		selected = items.select() { |i| f.call(i) }
-		selected.sort!()
-		out.push(*selected)
-	end
-	return out
+    filters = filters_str.map() do |f|
+        case f
+        when %r{^:/(.*)}
+            f = Regexp.new($1, Regexp::IGNORECASE)
+            lambda { |i| i.what =~ f }
+        when 'dead'
+            lambda { |i| i.classify() == :dead }
+        when 'close'
+            lambda { |i| i.classify() == :close }
+        when /^(today|week)$/
+            lambda { |i| i.dead_at?($1.to_sym()) }
+        else
+            lambda { |i| i.id == f }
+        end
+    end
+    out = []
+    filters.each() do |f|
+        selected = items.select() { |i| f.call(i) }
+        selected.sort!()
+        out.push(*selected)
+    end
+    return out
 end
 
 def filter_bodies(items, filter)
-	items.select() { |i| i.content =~ /#{filter}/i }
+    items.select() { |i| i.content =~ /#{filter}/i }
 end
 
 def filter_rotting(items, months)
-	now = Time.now()
-	items.select() do |i|
-		lchange = `git log '--pretty=format:%ct' -n 1 -- "#{i.filename}"`
-		lchange = Time.at(lchange.to_i)
-		now - lchange > months * 60 * 60 * 24 * 30
-	end
+    now = Time.now()
+    items.select() do |i|
+        lchange = `git log '--pretty=format:%ct' -n 1 -- "#{i.filename}"`
+        lchange = Time.at(lchange.to_i)
+        now - lchange > months * 60 * 60 * 24 * 30
+    end
 end
 
 def print_cron(items, selection)
-	outdated = filter_ids(items, ['dead'])
-	outdated.select!() { |i| !i.nocron }
-	if outdated.size() > 0
-		puts('OUTDATED TASKS:')
-		puts('===============')
-		puts()
-		list_items(outdated, true)
-	end
+    outdated = filter_ids(items, ['dead'])
+    outdated.select!() { |i| !i.nocron }
+    if outdated.size() > 0
+        puts('OUTDATED TASKS:')
+        puts('===============')
+        puts()
+        list_items(outdated, true)
+    end
 
-	if selection == :all
-		close = filter_ids(items, ['close'])
-		close.select!() { |i| !i.nocron }
-		if close.size() > 0
-			if outdated.size() > 0
-				puts()
-				puts()
-			end
+    if selection == :all
+        close = filter_ids(items, ['close'])
+        close.select!() { |i| !i.nocron }
+        if close.size() > 0
+            if outdated.size() > 0
+                puts()
+                puts()
+            end
 
-			puts('DEADLINE CLOSE:')
-			puts('===============')
-			puts()
-			list_items(close, true)
-		end
-	end
+            puts('DEADLINE CLOSE:')
+            puts('===============')
+            puts()
+            list_items(close, true)
+        end
+    end
 end
 
 def new_filename()
-	filename = 'i' + ('%04d' % rand(0..9999))
-	while File.exists?(filename)
-		filename = 'i' + ('%04d' % rand(0..9999))
-	end
-	return filename
+    filename = 'i' + ('%04d' % rand(0..9999))
+    while File.exists?(filename)
+        filename = 'i' + ('%04d' % rand(0..9999))
+    end
+    return filename
 end
 
 def new_items(how_many)
-	out = []
-	how_many.times() do
-		out << new_filename()
-		File.open(out.last, 'w') { |f| f.write("what: \n") }
-	end
-	out
+    out = []
+    how_many.times() do
+        out << new_filename()
+        File.open(out.last, 'w') { |f| f.write("what: \n") }
+    end
+    out
 end
 
 def new_items_from_files(orig_pwd, sources)
-	out = []
-	orig_pwd_path = Pathname.new(orig_pwd)
-	sources.each() do |s|
-		f = new_filename()
-		s_path = Pathname.new(s)
-		if s_path.absolute?()
-			FileUtils.cp(s, f)
-		else
-			FileUtils.cp(orig_pwd_path + s, f)
-		end
-		out << f
-	end
-	out
+    out = []
+    orig_pwd_path = Pathname.new(orig_pwd)
+    sources.each() do |s|
+        f = new_filename()
+        s_path = Pathname.new(s)
+        if s_path.absolute?()
+            FileUtils.cp(s, f)
+        else
+            FileUtils.cp(orig_pwd_path + s, f)
+        end
+        out << f
+    end
+    out
 end
 
 def edit(editor, edit_single, filenames)
-	if filenames.size() == 0
-		return
-	end
+    if filenames.size() == 0
+        return
+    end
 
-	if edit_single
-		system("#{editor} #{filenames.join(' ')}")
-	else
-		filenames.each() do |f|
-			system("#{editor} #{f}")
-		end
-	end
+    if edit_single
+        system("#{editor} #{filenames.join(' ')}")
+    else
+        filenames.each() do |f|
+            system("#{editor} #{f}")
+        end
+    end
 end
 
 def delete_items(items)
-	items.each() do |i|
-		File.delete(i.filename)
-	end
+    items.each() do |i|
+        File.delete(i.filename)
+    end
 end
 
 def commit()
-	system('git add -A .')
-	system('git commit -m "Auto-Commit by gitodo on $(hostname)"')
+    system('git add -A .')
+    system('git commit -m "Auto-Commit by gitodo on $(hostname)"')
 end
 
 
@@ -421,15 +421,15 @@ edit_single = ENV['GITODO_EDIT_SINGLE'] || false
 # work.
 orig_pwd = Dir.pwd()
 if !check_and_chdir_repo(datadir)
-	$stderr.puts("`#{datadir}' is not a Git repository.")
-	exit 1
+    $stderr.puts("`#{datadir}' is not a Git repository.")
+    exit 1
 end
 
 items = load_all_items()
 
 if ARGV.size() == 0
-	list_items(items)
-	exit
+    list_items(items)
+    exit
 end
 
 # Options may be given as "--foo", "-foo" or "foo".
@@ -438,43 +438,43 @@ ARGV.shift()
 
 case opt
 when 'new', 'n'
-	edit(editor, edit_single, new_items(ARGV[0] ? ARGV[0].to_i : 1))
-	clean_empty()
-	commit()
+    edit(editor, edit_single, new_items(ARGV[0] ? ARGV[0].to_i : 1))
+    clean_empty()
+    commit()
 when 'new-from-files', 'f'
-	edit(editor, edit_single, new_items_from_files(orig_pwd, ARGV))
-	clean_empty()
-	commit()
+    edit(editor, edit_single, new_items_from_files(orig_pwd, ARGV))
+    clean_empty()
+    commit()
 when 'list', 'l'
-	list_items(filter_ids(items, ARGV))
+    list_items(filter_ids(items, ARGV))
 when 'print', 'p'
-	print_items(filter_ids(items, ARGV))
+    print_items(filter_ids(items, ARGV))
 when 'body', 'b'
-	print_items(filter_bodies(items, ARGV[0]))
+    print_items(filter_bodies(items, ARGV[0]))
 when 'edit', 'e'
-	edit(editor, edit_single, filter_ids(items, ARGV).map() { |i| i.filename })
-	clean_empty()
-	commit()
+    edit(editor, edit_single, filter_ids(items, ARGV).map() { |i| i.filename })
+    clean_empty()
+    commit()
 when 'delete', 'd'
-	filter_ids(items, ARGV).each() do |i|
-		puts("Deleting #{i.id}: #{i.what}")
-		File.delete(i.filename)
-	end
-	clean_empty()
-	commit()
+    filter_ids(items, ARGV).each() do |i|
+        puts("Deleting #{i.id}: #{i.what}")
+        File.delete(i.filename)
+    end
+    clean_empty()
+    commit()
 when 'count'
-	total = items.size()
-	dead = items.count() { |i| i.classify == :dead }
-	close = items.count() { |i| i.classify == :close }
-	puts("#{dead} #{close} #{total}")
+    total = items.size()
+    dead = items.count() { |i| i.classify == :dead }
+    close = items.count() { |i| i.classify == :close }
+    puts("#{dead} #{close} #{total}")
 when 'cron', 'c'
-	print_cron(items, :all)
+    print_cron(items, :all)
 when 'cron-outdated', 'o'
-	print_cron(items, :no_close)
+    print_cron(items, :no_close)
 when 'raw'
-	items.each() { |i| i.show_raw() }
+    items.each() { |i| i.show_raw() }
 when 'rotting'
-	list_items(filter_rotting(items, ARGV[0] ? ARGV[0].to_i : 3))
+    list_items(filter_rotting(items, ARGV[0] ? ARGV[0].to_i : 3))
 else
-	puts('gitodo: Invalid option. See manpage.')
+    puts('gitodo: Invalid option. See manpage.')
 end

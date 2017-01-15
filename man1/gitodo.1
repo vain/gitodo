@@ -134,12 +134,12 @@ Items are simple text files. They look like this:
 .P
 \f(CW
 .nf
-	what: Subject of the task
-	when: 2010-12-10 08:30
-	prio: 2
-	warn: 4
+    what: Subject of the task
+    when: 2010-12-10 08:30
+    prio: 2
+    warn: 4
 
-	Some other lines describing the task in detail.
+    Some other lines describing the task in detail.
 .fi
 \fP
 .P
@@ -173,11 +173,11 @@ to be bothered by them \(em until it really is about time.
 .P
 \f(CW
 .nf
-	what: Wash the car
-	dead: 2012-06-15 12:00
-	prio: 100
+    what: Wash the car
+    dead: 2012-06-15 12:00
+    prio: 100
 
-	I really should do this. Some day.
+    I really should do this. Some day.
 .fi
 \fP
 .P
@@ -220,7 +220,7 @@ with ID 432 and all items matching \(lqgnu\(rq:
 .P
 \f(CW
 .nf
-	$ gitodo -e ':/(j|di)ane' 432 ':/gnu'
+    $ gitodo -e ':/(j|di)ane' 432 ':/gnu'
 .fi
 \fP
 .P
@@ -234,10 +234,10 @@ perform a searching using Ruby regular expressions:
 .P
 \f(CW
 .nf
-	$ gitodo --list :/time
-	 S   Pri      Deadline         ID    Subject
-	---+-----+------------------+------+-----------------
-	   |   0 | 2012-07-13 11:01 | 1156 | time_t party
+    $ gitodo --list :/time
+     S   Pri      Deadline         ID    Subject
+    ---+-----+------------------+------+-----------------
+       |   0 | 2012-07-13 11:01 | 1156 | time_t party
 .fi
 \fP
 .P
@@ -245,12 +245,12 @@ Or, you can supply one or more ids and even mix both variants:
 .P
 \f(CW
 .nf
-	$ gitodo --list 7458 2436 :/time
-	 S   Pri      Deadline         ID    Subject
-	---+-----+------------------+------+-----------------
-	   |   0 | 2012-07-01       | 7458 | lico-update
-	   |   0 | 2012-07-13 11:01 | 1156 | time_t party
-	   |   1 |                  | 2436 | aoi patches
+    $ gitodo --list 7458 2436 :/time
+     S   Pri      Deadline         ID    Subject
+    ---+-----+------------------+------+-----------------
+       |   0 | 2012-07-01       | 7458 | lico-update
+       |   0 | 2012-07-13 11:01 | 1156 | time_t party
+       |   1 |                  | 2436 | aoi patches
 .fi
 \fP
 .P
@@ -261,19 +261,19 @@ The \fB:/\fP is only needed to distinguish IDs from search terms. As
 .P
 \f(CW
 .nf
-	$ gitodo --body party
-	 1156
-	------
-	what: time_t party
-	when: 2012-07-13 11:01
-	prio: 50
+    $ gitodo --body party
+     1156
+    ------
+    what: time_t party
+    when: 2012-07-13 11:01
+    prio: 50
 
-	At 11:01:20 UTC on July 13, 2012, the Unix time number will
-	reach 0x50000000 (1,342,177,280 seconds). With the exception of
-	locations in time zones UTC−12:00, UTC+13:00, and UTC+14:00,
-	this also happens on a Friday the 13th.
+    At 11:01:20 UTC on July 13, 2012, the Unix time number will
+    reach 0x50000000 (1,342,177,280 seconds). With the exception of
+    locations in time zones UTC−12:00, UTC+13:00, and UTC+14:00,
+    this also happens on a Friday the 13th.
 
-	http://en.wikipedia.org/wiki/Unix_time
+    http://en.wikipedia.org/wiki/Unix_time
 .fi
 \fP
 .P
@@ -289,7 +289,7 @@ On Unix-like systems, it can be easily combined with gitodo:
 .P
 \f(CW
 .nf
-	$ gitodo --raw | cut -d' ' -f2 | highcal
+    $ gitodo --raw | cut -d' ' -f2 | highcal
 .fi
 \fP
 .P
