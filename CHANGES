@@ -1,5 +1,11 @@
 Release history for gitodo
 
+next
+  [LICENSING]
+  - The project has been relicensed under the MIT license (more
+    precisely called "Expat License", but everyone calls it "MIT
+    license" these days).
+
 v17.04  2017-04-17
   [Fixed]
   - We now use Time.parse() to parse the "when" field and any input to
