@@ -36,6 +36,7 @@ class Item
     attr_accessor(:filename)
     attr_accessor(:prio)
     attr_accessor(:when)
+    attr_accessor(:has_when)
     attr_accessor(:warn)
     attr_accessor(:what)
     attr_accessor(:nocron)
@@ -47,6 +48,7 @@ class Item
         @filename = ''
         @prio = 0
         @when = Time.local(2037)
+        @has_when = false
         @warn = 1
         @what = ''
         @nocron = false
@@ -195,6 +197,7 @@ def load_all_items()
             elsif line =~ /^(when|dead): (.*)/
                 begin
                     item.when = Time.parse($2)
+                    item.has_when = true
                 rescue ArgumentError
                     $stderr.puts("#{filename}'s deadline is not a valid date.")
                     item.when = Time.now()
@@ -466,7 +469,8 @@ when 'count'
     total = items.size()
     dead = items.count() { |i| i.classify == :dead }
     close = items.count() { |i| i.classify == :close }
-    puts("#{dead} #{close} #{total}")
+    no_when = items.count() { |i| not i.has_when }
+    puts("#{dead} #{close} #{no_when} #{total}")
 when 'cron', 'c'
     print_cron(items, :all)
 when 'cron-outdated', 'o'
