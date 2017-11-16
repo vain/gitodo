@@ -1,6 +1,6 @@
 Release history for gitodo
 
-next
+v17.11  2017-11-16
   [Changed]
   - "--count" now also prints the number of tasks that don't have a
     deadline set.
