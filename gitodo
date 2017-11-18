@@ -43,7 +43,7 @@ class Item
     attr_accessor(:content)
     attr_accessor(:timetype)
 
-    def initialize()
+    def initialize(filename)
         @id = 0
         @filename = ''
         @prio = 0
@@ -54,6 +54,52 @@ class Item
         @nocron = false
         @content = ''
         @timetype = :none
+
+        lines = []
+        File.open(filename, 'r') { |f| lines = f.readlines() }
+
+        filename =~ /.*i0*([[:digit:]]+)$/
+        @id = $1
+        @filename = filename
+
+        @content = lines.join('')
+
+        lines.each() do |line|
+            if line =~ /^(prio): (.*)/
+                @prio = $2.to_i()
+            elsif line =~ /^(when|dead): (.*)/
+                begin
+                    @when = Time.parse($2)
+                    @has_when = true
+                rescue ArgumentError
+                    $stderr.puts("#{filename}'s deadline is not a valid date.")
+                    @when = Time.now()
+                end
+
+                spaces = $2.count(' ')
+                colons = $2.count(':')
+                case spaces
+                when 0
+                    if colons > 0
+                        @timetype = :time
+                    else
+                        @timetype = :date
+                    end
+                else
+                    @timetype = :datetime
+                end
+            elsif line =~ /^(warn): (.*)/
+                @warn = $2.to_i()
+            elsif line =~ /^(what|subject): (.*)/
+                @what = $2
+            elsif line.strip() == 'nocron'
+                @nocron = true
+            end
+        end
+
+        if @what.strip() == ''
+            @what = '<NO SUBJECT>'
+        end
     end
 
     # Check if this item is okay, close to the deadline or dead.
@@ -180,55 +226,7 @@ def load_all_items()
     items = []
 
     Dir.glob('i*').each() do |filename|
-        lines = []
-        File.open(filename, 'r') { |f| lines = f.readlines() }
-
-        item = Item.new()
-
-        filename =~ /.*i0*([[:digit:]]+)$/
-        item.id = $1
-        item.filename = filename
-
-        item.content = lines.join('')
-
-        lines.each() do |line|
-            if line =~ /^(prio): (.*)/
-                item.prio = $2.to_i()
-            elsif line =~ /^(when|dead): (.*)/
-                begin
-                    item.when = Time.parse($2)
-                    item.has_when = true
-                rescue ArgumentError
-                    $stderr.puts("#{filename}'s deadline is not a valid date.")
-                    item.when = Time.now()
-                end
-
-                spaces = $2.count(' ')
-                colons = $2.count(':')
-                case spaces
-                when 0
-                    if colons > 0
-                        item.timetype = :time
-                    else
-                        item.timetype = :date
-                    end
-                else
-                    item.timetype = :datetime
-                end
-            elsif line =~ /^(warn): (.*)/
-                item.warn = $2.to_i()
-            elsif line =~ /^(what|subject): (.*)/
-                item.what = $2
-            elsif line.strip() == 'nocron'
-                item.nocron = true
-            end
-        end
-
-        if item.what.strip() == ''
-            item.what = '<NO SUBJECT>'
-        end
-
-        items << item
+        items << Item.new(filename)
     end
 
     return items
