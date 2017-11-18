@@ -40,17 +40,87 @@ class Item
     attr_accessor(:content)
     attr_accessor(:timetype)
 
-    def initialize()
+    def initialize(filename)
         @id = 0
         @filename = ''
         @prio = 0
+        @has_prio = false
         @when = Time.local(2037)
         @has_when = false
         @warn = 1
+        @has_warn = false
         @what = ''
         @nocron = false
         @content = ''
+        @body = ''
         @timetype = :none
+
+        lines = []
+        File.open(filename, 'r') { |f| lines = f.readlines() }
+
+        filename =~ /.*i0*([[:digit:]]+)$/
+        @id = $1
+        @filename = filename
+
+        body_lines = []
+
+        lines.each() do |line|
+            if line =~ /^(prio): (.*)/
+                @prio = $2.to_i()
+                @has_prio = true
+            elsif line =~ /^(when|dead): \+([0-9]+)([hdwm])/
+                case $3
+                when 'h'
+                    scale = 60 * 60
+                when 'd'
+                    scale = 60 * 60 * 24
+                when 'w'
+                    scale = 60 * 60 * 24 * 7
+                when 'm'
+                    scale = 60 * 60 * 24 * 30
+                end
+                @when = Time.now() + $2.to_i() * scale
+                @has_when = true
+                @timetype = :datetime
+            elsif line =~ /^(when|dead): (.*)/
+                begin
+                    @when = Time.parse($2)
+                    @has_when = true
+                rescue ArgumentError
+                    $stderr.puts("#{filename}'s deadline is not a valid date.")
+                    @when = Time.now()
+                end
+
+                spaces = $2.count(' ')
+                colons = $2.count(':')
+                case spaces
+                when 0
+                    if colons > 0
+                        @timetype = :time
+                    else
+                        @timetype = :date
+                    end
+                else
+                    @timetype = :datetime
+                end
+            elsif line =~ /^(warn): (.*)/
+                @warn = $2.to_i()
+                @has_warn = true
+            elsif line =~ /^(what|subject): (.*)/
+                @what = $2
+            elsif line.strip() == 'nocron'
+                @nocron = true
+            else
+                body_lines << line
+            end
+        end
+
+        if @what.strip() == ''
+            @what = '<NO SUBJECT>'
+        end
+
+        @content = lines.join('')
+        @body = body_lines.join('')
     end
 
     # Check if this item is okay, close to the deadline or dead.
@@ -93,6 +163,47 @@ class Item
     # Hide unimportant items?
     def hide?()
         classify() == :normal && @prio > 99 && !ENV['GITODO_SHOW_UNIMPORTANT']
+    end
+
+    def save()
+        if @content.strip() == ''
+            # The item is empty at the moment. We must not rewrite it
+            # because that would introduce a "what:" line. clean_empty()
+            # will pick it up later.
+            return
+        end
+
+        File.open(@filename, 'w') do |f|
+            f.write("what: #{@what}\n")
+
+            if @has_when
+                case @timetype
+                when :time
+                    f.write("when: #{@when.strftime('%H:%M')}\n")
+                when :date
+                    f.write("when: #{@when.strftime('%F')}\n")
+                when :datetime
+                    f.write("when: #{@when.strftime('%F %H:%M')}\n")
+                end
+            end
+
+            if @has_prio
+                f.write("prio: #{@prio}\n")
+            end
+
+            if @has_warn
+                f.write("warn: #{@warn}\n")
+            end
+
+            if @nocron
+                f.write("nocron\n")
+            end
+
+            if @body.size() > 0
+                # Includes delimiting empty line.
+                f.write(@body)
+            end
+        end
     end
 
     # Show a line suitable for output in the traditional listing.
@@ -177,55 +288,7 @@ def load_all_items()
     items = []
 
     Dir.glob('i*').each() do |filename|
-        lines = []
-        File.open(filename, 'r') { |f| lines = f.readlines() }
-
-        item = Item.new()
-
-        filename =~ /.*i0*([[:digit:]]+)$/
-        item.id = $1
-        item.filename = filename
-
-        item.content = lines.join('')
-
-        lines.each() do |line|
-            if line =~ /^(prio): (.*)/
-                item.prio = $2.to_i()
-            elsif line =~ /^(when|dead): (.*)/
-                begin
-                    item.when = Time.parse($2)
-                    item.has_when = true
-                rescue ArgumentError
-                    $stderr.puts("#{filename}'s deadline is not a valid date.")
-                    item.when = Time.now()
-                end
-
-                spaces = $2.count(' ')
-                colons = $2.count(':')
-                case spaces
-                when 0
-                    if colons > 0
-                        item.timetype = :time
-                    else
-                        item.timetype = :date
-                    end
-                else
-                    item.timetype = :datetime
-                end
-            elsif line =~ /^(warn): (.*)/
-                item.warn = $2.to_i()
-            elsif line =~ /^(what|subject): (.*)/
-                item.what = $2
-            elsif line.strip() == 'nocron'
-                item.nocron = true
-            end
-        end
-
-        if item.what.strip() == ''
-            item.what = '<NO SUBJECT>'
-        end
-
-        items << item
+        items << Item.new(filename)
     end
 
     return items
@@ -394,6 +457,13 @@ def edit(editor, edit_single, filenames)
         filenames.each() do |f|
             system("#{editor} #{f}")
         end
+    end
+
+    # Load and save all affected items. This resolves relative deadlines
+    # such as "+1h".
+    filenames.each() do |f|
+        item = Item.new(f)
+        item.save()
     end
 end
 
