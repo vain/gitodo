@@ -149,7 +149,24 @@ mandatory. The default priority is 0 and no deadline means 2037-01-01
 \fBnice\fP(1) values). The priority is meant to range from -99 to 99.
 .P
 \fBwhen\fP can be anything that is understood by Ruby's
-\fBTime.parse()\fP function.
+\fBTime.parse()\fP function. It can also denote a relative point in
+time, for example \fB+1h\fP. The following suffixes are understood:
+.P
+.TP
+\fBh\fP
+Hours.
+.TP
+\fBd\fP
+Days. This is equal to adding 24 hours.
+.TP
+\fBw\fP
+Weeks. This is equal to adding 7 days.
+.TP
+\fBm\fP
+Months. This is equal to adding 30 days.
+.P
+There must not be any whitespace, so \fB+3m\fP is valid but \fB+ 1h\fP
+is not.
 .P
 \fBwarn: 4\fP means that this task gets marked as \(lqclose to
 deadline\(rq four hours before the deadline will be reached. If this

@@ -1,5 +1,15 @@
 Release history for gitodo
 
+next
+  [Changed]
+  - Header fields will now be normalized. "dead" will automatically be
+    rewritten as "when" and "subject" will be changed to "what". Please
+    note that these aliases are now considered deprecated and might be
+    removed in the following version.
+
+  [Added]
+  - The "when" field can now include relative value, e.g. "+1h".
+
 v17.11  2017-11-16
   [Changed]
   - "--count" now also prints the number of tasks that don't have a
