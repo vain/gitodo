@@ -1,6 +1,6 @@
 Release history for gitodo
 
-next
+v17.12  2017-12-23
   [Changed]
   - Header fields will now be normalized. "dead" will automatically be
     rewritten as "when" and "subject" will be changed to "what". Please
