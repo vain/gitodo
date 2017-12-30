@@ -1,5 +1,9 @@
 Release history for gitodo
 
+next
+  [Changed]
+  - Standard output is now sorted by subject line as well.
+
 v17.12  2017-12-23
   [Changed]
   - Header fields will now be normalized. "dead" will automatically be

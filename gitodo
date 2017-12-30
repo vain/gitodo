@@ -278,9 +278,10 @@ class Item
         puts()
     end
 
-    # Make Item sortable. Sort by priority, then by deadline.
+    # Make Item sortable. Sort by priority, then by deadline, finally by
+    # subject line.
     def <=>(other)
-        [@prio, @when] <=> [other.prio, other.when]
+        [@prio, @when, @what] <=> [other.prio, other.when, other.what]
     end
 end
 
