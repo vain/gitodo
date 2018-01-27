@@ -1,6 +1,6 @@
 Release history for gitodo
 
-next
+v18.01  2018-01-27
   [Changed]
   - Standard output is now sorted by subject line as well.
 
